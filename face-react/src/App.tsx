@@ -4,6 +4,7 @@ import WebCam from "./components/StudentWeb";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import StudentWeb from "./components/StudentWeb";
 import StudentExam from "./components/StudentExam";
+import TeacherHome from "./components/TeacherHome";
 
 const App = () => {
   return (
