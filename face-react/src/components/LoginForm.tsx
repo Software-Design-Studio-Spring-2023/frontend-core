@@ -11,6 +11,7 @@ export var currentUser: User | undefined = {
   userType: "",
   email: "",
   password: "",
+  warnings: 0,
 };
 
 export const users: User[] = [
@@ -21,6 +22,7 @@ export const users: User[] = [
     userType: "student",
     email: "marko@student.uts.edu.au",
     password: "password",
+    warnings: 0,
   },
   {
     id: 1,
@@ -29,6 +31,7 @@ export const users: User[] = [
     userType: "staff",
     email: "sydney@staff.uts.edu.au",
     password: "hello",
+    warnings: 0,
   },
   {
     id: 2,
@@ -37,6 +40,7 @@ export const users: User[] = [
     userType: "student",
     email: "michael@student.uts.edu.au",
     password: "goodbye",
+    warnings: 0,
   },
 ];
 

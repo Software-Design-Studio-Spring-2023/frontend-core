@@ -6,5 +6,5 @@ export interface User {
     password:string,
     userType: string,
     loggedIn: boolean,
-    firstName: string
+    firstName: string, warnings: number
 }
