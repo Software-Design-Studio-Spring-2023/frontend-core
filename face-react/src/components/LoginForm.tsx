@@ -2,13 +2,9 @@ import React, { useState } from "react";
 import { User } from "../hooks/useUsers";
 import { useNavigate } from "react-router-dom";
 
-// interface Props {
-//   students: Student[];
-// }
+//set logged in variable, which will be true throughout duration of exam. only way to revert false is by finishing exam
 
-// interface Props {
-//   onLogin: (email: string, password: string) => void;
-// }
+export const currentUser: User = { email: "", password: "" };
 
 const users: User[] = [
   { email: "marko@student.uts.edu.au", password: "password" },
@@ -32,6 +28,8 @@ const LoginForm = () => {
     ) {
       alert("Welcome Student");
       setLoggedIn(true);
+      currentUser.email = email;
+      currentUser.password = password;
       console.log(loggedIn);
       navigate("/student");
     } else if (
