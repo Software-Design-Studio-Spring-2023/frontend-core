@@ -12,7 +12,7 @@ const App = () => {
         <Route path="/" Component={LoginForm} />
         <Route path="/student" Component={StudentWeb} />
         <Route path="/studentexam" Component={StudentExam} />
-        <Route path="/teacher" Component={LoginForm} />
+        <Route path="/teacher" Component={TeacherHome} />
       </Routes>
     </Router>
   );
