@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import Webcam from "react-webcam";
 
@@ -11,6 +11,9 @@ let name = "";
 
 const StudentWeb = () => {
   const navigate = useNavigate();
+  // useEffect(() => {
+  //   navigate("/");
+  // }, []);
 
   if (currentUser !== undefined) {
     name = currentUser.firstName;

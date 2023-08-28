@@ -3,21 +3,26 @@ import Webcam from "react-webcam";
 
 import { users } from "./LoginForm";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const TeacherHome = () => {
   const navigate = useNavigate();
+  //   useEffect(() => {
+  //     navigate("/");
+  //   }, []);
   return (
     <>
       <Grid templateColumns="repeat(5, 1fr)">
         {users.map(
-          (item) =>
-            item.userType === "student" && (
+          (user) =>
+            user.userType === "student" && (
               <GridItem
                 cursor={"pointer"}
+                key={user.id}
                 onClick={() => navigate("/teacherview")}
               >
                 <Webcam />
-                {item.firstName}
+                {user.firstName}
               </GridItem>
             )
         )}
