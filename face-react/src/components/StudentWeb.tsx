@@ -7,16 +7,21 @@ import { useNavigate } from "react-router-dom";
 import { currentUser } from "./LoginForm";
 
 const detected: boolean = true;
+let name = "";
 
 const StudentWeb = () => {
   const navigate = useNavigate();
+
+  if (currentUser !== undefined) {
+    name = currentUser.firstName;
+  }
 
   return (
     <>
       <div>
         <label>
           <Webcam />
-          {currentUser.email}
+          {name}
         </label>
       </div>
       <div>
