@@ -4,12 +4,44 @@ import { useNavigate } from "react-router-dom";
 
 //set logged in variable, which will be true throughout duration of exam. only way to revert false is by finishing exam
 
-export const currentUser: User = { email: "", password: "" };
+export var currentUser: User | undefined = {
+  id: 0,
+  firstName: "",
+  loggedIn: false,
+  userType: "",
+  email: "",
+  password: "",
+  warnings: 0,
+};
 
-const users: User[] = [
-  { email: "marko@student.uts.edu.au", password: "password" },
-  { email: "sydney@staff.uts.edu.au", password: "hello" },
-  { email: "michael@student.uts.edu.au", password: "goodbye" },
+export const users: User[] = [
+  {
+    id: 0,
+    firstName: "Marko",
+    loggedIn: false,
+    userType: "student",
+    email: "marko@student.uts.edu.au",
+    password: "password",
+    warnings: 0,
+  },
+  {
+    id: 1,
+    firstName: "Sydney",
+    loggedIn: false,
+    userType: "staff",
+    email: "sydney@staff.uts.edu.au",
+    password: "hello",
+    warnings: 0,
+  },
+  {
+    id: 2,
+    firstName: "Michael",
+    loggedIn: false,
+    userType: "student",
+    email: "michael@student.uts.edu.au",
+    password: "goodbye",
+    warnings: 0,
+  },
 ];
 
 const LoginForm = () => {
@@ -21,26 +53,29 @@ const LoginForm = () => {
       users.some(
         (user) =>
           user.email === email &&
-          //   loggedIn === false &&
           user.password === password &&
-          email.includes("@student.uts.edu.au")
+          user.userType === "student"
       )
     ) {
-      alert("Welcome Student");
-      setLoggedIn(true);
-      currentUser.email = email;
-      currentUser.password = password;
-      console.log(loggedIn);
+      currentUser = users.find((user) => user.email && user.password);
+      if (currentUser !== undefined) {
+        alert(`Welcome Student ${currentUser.firstName}`);
+        currentUser.loggedIn = true;
+      }
       navigate("/student");
     } else if (
       users.some(
         (user) =>
           user.email === email &&
           user.password === password &&
-          email.includes("@staff.uts.edu.au")
+          user.userType === "teacher"
       )
     ) {
-      alert("Welcome Staff Member");
+      currentUser = users.find((user) => user.email && user.password);
+      if (currentUser !== undefined) {
+        alert(`Welcome Teacher ${currentUser.firstName}`);
+        currentUser.loggedIn = true;
+      }
       navigate("/teacher");
     } else {
       alert("Invalid username or password");
