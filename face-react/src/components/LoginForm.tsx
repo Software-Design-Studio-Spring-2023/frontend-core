@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { User } from "../hooks/useUsers";
 import { useNavigate } from "react-router-dom";
 
@@ -46,9 +46,16 @@ export const users: User[] = [
 
 const LoginForm = () => {
   const navigate = useNavigate();
+  useEffect(() => {
+    navigate("/");
+  }, []);
   const [loggedIn, setLoggedIn] = useState(false);
 
-  const handleLogin = (email: string, password: string) => {
+  const handleLogin = (
+    email: string,
+    password: string,
+    event: React.FormEvent
+  ) => {
     if (
       users.some(
         (user) =>
@@ -80,6 +87,7 @@ const LoginForm = () => {
     } else {
       alert("Invalid username or password");
     }
+    event.preventDefault();
   };
 
   const [email, setEmail] = useState("");
@@ -107,7 +115,12 @@ const LoginForm = () => {
           />
         </label>
       </div>
-      <button onClick={() => handleLogin(email, password)} type="submit">
+      <button
+        onClick={(event) => {
+          handleLogin(email, password, event);
+        }}
+        type="submit"
+      >
         Login
       </button>
     </form>
