@@ -56,6 +56,7 @@ const LoginForm = () => {
       currentUser = users.find((user) => user.email && user.password);
       if (currentUser !== undefined) {
         alert(`Welcome Student ${currentUser.firstName}`);
+        currentUser.loggedIn = true;
       }
       navigate("/student");
     } else if (
@@ -69,6 +70,7 @@ const LoginForm = () => {
       currentUser = users.find((user) => user.email && user.password);
       if (currentUser !== undefined) {
         alert(`Welcome Teacher ${currentUser.firstName}`);
+        currentUser.loggedIn = true;
       }
       navigate("/teacher");
     } else {
