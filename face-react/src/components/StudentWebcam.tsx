@@ -10,6 +10,7 @@ let name = "";
 let warnings: number;
 
 const StudentWebcam = () => {
+  //prevent refresh
   //   const navigate = useNavigate();
   // useEffect(() => {
   //   navigate("/");
@@ -21,11 +22,16 @@ const StudentWebcam = () => {
   }
   const webcamRef = useRef<(Webcam & HTMLVideoElement) | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [frameCaptureInterval, setFrameCaptureInterval] = useState<
+    number | null
+  >(null);
   const [recording, setRecording] = useState<boolean>(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
   );
   const capturedChunksRef = useRef<BlobPart[]>([]);
+
+  const frames: string[] = [];
 
   const captureFrame = () => {
     const video = webcamRef.current?.video;
@@ -39,14 +45,23 @@ const StudentWebcam = () => {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         // You can now save the image data from the canvas or do further processing.
-        // For example, to get the image as a data URL:
         const imageDataUrl = canvas.toDataURL("image/png");
-        const downloadLink = document.createElement("a");
-        downloadLink.href = imageDataUrl;
-        downloadLink.download = "captured_frame.png"; // You can change the name here
-        downloadLink.click();
+        frames.push(imageDataUrl);
+        console.log(frames);
+        // code for downloading the frame, for now its being pushed to an array
+        // const downloadLink = document.createElement("a");
+        // downloadLink.href = imageDataUrl;
+        // downloadLink.download = "captured_frame.png"; // You can change the name here
+        // downloadLink.click();
       }
     }
+  };
+
+  const handleWebcamLoad = () => {
+    // This will be triggered once the webcam is loaded and ready.
+    //useful for immediate user identification
+    const intervalId = window.setInterval(captureFrame, 1000 / 30); // for 30 fps
+    setFrameCaptureInterval(intervalId);
   };
 
   const handleStartCapture = () => {
@@ -89,14 +104,15 @@ const StudentWebcam = () => {
 
     if (capturedChunksRef.current.length) {
       downloadVideo();
-    } else {
-      // Optional: add a slight delay before checking again
-      setTimeout(() => {
-        if (capturedChunksRef.current.length) {
-          downloadVideo();
-        }
-      }, 1000);
     }
+    // else {
+    //   // Optional: add a slight delay before checking again
+    //   setTimeout(() => {
+    //     if (capturedChunksRef.current.length) {
+    //       downloadVideo();
+    //     }
+    //   }, 1000);
+    // }
   };
 
   const handleStopCapture = () => {
@@ -104,17 +120,23 @@ const StudentWebcam = () => {
       mediaRecorder.stop();
       setRecording(false);
       captureFrame();
+      //this is to permanently shut the camera off once exam is confirmed done
       //   const stream = webcamRef.current?.stream;
       //   const tracks = stream.getTracks();
       //   tracks.forEach((track) => track.stop());
+
+      if (frameCaptureInterval) {
+        window.clearInterval(frameCaptureInterval);
+        setFrameCaptureInterval(null);
+      }
     }
-    alert("Are you sure?");
+    alert("Are you sure?"); //transfer this to another function so once exam is confirmed ended recording will stop
   };
 
   return (
     <div>
       <div>
-        <Webcam audio={false} ref={webcamRef} />
+        <Webcam audio={false} ref={webcamRef} onUserMedia={handleWebcamLoad} />
         <canvas
           ref={canvasRef}
           width={640}
