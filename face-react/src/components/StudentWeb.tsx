@@ -10,15 +10,6 @@ const detected: boolean = true;
 let name = "";
 
 const StudentWeb = () => {
-  const navigate = useNavigate();
-  // useEffect(() => {
-  //   navigate("/");
-  // }, []);
-
-  if (currentUser !== undefined) {
-    name = currentUser.firstName;
-  }
-
   return (
     <>
       <div>

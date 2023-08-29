@@ -5,6 +5,7 @@ import Webcam from "react-webcam";
 import { useNavigate } from "react-router-dom";
 
 import { currentUser } from "./LoginForm";
+import StudentWebcam from "./StudentWebcam";
 
 let name = "";
 
@@ -26,7 +27,7 @@ const StudentExam = () => {
     <div>
       <div>
         <label>
-          <Webcam />
+          <StudentWebcam />
           {name}
         </label>
       </div>
