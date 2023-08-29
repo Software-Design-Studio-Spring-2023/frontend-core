@@ -61,10 +61,13 @@ const LoginForm = () => {
         (user) =>
           user.email === email &&
           user.password === password &&
-          user.userType === "student"
+          // user.userType === "student"
+          email.includes("@student.uts.edu.au")
       )
     ) {
-      currentUser = users.find((user) => user.email && user.password);
+      currentUser = users.find(
+        (user) => user.email === email && user.password === password
+      );
       if (currentUser !== undefined) {
         alert(`Welcome Student ${currentUser.firstName}`);
         currentUser.loggedIn = true;
@@ -75,10 +78,13 @@ const LoginForm = () => {
         (user) =>
           user.email === email &&
           user.password === password &&
-          user.userType === "teacher"
+          // user.userType === "teacher"
+          email.includes("@staff.uts.edu.au")
       )
     ) {
-      currentUser = users.find((user) => user.email && user.password);
+      currentUser = users.find(
+        (user) => user.email === email && user.password === password
+      );
       if (currentUser !== undefined) {
         alert(`Welcome Teacher ${currentUser.firstName}`);
         currentUser.loggedIn = true;
