@@ -46,16 +46,12 @@ export const users: User[] = [
 
 const LoginForm = () => {
   const navigate = useNavigate();
-  useEffect(() => {
-    navigate("/");
-  }, []);
+  // useEffect(() => {
+  //   navigate("/");
+  // }, []);
   const [loggedIn, setLoggedIn] = useState(false);
 
-  const handleLogin = (
-    email: string,
-    password: string,
-    event: React.FormEvent
-  ) => {
+  const handleLogin = (email: string, password: string) => {
     if (
       users.some(
         (user) =>
@@ -91,10 +87,15 @@ const LoginForm = () => {
         currentUser.loggedIn = true;
       }
       navigate("/teacher");
+    } else if (
+      currentUser?.loggedIn === true &&
+      currentUser?.userType === "student"
+    ) {
+      //start of handler for students already logged in. will retrieve value from database
+      alert("Student is already logged in!!");
     } else {
       alert("Invalid username or password");
     }
-    event.preventDefault();
   };
 
   const [email, setEmail] = useState("");
@@ -123,8 +124,8 @@ const LoginForm = () => {
         </label>
       </div>
       <button
-        onClick={(event) => {
-          handleLogin(email, password, event);
+        onClick={() => {
+          handleLogin(email, password);
         }}
         type="submit"
       >

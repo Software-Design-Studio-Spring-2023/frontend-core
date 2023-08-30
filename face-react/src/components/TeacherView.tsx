@@ -22,6 +22,10 @@ const TeacherView = () => {
     useEffect(() => {
       navigate("/");
     }, []);
+  } else if (currentUser?.userType === "student") {
+    useEffect(() => {
+      navigate("/*");
+    }, []);
   }
 
   const [warning, setWarning] = useState(warnings);
@@ -35,8 +39,11 @@ const TeacherView = () => {
   return (
     <>
       <div>
+        <button onClick={() => navigate("/")}>Log Out</button>
+
         <label>
           <Webcam />
+          {/* {currentUser?.firstName} replace this with name of the viewed user */}
         </label>
       </div>
       <div>

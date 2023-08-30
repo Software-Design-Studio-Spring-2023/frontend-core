@@ -11,9 +11,14 @@ const TeacherHome = () => {
     useEffect(() => {
       navigate("/");
     }, []);
+  } else if (currentUser?.userType === "student") {
+    useEffect(() => {
+      navigate("/*");
+    }, []);
   }
   return (
     <>
+      <button onClick={() => navigate("/")}>Log Out</button>
       <Grid templateColumns="repeat(5, 1fr)">
         {users.map(
           (user) =>

@@ -7,6 +7,7 @@ import StudentExam from "./components/StudentExam";
 import TeacherHome from "./components/TeacherHome";
 import TeacherView from "./components/TeacherView";
 import StudentWebcam from "./components/StudentWebcam";
+import PageNotFound from "./components/PageNotFound";
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
         <Route path="/student" Component={StudentWebcam} />
         <Route path="/teacher" Component={TeacherHome} />
         <Route path="/teacherview" Component={TeacherView} />
+        <Route path="/*" Component={PageNotFound} />
       </Routes>
     </Router>
   );
