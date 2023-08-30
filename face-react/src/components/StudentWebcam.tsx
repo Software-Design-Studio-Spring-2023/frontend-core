@@ -4,6 +4,8 @@ import Webcam from "react-webcam";
 import { currentUser } from "./LoginForm";
 
 import { useNavigate } from "react-router-dom";
+import EndExam from "./alerts/EndExam";
+import { useDisclosure } from "@chakra-ui/react";
 
 let name = "";
 
@@ -126,16 +128,19 @@ const StudentWebcam = () => {
       setRecording(false);
       captureFrame();
       //this is to permanently shut the camera off once exam is confirmed done
-      //   const stream = webcamRef.current?.stream;
-      //   const tracks = stream.getTracks();
-      //   tracks.forEach((track) => track.stop());
+      const stream = webcamRef.current?.stream;
+      const tracks = stream.getTracks();
+      tracks.forEach((track) => track.stop());
 
       if (frameCaptureInterval) {
         window.clearInterval(frameCaptureInterval);
         setFrameCaptureInterval(null);
       }
     }
-    alert("Are you sure?"); //transfer this to another function so once exam is confirmed ended recording will stop
+    // if (currentUser?.loggedIn === true) {
+    // currentUser.loggedIn = false;
+    navigate("/");
+    // }
   };
 
   return (
@@ -160,12 +165,13 @@ const StudentWebcam = () => {
         <p>Warnings: {warnings}</p>
       </div>
       <div>
-        <button
-          disabled={false}
-          onClick={recording ? handleStopCapture : handleStartCapture}
-        >
-          {recording ? "Finish Exam" : "Start Exam"}
+        <button hidden={recording ? true : false} onClick={handleStartCapture}>
+          {"Start Exam"}
         </button>
+        <div hidden={recording ? false : true}>
+          {/* {"Finish Exam"} */}
+          <EndExam handleTerminate={handleStopCapture} />
+        </div>
       </div>
     </div>
   );

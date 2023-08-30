@@ -18,6 +18,7 @@ const TeacherHome = () => {
   }
   return (
     <>
+      <button onClick={() => navigate("/")}>Log Out</button>
       <Grid templateColumns="repeat(5, 1fr)">
         {users.map(
           (user) =>

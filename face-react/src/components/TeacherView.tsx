@@ -39,8 +39,11 @@ const TeacherView = () => {
   return (
     <>
       <div>
+        <button onClick={() => navigate("/")}>Log Out</button>
+
         <label>
           <Webcam />
+          {/* {currentUser?.firstName} replace this with name of the viewed user */}
         </label>
       </div>
       <div>
