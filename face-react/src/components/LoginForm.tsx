@@ -88,10 +88,10 @@ const LoginForm = () => {
       }
       navigate("/teacher");
     } else if (
-      currentUser &&
-      currentUser.userType === "student" &&
-      currentUser.loggedIn === true
+      currentUser?.loggedIn === true &&
+      currentUser?.userType === "student"
     ) {
+      //start of handler for students already logged in. will retrieve value from database
       alert("Student is already logged in!!");
     } else {
       alert("Invalid username or password");
