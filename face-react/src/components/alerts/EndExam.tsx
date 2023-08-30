@@ -8,7 +8,7 @@ import {
   useDisclosure,
   Button,
 } from "@chakra-ui/react";
-import React, { useRef } from "react";
+import { useRef } from "react";
 
 interface Props {
   handleTerminate: () => void;
@@ -18,7 +18,6 @@ const EndExam = ({ handleTerminate }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef(null);
 
-  // Create a new function to handle the "Yes" button click
   const handleConfirmTerminate = () => {
     handleTerminate();
     onClose();
@@ -48,7 +47,6 @@ const EndExam = ({ handleTerminate }: Props) => {
               <Button ref={cancelRef} onClick={onClose}>
                 No
               </Button>
-              {/* Modify the onClick handler of the "Yes" button */}
               <Button colorScheme="red" onClick={handleConfirmTerminate} ml={3}>
                 Yes
               </Button>
