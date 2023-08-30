@@ -22,6 +22,10 @@ const TeacherView = () => {
     useEffect(() => {
       navigate("/");
     }, []);
+  } else if (currentUser?.userType === "student") {
+    useEffect(() => {
+      navigate("/*");
+    }, []);
   }
 
   const [warning, setWarning] = useState(warnings);

@@ -11,6 +11,10 @@ const TeacherHome = () => {
     useEffect(() => {
       navigate("/");
     }, []);
+  } else if (currentUser?.userType === "student") {
+    useEffect(() => {
+      navigate("/*");
+    }, []);
   }
   return (
     <>

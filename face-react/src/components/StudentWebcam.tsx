@@ -15,6 +15,10 @@ const StudentWebcam = () => {
     useEffect(() => {
       navigate("/");
     }, []);
+  } else if (currentUser?.userType === "teacher") {
+    useEffect(() => {
+      navigate("/*");
+    }, []);
   }
 
   if (currentUser !== undefined) {
