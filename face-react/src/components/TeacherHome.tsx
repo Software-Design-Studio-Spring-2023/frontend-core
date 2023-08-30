@@ -4,6 +4,7 @@ import Webcam from "react-webcam";
 import { currentUser, users } from "./LoginForm";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import LogOut from "./alerts/LogOut";
 
 const TeacherHome = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const TeacherHome = () => {
   }
   return (
     <>
-      <button onClick={() => navigate("/")}>Log Out</button>
+      <LogOut handleLogout={() => navigate("/")} />
       <Grid templateColumns="repeat(5, 1fr)">
         {users.map(
           (user) =>

@@ -5,6 +5,8 @@ import Webcam from "react-webcam";
 import { useNavigate } from "react-router-dom";
 
 import { currentUser } from "./LoginForm";
+import TerminateExam from "./alerts/TerminateExam";
+import LogOut from "./alerts/LogOut";
 
 // if (currentUser) {
 //   warnings = currentUser.warnings;
@@ -39,7 +41,7 @@ const TeacherView = () => {
   return (
     <>
       <div>
-        <button onClick={() => navigate("/")}>Log Out</button>
+        <LogOut handleLogout={() => navigate("/")} />
 
         <label>
           <Webcam />
@@ -62,10 +64,17 @@ const TeacherView = () => {
           Issue Warning
         </button>
       </div>
-      <div>
-        <button disabled={safe} onClick={() => alert("Are You sure?")}>
-          Terminate Exam
-        </button>
+      <div hidden={safe}>
+        <TerminateExam
+          handleTerminate={() =>
+            // add the logic here for stopping a webcam
+            {
+              if (currentUser !== undefined) {
+                currentUser.loggedIn = false;
+              }
+            }
+          }
+        />
       </div>
     </>
   );
