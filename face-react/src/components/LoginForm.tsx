@@ -62,7 +62,8 @@ const LoginForm = () => {
           user.email === email &&
           user.password === password &&
           // user.userType === "student"
-          email.includes("@student.uts.edu.au")
+          email.includes("@student.uts.edu.au") &&
+          user.loggedIn === false
       )
     ) {
       currentUser = users.find(
@@ -70,7 +71,7 @@ const LoginForm = () => {
       );
       if (currentUser !== undefined) {
         alert(`Welcome Student ${currentUser.firstName}`);
-        currentUser.loggedIn = true;
+        currentUser.loggedIn = true; //gotta send this to the database, students can't login again until after exam is done
       }
       navigate("/student");
     } else if (

@@ -1,15 +1,17 @@
 import { Grid, GridItem } from "@chakra-ui/react";
 import Webcam from "react-webcam";
 
-import { users } from "./LoginForm";
+import { currentUser, users } from "./LoginForm";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
 const TeacherHome = () => {
   const navigate = useNavigate();
-  //   useEffect(() => {
-  //     navigate("/");
-  //   }, []);
+  if (currentUser?.loggedIn === false) {
+    useEffect(() => {
+      navigate("/");
+    }, []);
+  }
   return (
     <>
       <Grid templateColumns="repeat(5, 1fr)">

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import Webcam from "react-webcam";
 
@@ -18,9 +18,11 @@ if (currentUser !== undefined) {
 
 const TeacherView = () => {
   const navigate = useNavigate();
-  //   useEffect(() => {
-  //     navigate("/");
-  //   }, []);
+  if (currentUser?.loggedIn === false) {
+    useEffect(() => {
+      navigate("/");
+    }, []);
+  }
 
   const [warning, setWarning] = useState(warnings);
 

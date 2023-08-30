@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 
 import { currentUser } from "./LoginForm";
@@ -10,11 +10,12 @@ let name = "";
 let warnings: number;
 
 const StudentWebcam = () => {
-  //prevent refresh
-  //   const navigate = useNavigate();
-  // useEffect(() => {
-  //   navigate("/");
-  // }, []);
+  const navigate = useNavigate();
+  if (currentUser?.loggedIn === false) {
+    useEffect(() => {
+      navigate("/");
+    }, []);
+  }
 
   if (currentUser !== undefined) {
     name = currentUser.firstName;
