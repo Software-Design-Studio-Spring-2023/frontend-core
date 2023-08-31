@@ -5,6 +5,7 @@ import { User } from "../hooks/useUsers";
 import { currentUser } from "./LoginForm";
 import { useNavigate } from "react-router-dom";
 import LogOut from "./alerts/LogOut";
+import IssueWarning from "./alerts/IssueWarning";
 // import { Button } from "@chakra-ui/react";
 
 interface Props {
@@ -52,19 +53,18 @@ const TeacherView = ({ user }: Props) => {
       <div>
         <p>Warnings: {warning}</p>
       </div>
-      <div>
-        <button
-          onClick={(e) => {
+      <div hidden={user.warnings === 2 ? true : false}>
+        <IssueWarning
+          handleWarning={() => {
             //this needs to be sent back to the database so the warnings reset clicking on a new user
-            e.preventDefault();
+            // this is the code for adding warning without database
+
             if (warning <= 1) setWarning(warning + 1);
             if (user !== undefined) {
               user.warnings = warning;
             }
           }}
-        >
-          Issue Warning
-        </button>
+        />
       </div>
       <div hidden={safe}>
         <TerminateExam
