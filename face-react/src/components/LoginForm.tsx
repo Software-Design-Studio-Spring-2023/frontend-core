@@ -42,6 +42,46 @@ export const users: User[] = [
     password: "goodbye",
     warnings: 0,
   },
+
+  {
+    id: 3,
+    firstName: "Reuben",
+    loggedIn: false,
+    userType: "student",
+    email: "reuben@student.uts.edu.au",
+    password: "123456",
+    warnings: 0,
+  },
+
+  {
+    id: 4,
+    firstName: "Liam",
+    loggedIn: false,
+    userType: "student",
+    email: "liam@student.uts.edu.au",
+    password: "09876",
+    warnings: 0,
+  },
+
+  {
+    id: 5,
+    firstName: "Daniel",
+    loggedIn: false,
+    userType: "student",
+    email: "daniel@student.uts.edu.au",
+    password: "utsiscool",
+    warnings: 0,
+  },
+
+  {
+    id: 6,
+    firstName: "Shephon",
+    loggedIn: false,
+    userType: "student",
+    email: "shephon@student.uts.edu.au",
+    password: "utsisnotcool",
+    warnings: 0,
+  },
 ];
 
 const LoginForm = () => {
