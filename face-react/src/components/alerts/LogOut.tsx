@@ -25,7 +25,7 @@ const EndExam = ({ handleLogout }: Props) => {
 
   return (
     <>
-      <button onClick={onOpen}>Log Exam</button>
+      <button onClick={onOpen}>Log Out</button>
       <AlertDialog
         motionPreset="scale"
         isOpen={isOpen}

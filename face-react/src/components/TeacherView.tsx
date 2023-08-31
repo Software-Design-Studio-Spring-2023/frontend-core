@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
-
 import Webcam from "react-webcam";
-
-import { useNavigate } from "react-router-dom";
-
-import { currentUser } from "./LoginForm";
 import TerminateExam from "./alerts/TerminateExam";
+import { User } from "../hooks/useUsers";
+import { currentUser } from "./LoginForm";
+import { useNavigate } from "react-router-dom";
 import LogOut from "./alerts/LogOut";
+// import { Button } from "@chakra-ui/react";
+
+interface Props {
+  user: User;
+}
 
 // if (currentUser) {
 //   warnings = currentUser.warnings;
@@ -14,11 +17,7 @@ import LogOut from "./alerts/LogOut";
 
 let warnings: number;
 
-if (currentUser !== undefined) {
-  warnings = currentUser.warnings;
-}
-
-const TeacherView = () => {
+const TeacherView = ({ user }: Props) => {
   const navigate = useNavigate();
   if (currentUser?.loggedIn === false) {
     useEffect(() => {
@@ -34,6 +33,10 @@ const TeacherView = () => {
 
   let safe = true;
 
+  if (user !== undefined) {
+    warnings = user.warnings;
+  }
+
   if (warning === 2) {
     safe = false;
   }
@@ -41,11 +44,16 @@ const TeacherView = () => {
   return (
     <>
       <div>
-        <LogOut handleLogout={() => navigate("/")} />
+        <div>
+          <LogOut handleLogout={() => navigate("/")} />
+        </div>
+        <div>
+          <button onClick={() => navigate("/teacher")}>Go Back</button>
+        </div>
 
         <label>
           <Webcam />
-          {/* {currentUser?.firstName} replace this with name of the viewed user */}
+          {user.firstName}
         </label>
       </div>
       <div>
@@ -54,10 +62,11 @@ const TeacherView = () => {
       <div>
         <button
           onClick={(e) => {
+            //this needs to be sent back to the database so the warnings reset clicking on a new user
             e.preventDefault();
             if (warning <= 1) setWarning(warning + 1);
-            if (currentUser !== undefined) {
-              currentUser.warnings = warning;
+            if (user !== undefined) {
+              user.warnings = warning;
             }
           }}
         >
@@ -69,8 +78,8 @@ const TeacherView = () => {
           handleTerminate={() =>
             // add the logic here for stopping a webcam
             {
-              if (currentUser !== undefined) {
-                currentUser.loggedIn = false;
+              if (user !== undefined) {
+                user.loggedIn = false;
               }
             }
           }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { User } from "../hooks/useUsers";
 import { useNavigate } from "react-router-dom";
 
@@ -49,7 +49,7 @@ const LoginForm = () => {
   // useEffect(() => {
   //   navigate("/");
   // }, []);
-  const [loggedIn, setLoggedIn] = useState(false);
+  // const [loggedIn, setLoggedIn] = useState(false);
 
   const handleLogin = (email: string, password: string) => {
     if (

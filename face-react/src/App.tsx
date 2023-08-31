@@ -1,23 +1,36 @@
-import React from "react";
 import LoginForm from "./components/LoginForm";
-import WebCam from "./components/StudentWeb";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import StudentWeb from "./components/StudentWeb";
-import StudentExam from "./components/StudentExam";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Outlet,
+} from "react-router-dom";
 import TeacherHome from "./components/TeacherHome";
-import TeacherView from "./components/TeacherView";
 import StudentWebcam from "./components/StudentWebcam";
 import PageNotFound from "./components/PageNotFound";
+import { users } from "./components/LoginForm";
+import TeacherView from "./components/TeacherView";
+import { User } from "./hooks/useUsers";
 
 const App = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" Component={LoginForm} />
-        <Route path="/student" Component={StudentWebcam} />
-        <Route path="/teacher" Component={TeacherHome} />
-        <Route path="/teacherview" Component={TeacherView} />
-        <Route path="/*" Component={PageNotFound} />
+        <Route path="/" element={<LoginForm />} />
+        <Route path="/student" element={<StudentWebcam />} />
+        <Route path="/teacher" element={<TeacherHome />}>
+          {users.map(
+            (user: User) =>
+              user.userType === "student" && (
+                <Route
+                  path={user.id.toString()}
+                  key={user.id}
+                  element={<TeacherView user={user} />}
+                />
+              )
+          )}
+        </Route>
+        <Route path="/*" element={<PageNotFound />} />
       </Routes>
     </Router>
   );
