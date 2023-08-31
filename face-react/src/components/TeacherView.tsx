@@ -44,13 +44,6 @@ const TeacherView = ({ user }: Props) => {
   return (
     <>
       <div>
-        <div>
-          <LogOut handleLogout={() => navigate("/")} />
-        </div>
-        <div>
-          <button onClick={() => navigate("/teacher")}>Go Back</button>
-        </div>
-
         <label>
           <Webcam />
           {user.firstName}
