@@ -79,7 +79,7 @@ const TeacherView = ({ user }: Props) => {
       <div>
         <p>Warnings: {warning}</p>
       </div>
-      <div hidden={user.warnings === 2 ? true : false}>
+      <div hidden={warning === 2 ? true : false}>
         <IssueWarning
           handleWarning={() => {
             //this needs to be sent back to the database so the warnings reset clicking on a new user
