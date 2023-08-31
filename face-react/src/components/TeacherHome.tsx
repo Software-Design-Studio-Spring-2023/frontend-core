@@ -15,6 +15,7 @@ import LogOut from "./alerts/LogOut";
 const TeacherHome = () => {
   const navigate = useNavigate();
   const [itemClicked, setItemClicked] = useState(false);
+
   // setItemClicked(false);
 
   if (currentUser?.loggedIn === false) {
