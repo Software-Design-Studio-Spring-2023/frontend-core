@@ -2,17 +2,12 @@ import { Grid, GridItem } from "@chakra-ui/react";
 import Webcam from "react-webcam";
 
 import { currentUser, users } from "./LoginForm";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import LogOut from "./alerts/LogOut";
 
-// import TeacherView from "./TeacherView";
-
-// interface Props {
-//   user:User
-// }
-
 const TeacherHome = () => {
+  const location = useLocation();
   const navigate = useNavigate();
   const [itemClicked, setItemClicked] = useState(false);
 
@@ -29,16 +24,14 @@ const TeacherHome = () => {
   }
 
   useEffect(() => {
+    if (location.pathname === "/teacher") {
+      setItemClicked(false);
+    }
+  }, [location]);
+
+  useEffect(() => {
     setItemClicked(false);
   }, []);
-
-  // const navigateHelper = () => {};
-
-  // let user:User
-
-  // const subNavigate = (user:User) => {
-  //   navigate(`/teacher/${user.id}`);
-  // }
 
   return (
     <>
@@ -47,7 +40,12 @@ const TeacherHome = () => {
         templateColumns={
           itemClicked
             ? //this is for the small grids
-              "repeat(10, 1fr)"
+              {
+                //this is responsive grid scaling for different sized devices
+                lg: "repeat(10, 1fr)",
+                md: "repeat(8, 1fr)",
+                sm: "repeat(7, 1fr)",
+              }
             : {
                 //this is responsive grid scaling for different sized devices
                 lg: "repeat(5, 1fr)",
@@ -61,6 +59,7 @@ const TeacherHome = () => {
             user.userType === "student" && (
               <GridItem
                 cursor={"pointer"}
+                //manually set the width and height of the camera boxes in the display
                 // w={itemClicked ? "100%" : "100%"}
                 // h={itemClicked ? "100%" : "100%"}
                 key={user.id}

@@ -20,28 +20,16 @@ let warnings: number;
 
 const TeacherView = ({ user }: Props) => {
   useEffect(() => {
-    const handleBackButtonEvent = (e: PopStateEvent) => {
+    const handleBeforeUnloadEvent = (e: BeforeUnloadEvent) => {
       e.preventDefault();
-
-      // Keep pushing the current state to history whenever popstate is triggered
-      window.history.pushState({}, "", window.location.pathname);
+      e.returnValue = "";
+      return "";
     };
-
-    // const handleBeforeUnloadEvent = (e: BeforeUnloadEvent) => {
-    //   e.preventDefault();
-    //   e.returnValue = "";
-    //   return "";
-    // };
-
-    window.addEventListener("popstate", handleBackButtonEvent);
-    // window.addEventListener("beforeunload", handleBeforeUnloadEvent);
-
-    // Push the current state once when component mounts
-    window.history.pushState({}, "", window.location.pathname);
+    window.addEventListener("beforeunload", handleBeforeUnloadEvent);
 
     return () => {
-      window.removeEventListener("popstate", handleBackButtonEvent);
-      // window.removeEventListener("beforeunload", handleBeforeUnloadEvent);
+      // window.removeEventListener("popstate", handleBackButtonEvent);
+      window.removeEventListener("beforeunload", handleBeforeUnloadEvent);
     };
   }, []);
 
