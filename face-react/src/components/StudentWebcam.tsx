@@ -5,13 +5,39 @@ import { currentUser } from "./LoginForm";
 
 import { useNavigate } from "react-router-dom";
 import EndExam from "./alerts/EndExam";
-import { useDisclosure } from "@chakra-ui/react";
+// import { useDisclosure } from "@chakra-ui/react";
 
 let name = "";
 
 let warnings: number;
 
 const StudentWebcam = () => {
+  useEffect(() => {
+    const handleBackButtonEvent = (e: PopStateEvent) => {
+      e.preventDefault();
+
+      // Keep pushing the current state to history whenever popstate is triggered
+      window.history.pushState({}, "", window.location.pathname);
+    };
+
+    const handleBeforeUnloadEvent = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+      return "";
+    };
+
+    window.addEventListener("popstate", handleBackButtonEvent);
+    window.addEventListener("beforeunload", handleBeforeUnloadEvent);
+
+    // Push the current state once when component mounts
+    window.history.pushState({}, "", window.location.pathname);
+
+    return () => {
+      window.removeEventListener("popstate", handleBackButtonEvent);
+      window.removeEventListener("beforeunload", handleBeforeUnloadEvent);
+    };
+  }, []);
+
   const navigate = useNavigate();
   if (currentUser?.loggedIn === false) {
     useEffect(() => {

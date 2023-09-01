@@ -11,21 +11,21 @@ import {
 import { useRef } from "react";
 
 interface Props {
-  handleLogout: () => void;
+  handleWarning: () => void;
 }
 
-const EndExam = ({ handleLogout }: Props) => {
+const IssueWarning = ({ handleWarning }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef(null);
 
-  const handleConfirmLogout = () => {
-    handleLogout();
+  const handleConfirmWarning = () => {
+    handleWarning();
     onClose();
   };
 
   return (
     <>
-      <button onClick={onOpen}>Log Out</button>
+      <button onClick={onOpen}>Issue Warning</button>
       <AlertDialog
         motionPreset="scale"
         isOpen={isOpen}
@@ -35,16 +35,19 @@ const EndExam = ({ handleLogout }: Props) => {
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Log Out
+              Issue Warning
             </AlertDialogHeader>
 
-            <AlertDialogBody>Are you sure you want to log out?</AlertDialogBody>
+            <AlertDialogBody>
+              Are you sure you want to issue a warning to this student?
+              {/* We can include the actual persons name here when we set up the database */}
+            </AlertDialogBody>
 
             <AlertDialogFooter>
               <Button ref={cancelRef} onClick={onClose}>
                 No
               </Button>
-              <Button colorScheme="red" onClick={handleConfirmLogout} ml={3}>
+              <Button colorScheme="red" onClick={handleConfirmWarning} ml={3}>
                 Yes
               </Button>
             </AlertDialogFooter>
@@ -55,4 +58,4 @@ const EndExam = ({ handleLogout }: Props) => {
   );
 };
 
-export default EndExam;
+export default IssueWarning;
