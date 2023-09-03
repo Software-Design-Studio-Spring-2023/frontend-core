@@ -1,4 +1,4 @@
-import { Grid, GridItem } from "@chakra-ui/react";
+import { Button, Grid, GridItem } from "@chakra-ui/react";
 import Webcam from "react-webcam";
 
 import { currentUser, users } from "./LoginForm";
@@ -52,11 +52,12 @@ const TeacherHome = () => {
                 md: "repeat(3, 1fr)",
                 sm: "repeat(2, 1fr)",
               }
-        }
-      >
+            }
+            gap={4} // Add some gap between GridItems
+          >
         {users.map(
           (user) =>
-            user.userType === "student" && (
+          user.userType === "student" && (
               <GridItem
                 cursor={"pointer"}
                 //manually set the width and height of the camera boxes in the display
@@ -75,15 +76,16 @@ const TeacherHome = () => {
         )}
       </Grid>
       <hr hidden={itemClicked ? false : true} />
-      <button
+      <Button
         hidden={itemClicked ? false : true}
         onClick={() => {
           setItemClicked(false);
           navigate("/teacher");
         }}
+        colorScheme='teal' variant='solid'
       >
         Go Back
-      </button>
+      </Button>
       <Outlet />
     </>
   );
