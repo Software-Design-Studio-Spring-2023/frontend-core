@@ -25,7 +25,7 @@ const IssueWarning = ({ handleWarning }: Props) => {
 
   return (
     <>
-      <button onClick={onOpen}>Issue Warning</button>
+      <Button color='#FFF5F5' bgColor={"red.500"} variant='solid' onClick={onOpen}>Issue Warning</Button>
       <AlertDialog
         motionPreset="scale"
         isOpen={isOpen}
