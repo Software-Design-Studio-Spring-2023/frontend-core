@@ -82,7 +82,7 @@ const TeacherHome = () => {
           setItemClicked(false);
           navigate("/teacher");
         }}
-        colorScheme='teal' variant='solid'
+        bgColor='gray.600'
       >
         Go Back
       </Button>
