@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { User } from "../hooks/useUsers";
 import { useNavigate } from "react-router-dom";
+import { Button, FormControl, FormLabel, Input, VStack, InputGroup, HStack, InputRightElement } from '@chakra-ui/react'
+import React from "react";
 
 //set logged in variable, which will be true throughout duration of exam. only way to revert false is by finishing exam
 
@@ -140,38 +142,46 @@ const LoginForm = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [show, setShow] = React.useState(false)
+  const handleClick = () => setShow(!show)
 
   return (
-    <form>
-      <div>
-        <label>
-          Email:
-          <input
-            type="text"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+    <VStack minHeight="100vh" justifyContent="center" alignItems="center" spacing={5}>
+      <form>
+        <FormControl isRequired>
+          <FormLabel>Enter your UTS Email Address</FormLabel>
+          <Input 
+          placeholder='Email Address'
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           />
-        </label>
-      </div>
-      <div>
-        <label>
-          Password:
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </label>
-      </div>
-      <button
-        onClick={() => {
-          handleLogin(email, password);
-        }}
-        type="submit"
-      >
-        Login
-      </button>
-    </form>
+        </FormControl>
+
+        <FormControl isRequired paddingTop={5} paddingBottom={5}>
+          <FormLabel>Password</FormLabel>
+          <InputGroup size='md'>
+            <Input 
+              pr='4.5rem'
+              onChange={(e) => setPassword(e.target.value)}
+              type={show ? 'text' : 'password'}           // this might be a problem...
+              placeholder='Enter Password'
+              value={password}
+            />
+            <InputRightElement width='4.5rem'>
+              <Button h='1.75rem' size='sm' onClick={handleClick}>
+                {show ? 'Hide' : 'Show'}
+              </Button>
+            </InputRightElement>
+          </InputGroup>
+        </FormControl>
+
+        <HStack justifyContent="center" alignItems="center" spacing={5}>
+          <Button onClick={() => handleLogin(email, password)} type="submit" colorScheme='teal' variant='solid'>
+            Login
+          </Button>
+        </HStack>
+      </form>
+    </VStack>
   );
 };
 
