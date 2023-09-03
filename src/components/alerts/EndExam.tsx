@@ -25,7 +25,8 @@ const EndExam = ({ handleTerminate }: Props) => {
 
   return (
     <>
-      <button onClick={onOpen}>Finish Exam</button>
+      <Button colorScheme='teal' variant='outline'
+        borderColor={"teal.500"} onClick={onOpen}>Finish Exam</Button>
       <AlertDialog
         motionPreset="scale"
         isOpen={isOpen}
