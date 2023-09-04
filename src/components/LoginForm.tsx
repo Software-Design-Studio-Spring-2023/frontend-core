@@ -10,8 +10,10 @@ import {
   InputGroup,
   HStack,
   InputRightElement,
+  Heading,
 } from "@chakra-ui/react";
 import React from "react";
+import { HiEye, HiOutlineEye } from "react-icons/hi";
 
 //set logged in variable, which will be true throughout duration of exam. only way to revert false is by finishing exam
 
@@ -152,7 +154,7 @@ const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = React.useState(false);
-  const handleClick = () => setShow(!show);
+  // const handleClick = () => setShow(!show);
 
   return (
     <VStack
@@ -161,6 +163,12 @@ const LoginForm = () => {
       alignItems="center"
       spacing={5}
     >
+      <HStack paddingTop={5}>
+        <HiEye color={"#81E6D9"} size={"3em"} />
+        <Heading fontStyle={"italic"} paddingBottom={2}>
+          eyedentify
+        </Heading>
+      </HStack>
       <form>
         <FormControl isRequired>
           <FormLabel>Enter your UTS Email Address</FormLabel>
@@ -181,16 +189,14 @@ const LoginForm = () => {
               placeholder="Enter Password"
               value={password}
             />
-            <InputRightElement width="4.5rem">
-              <Button
-                h="1.75rem"
-                size="sm"
+            <InputRightElement cursor={"pointer"} marginRight={2}>
+              <HiOutlineEye
+                size="1.5em"
+                color={show ? "gray" : "white"}
                 onMouseDown={() => setShow(true)}
                 onMouseUp={() => setShow(false)}
                 onMouseLeave={() => setShow(false)}
-              >
-                {show ? "Hide" : "Show"}
-              </Button>
+              />
             </InputRightElement>
           </InputGroup>
         </FormControl>
