@@ -6,6 +6,7 @@ import { currentUser } from "./LoginForm";
 import { useNavigate } from "react-router-dom";
 import LogOut from "./alerts/LogOut";
 import IssueWarning from "./alerts/IssueWarning";
+import { VStack } from "@chakra-ui/react";
 // import { Button } from "@chakra-ui/react";
 
 interface Props {
@@ -58,6 +59,7 @@ const TeacherView = ({ user }: Props) => {
 
   return (
     <>
+    <VStack minHeight="50vh" justifyContent="center" alignItems="center" spacing={5}>
       <div>
         <label>
           <Webcam />
@@ -92,6 +94,7 @@ const TeacherView = ({ user }: Props) => {
           }
         />
       </div>
+      </VStack>
     </>
   );
 };

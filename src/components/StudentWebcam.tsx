@@ -5,6 +5,7 @@ import { currentUser } from "./LoginForm";
 
 import { useNavigate } from "react-router-dom";
 import EndExam from "./alerts/EndExam";
+import { Button, VStack } from "@chakra-ui/react";
 // import { useDisclosure } from "@chakra-ui/react";
 
 let name = "";
@@ -170,36 +171,36 @@ const StudentWebcam = () => {
   };
 
   return (
+    <VStack minHeight="100vh" justifyContent="center" alignItems="center" spacing={5}>
     <div>
-      <div>
-        <Webcam audio={false} ref={webcamRef} onUserMedia={handleWebcamLoad} />
-        <canvas
-          ref={canvasRef}
-          width={640}
-          height={480}
-          style={{ display: "none" }}
-        ></canvas>{" "}
-        {/* Hide the canvas element */}
-      </div>
-      <div>
-        <p>{name}</p>
-      </div>
-      <div hidden={recording ? true : false}>
-        <p>This is where the checklist will be</p>
-      </div>
+      <Webcam audio={false} ref={webcamRef} onUserMedia={handleWebcamLoad} />
+      <canvas
+        ref={canvasRef}
+        width={640}
+        height={480}
+        style={{ display: "none" }}
+      ></canvas>{" "}
+      {/* Hide the canvas element */}
+    </div>
+    <div>
+      <p>{name}</p>
+    </div>
+    <div hidden={recording ? true : false}>
+      <p>This is where the checklist will be</p>
+    </div>
+    <div hidden={recording ? false : true}>
+      <p>Warnings: {warnings}</p>
+    </div>
+    <div>
+      <Button colorScheme='teal' variant='solid' hidden={recording ? true : false} onClick={handleStartCapture}>
+        {"Start Exam"}
+      </Button>
       <div hidden={recording ? false : true}>
-        <p>Warnings: {warnings}</p>
-      </div>
-      <div>
-        <button hidden={recording ? true : false} onClick={handleStartCapture}>
-          {"Start Exam"}
-        </button>
-        <div hidden={recording ? false : true}>
-          {/* {"Finish Exam"} */}
-          <EndExam handleTerminate={handleStopCapture} />
-        </div>
+        {/* {"Finish Exam"} */}
+        <EndExam handleTerminate={handleStopCapture} />
       </div>
     </div>
+    </VStack>
   );
 };
 
