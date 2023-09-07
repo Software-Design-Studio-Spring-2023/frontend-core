@@ -11,6 +11,7 @@ import PageNotFound from "./components/PageNotFound";
 import { users } from "./components/LoginForm";
 import TeacherView from "./components/TeacherView";
 import { User } from "./hooks/useUsers";
+import { useDatabase } from "./hooks/useDatabase";
 
 const App = () => {
   return (
