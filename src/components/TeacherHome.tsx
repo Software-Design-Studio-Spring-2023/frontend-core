@@ -1,15 +1,21 @@
-import { Button, Grid, GridItem } from "@chakra-ui/react";
+import { Button, Grid, GridItem, Heading } from "@chakra-ui/react";
 import Webcam from "react-webcam";
 
-import { currentUser, users } from "./LoginForm";
+import { currentUser } from "./LoginForm";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import LogOut from "./alerts/LogOut";
+import StudentCard from "./StudentCard";
+import StudentMiniCard from "./StudentMiniCard";
+import useUsers from "../hooks/useUsers";
+
+//
 
 const TeacherHome = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [itemClicked, setItemClicked] = useState(false);
+  const { data, loading, error } = useUsers();
 
   // setItemClicked(false);
 
@@ -36,7 +42,9 @@ const TeacherHome = () => {
   return (
     <>
       <LogOut handleLogout={() => navigate("/")} />
+      <Heading padding={"10px"}>Participants</Heading>
       <Grid
+        padding={"10px"}
         templateColumns={
           itemClicked
             ? //this is for the small grids
@@ -52,13 +60,15 @@ const TeacherHome = () => {
                 md: "repeat(3, 1fr)",
                 sm: "repeat(2, 1fr)",
               }
-            }
-            gap={4} // Add some gap between GridItems
-          >
-        {users.map(
+        }
+        gap={4} // Add some gap between GridItems
+      >
+        {data.map(
           (user) =>
-          user.userType === "student" && (
+            user.userType === "student" && (
               <GridItem
+                // overflow={"hidden"}
+                // borderRadius={"4px"}
                 cursor={"pointer"}
                 //manually set the width and height of the camera boxes in the display
                 // w={itemClicked ? "100%" : "100%"}
@@ -69,8 +79,11 @@ const TeacherHome = () => {
                   navigate(`/teacher/${user.id}`);
                 }}
               >
-                <Webcam />
-                {user.firstName}
+                {itemClicked ? (
+                  <StudentMiniCard name={user.name} warnings={user.warnings} />
+                ) : (
+                  <StudentCard name={user.name} warnings={user.warnings} />
+                )}
               </GridItem>
             )
         )}
@@ -82,7 +95,7 @@ const TeacherHome = () => {
           setItemClicked(false);
           navigate("/teacher");
         }}
-        bgColor='gray.600'
+        bgColor="gray.600"
       >
         Go Back
       </Button>
