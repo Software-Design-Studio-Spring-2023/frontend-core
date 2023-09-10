@@ -59,41 +59,46 @@ const TeacherView = ({ user }: Props) => {
 
   return (
     <>
-    <VStack minHeight="50vh" justifyContent="center" alignItems="center" spacing={5}>
-      <div>
-        <label>
-          <Webcam />
-          {user.firstName}
-        </label>
-      </div>
-      <div>
-        <p>Warnings: {warning}</p>
-      </div>
-      <div hidden={warning === 2 ? true : false}>
-        <IssueWarning
-          handleWarning={() => {
-            //this needs to be sent back to the database so the warnings reset clicking on a new user
-            // this is the code for adding warning without database
+      <VStack
+        minHeight="50vh"
+        justifyContent="center"
+        alignItems="center"
+        spacing={5}
+      >
+        <div>
+          <label>
+            <Webcam />
+            {user.name}
+          </label>
+        </div>
+        <div>
+          <p>Warnings: {warning}</p>
+        </div>
+        <div hidden={warning === 2 ? true : false}>
+          <IssueWarning
+            handleWarning={() => {
+              //this needs to be sent back to the database so the warnings reset clicking on a new user
+              // this is the code for adding warning without database
 
-            if (warning <= 1) setWarning(warning + 1);
-            if (user !== undefined) {
-              user.warnings = warning;
-            }
-          }}
-        />
-      </div>
-      <div hidden={safe}>
-        <TerminateExam
-          handleTerminate={() =>
-            // add the logic here for stopping a webcam
-            {
+              if (warning <= 1) setWarning(warning + 1);
               if (user !== undefined) {
-                user.loggedIn = false;
+                user.warnings = warning;
+              }
+            }}
+          />
+        </div>
+        <div hidden={safe}>
+          <TerminateExam
+            handleTerminate={() =>
+              // add the logic here for stopping a webcam
+              {
+                if (user !== undefined) {
+                  user.loggedIn = false;
+                }
               }
             }
-          }
-        />
-      </div>
+          />
+        </div>
       </VStack>
     </>
   );
