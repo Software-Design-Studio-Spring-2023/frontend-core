@@ -8,8 +8,25 @@ interface Props {
 }
 
 const StudentCard = ({ name, warnings }: Props) => {
+  const borderColor = () => {
+    switch (warnings) {
+      case 0:
+        return "green";
+      case 1:
+        return "#D69E2E";
+      case 2:
+        return "red";
+      default:
+        return "green"; // Default color in case warnings is undefined or out of range
+    }
+  };
   return (
-    <Card borderRadius={"10px"} overflow={"hidden"}>
+    <Card
+      overflow={"hidden"}
+      borderColor={borderColor()}
+      borderWidth={"1px"}
+      borderRadius={"10px"}
+    >
       <Webcam />
       <CardBody>
         <VStack>

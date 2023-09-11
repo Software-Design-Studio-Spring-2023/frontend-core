@@ -16,6 +16,7 @@ import LogOut from "./alerts/LogOut";
 import StudentCard from "./StudentCard";
 import StudentMiniCard from "./StudentMiniCard";
 import useUsers from "../hooks/useUsers";
+import { HiEye } from "react-icons/hi";
 
 //
 
@@ -50,9 +51,12 @@ const TeacherHome = () => {
   return (
     <>
       <HStack>
+        <Box paddingLeft={"10px"}>
+          <HiEye color={"#81E6D9"} size={"3em"} />
+        </Box>
         <Heading padding={"10px"}>Participants</Heading>
         <Spacer />
-        <Box paddingRight={"10px"}>
+        <Box paddingRight={"30px"}>
           <LogOut handleLogout={() => navigate("/")} />
         </Box>
       </HStack>

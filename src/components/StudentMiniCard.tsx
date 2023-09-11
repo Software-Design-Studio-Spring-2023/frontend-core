@@ -1,4 +1,12 @@
-import { Card, CardBody, Heading, VStack, Text, Box } from "@chakra-ui/react";
+import {
+  Card,
+  CardBody,
+  Heading,
+  VStack,
+  Text,
+  Box,
+  border,
+} from "@chakra-ui/react";
 import React from "react";
 import Webcam from "react-webcam";
 
@@ -8,12 +16,23 @@ interface Props {
 }
 
 const StudentMiniCard = ({ name, warnings }: Props) => {
+  const borderColor = () => {
+    switch (warnings) {
+      case 0:
+        return "green";
+      case 1:
+        return "#D69E2E";
+      case 2:
+        return "red";
+      default:
+        return "green"; // Default color in case warnings is undefined or out of range
+    }
+  };
   return (
     <>
       <Box
-        // boxShadow={"dark-lg"}
         overflow={"hidden"}
-        borderColor={warnings ? { 0: "green", 1: "yellow", 2: "red" } : "green"}
+        borderColor={borderColor()}
         borderWidth={"1px"}
         borderRadius={"lg"}
       >
