@@ -1,4 +1,4 @@
-import { Card, CardBody, Heading, VStack, Text } from "@chakra-ui/react";
+import { Card, CardBody, Heading, VStack, Text, Box } from "@chakra-ui/react";
 import React from "react";
 import Webcam from "react-webcam";
 
@@ -10,11 +10,13 @@ interface Props {
 const StudentMiniCard = ({ name, warnings }: Props) => {
   return (
     <>
-      <Webcam />
-      <Heading paddingTop={"2px"} fontSize="1xl">
-        {name}
-      </Heading>
-      <Text fontSize={"x-small"}>Warnings: {warnings}</Text>
+      <Box borderColor={"white"} border={"6px"}>
+        <Webcam />
+        <Heading paddingTop={"2px"} fontSize="1xl">
+          {name}
+        </Heading>
+        <Text fontSize={"x-small"}>Warnings: {warnings}</Text>
+      </Box>
     </>
   );
 };
