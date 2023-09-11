@@ -21,7 +21,7 @@ const App = () => {
         <Route path="/" element={<LoginForm />} />
         <Route path="/student" element={<StudentWebcam />} />
         <Route path="/teacher" element={<TeacherHome />}>
-          {data.map(
+          {data?.map(
             (user: User) =>
               user.userType === "student" && (
                 <Route
