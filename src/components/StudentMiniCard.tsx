@@ -10,12 +10,20 @@ interface Props {
 const StudentMiniCard = ({ name, warnings }: Props) => {
   return (
     <>
-      <Box borderColor={"white"} border={"6px"}>
+      <Box
+        // boxShadow={"dark-lg"}
+        overflow={"hidden"}
+        borderColor={warnings ? { 0: "green", 1: "yellow", 2: "red" } : "green"}
+        borderWidth={"1px"}
+        borderRadius={"lg"}
+      >
         <Webcam />
-        <Heading paddingTop={"2px"} fontSize="1xl">
+        <Heading paddingTop={"2px"} paddingLeft={"2px"} fontSize="1xl">
           {name}
         </Heading>
-        <Text fontSize={"x-small"}>Warnings: {warnings}</Text>
+        <Text paddingLeft={"2px"} paddingBottom={"2px"} fontSize={"x-small"}>
+          Warnings: {warnings}
+        </Text>
       </Box>
     </>
   );

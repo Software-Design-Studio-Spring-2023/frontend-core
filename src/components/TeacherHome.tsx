@@ -1,4 +1,12 @@
-import { Button, Grid, GridItem, Heading } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Grid,
+  GridItem,
+  HStack,
+  Heading,
+  Spacer,
+} from "@chakra-ui/react";
 import Webcam from "react-webcam";
 
 import { currentUser } from "./LoginForm";
@@ -41,8 +49,14 @@ const TeacherHome = () => {
 
   return (
     <>
-      <LogOut handleLogout={() => navigate("/")} />
-      <Heading padding={"10px"}>Participants</Heading>
+      <HStack>
+        <Heading padding={"10px"}>Participants</Heading>
+        <Spacer />
+        <Box paddingRight={"10px"}>
+          <LogOut handleLogout={() => navigate("/")} />
+        </Box>
+      </HStack>
+
       <Grid
         padding={"10px"}
         templateColumns={
@@ -89,16 +103,18 @@ const TeacherHome = () => {
         )}
       </Grid>
       <hr hidden={itemClicked ? false : true} />
-      <Button
-        hidden={itemClicked ? false : true}
-        onClick={() => {
-          setItemClicked(false);
-          navigate("/teacher");
-        }}
-        bgColor="gray.600"
-      >
-        Go Back
-      </Button>
+      <HStack padding={"10px"}>
+        <Button
+          hidden={itemClicked ? false : true}
+          onClick={() => {
+            setItemClicked(false);
+            navigate("/teacher");
+          }}
+          bgColor="gray.600"
+        >
+          Go Back
+        </Button>
+      </HStack>
       <Outlet />
     </>
   );
