@@ -16,6 +16,7 @@ import React from "react";
 import { HiEye, HiOutlineEye } from "react-icons/hi";
 
 //set logged in variable, which will be true throughout duration of exam. only way to revert false is by finishing exam
+// let users: User[];
 
 export var currentUser: User | undefined = {
   id: 0,
@@ -33,7 +34,8 @@ export var currentUser: User | undefined = {
 const LoginForm = () => {
   const navigate = useNavigate();
   const { data, loading, error } = useUsers();
-  // console.log(data);
+
+  // console.log(error ? null : error);
 
   // useEffect(() => {
   //   navigate("/");
