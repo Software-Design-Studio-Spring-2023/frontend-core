@@ -122,7 +122,7 @@ const LoginForm = () => {
         alert(`Welcome Student ${currentUser.firstName}`);
         currentUser.loggedIn = true; //gotta send this to the database, students can't login again until after exam is done
       }
-      navigate("/student");
+      navigate("/privacy");
     } else if (
       users.some(
         (user) =>

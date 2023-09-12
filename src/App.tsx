@@ -11,6 +11,7 @@ import PageNotFound from "./components/PageNotFound";
 import { users } from "./components/LoginForm";
 import TeacherView from "./components/TeacherView";
 import { User } from "./hooks/useUsers";
+import TermsAndConditions from "./components/TermsAndConditions";
 
 const App = () => {
   return (
@@ -21,15 +22,16 @@ const App = () => {
         <Route path="/teacher" element={<TeacherHome />}>
           {users.map(
             (user: User) =>
-              user.userType === "student" && (
-                <Route
-                  path={user.id.toString()}
-                  key={user.id}
-                  element={<TeacherView user={user} />}
-                />
-              )
+            user.userType === "student" && (
+              <Route
+              path={user.id.toString()}
+              key={user.id}
+              element={<TeacherView user={user} />}
+              />
+            )
           )}
         </Route>
+        <Route path="/privacy" element={<TermsAndConditions />} />
         <Route path="/*" element={<PageNotFound />} />
       </Routes>
     </Router>
