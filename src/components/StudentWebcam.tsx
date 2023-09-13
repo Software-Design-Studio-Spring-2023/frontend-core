@@ -51,7 +51,7 @@ const StudentWebcam = () => {
   }
 
   if (currentUser !== undefined) {
-    name = currentUser.firstName;
+    name = currentUser.name;
     warnings = currentUser.warnings;
   }
   const webcamRef = useRef<(Webcam & HTMLVideoElement) | null>(null);
@@ -171,35 +171,45 @@ const StudentWebcam = () => {
   };
 
   return (
-    <VStack minHeight="100vh" justifyContent="center" alignItems="center" spacing={5}>
-    <div>
-      <Webcam audio={false} ref={webcamRef} onUserMedia={handleWebcamLoad} />
-      <canvas
-        ref={canvasRef}
-        width={640}
-        height={480}
-        style={{ display: "none" }}
-      ></canvas>{" "}
-      {/* Hide the canvas element */}
-    </div>
-    <div>
-      <p>{name}</p>
-    </div>
-    <div hidden={recording ? true : false}>
-      <p>This is where the checklist will be</p>
-    </div>
-    <div hidden={recording ? false : true}>
-      <p>Warnings: {warnings}</p>
-    </div>
-    <div>
-      <Button colorScheme='teal' variant='solid' hidden={recording ? true : false} onClick={handleStartCapture}>
-        {"Start Exam"}
-      </Button>
-      <div hidden={recording ? false : true}>
-        {/* {"Finish Exam"} */}
-        <EndExam handleTerminate={handleStopCapture} />
+    <VStack
+      minHeight="100vh"
+      justifyContent="center"
+      alignItems="center"
+      spacing={5}
+    >
+      <div>
+        <Webcam audio={false} ref={webcamRef} onUserMedia={handleWebcamLoad} />
+        <canvas
+          ref={canvasRef}
+          width={640}
+          height={480}
+          style={{ display: "none" }}
+        ></canvas>{" "}
+        {/* Hide the canvas element */}
       </div>
-    </div>
+      <div>
+        <p>{name}</p>
+      </div>
+      <div hidden={recording ? true : false}>
+        <p>This is where the checklist will be</p>
+      </div>
+      <div hidden={recording ? false : true}>
+        <p>Warnings: {warnings}</p>
+      </div>
+      <div>
+        <Button
+          colorScheme="teal"
+          variant="solid"
+          hidden={recording ? true : false}
+          onClick={handleStartCapture}
+        >
+          {"Start Exam"}
+        </Button>
+        <div hidden={recording ? false : true}>
+          {/* {"Finish Exam"} */}
+          <EndExam handleTerminate={handleStopCapture} />
+        </div>
+      </div>
     </VStack>
   );
 };

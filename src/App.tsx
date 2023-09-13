@@ -8,18 +8,20 @@ import {
 import TeacherHome from "./components/TeacherHome";
 import StudentWebcam from "./components/StudentWebcam";
 import PageNotFound from "./components/PageNotFound";
-import { users } from "./components/LoginForm";
+
 import TeacherView from "./components/TeacherView";
-import { User } from "./hooks/useUsers";
+import useUsers, { User } from "./hooks/useUsers";
 
 const App = () => {
+  const { data, loading, error } = useUsers();
+
   return (
     <Router>
       <Routes>
         <Route path="/" element={<LoginForm />} />
         <Route path="/student" element={<StudentWebcam />} />
         <Route path="/teacher" element={<TeacherHome />}>
-          {users.map(
+          {data?.map(
             (user: User) =>
               user.userType === "student" && (
                 <Route

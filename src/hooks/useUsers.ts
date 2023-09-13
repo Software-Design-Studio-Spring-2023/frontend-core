@@ -1,11 +1,18 @@
 
+import useData from "./useData";
 
 export interface User {
-    id:number, 
-    email: string, 
-    password:string,
-    userType: string,
-    loggedIn: boolean,
-    firstName: string, 
-    warnings: number
-}
+    id: number;
+    name: string;
+    loggedIn: boolean;
+    userType: string;
+    email: string;
+    password: string;
+    imageURL: string;
+    encodeIP: number;
+    warnings: number;
+}  
+  
+const useUsers = () => (useData<User>("/all_users"))
+
+export default useUsers

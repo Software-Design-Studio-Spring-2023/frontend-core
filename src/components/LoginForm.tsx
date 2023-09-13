@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User } from "../hooks/useUsers";
+import useUsers, { User } from "../hooks/useUsers";
 import { useNavigate } from "react-router-dom";
 import {
   Button,
@@ -16,89 +16,27 @@ import React from "react";
 import { HiEye, HiOutlineEye } from "react-icons/hi";
 
 //set logged in variable, which will be true throughout duration of exam. only way to revert false is by finishing exam
+// let users: User[];
 
 export var currentUser: User | undefined = {
   id: 0,
-  firstName: "",
+  name: "",
   loggedIn: false,
   userType: "",
   email: "",
   password: "",
   warnings: 0,
+  imageURL: "",
+  encodeIP: 0,
 };
-
-export const users: User[] = [
-  {
-    id: 0,
-    firstName: "Marko",
-    loggedIn: false,
-    userType: "student",
-    email: "marko@student.uts.edu.au",
-    password: "password",
-    warnings: 0,
-  },
-  {
-    id: 1,
-    firstName: "Sydney",
-    loggedIn: false,
-    userType: "staff",
-    email: "sydney@staff.uts.edu.au",
-    password: "hello",
-    warnings: 0,
-  },
-  {
-    id: 2,
-    firstName: "Michael",
-    loggedIn: false,
-    userType: "student",
-    email: "michael@student.uts.edu.au",
-    password: "goodbye",
-    warnings: 0,
-  },
-
-  {
-    id: 3,
-    firstName: "Reuben",
-    loggedIn: false,
-    userType: "student",
-    email: "reuben@student.uts.edu.au",
-    password: "123456",
-    warnings: 0,
-  },
-
-  {
-    id: 4,
-    firstName: "Liam",
-    loggedIn: false,
-    userType: "student",
-    email: "liam@student.uts.edu.au",
-    password: "09876",
-    warnings: 0,
-  },
-
-  {
-    id: 5,
-    firstName: "Daniel",
-    loggedIn: false,
-    userType: "student",
-    email: "daniel@student.uts.edu.au",
-    password: "utsiscool",
-    warnings: 0,
-  },
-
-  {
-    id: 6,
-    firstName: "Shephon",
-    loggedIn: false,
-    userType: "student",
-    email: "shephon@student.uts.edu.au",
-    password: "utsisnotcool",
-    warnings: 0,
-  },
-];
+// localhost:8080/api/all_users
 
 const LoginForm = () => {
   const navigate = useNavigate();
+  const { data, loading, error } = useUsers();
+
+  // console.log(error ? null : error);
+
   // useEffect(() => {
   //   navigate("/");
   // }, []);
@@ -106,7 +44,7 @@ const LoginForm = () => {
 
   const handleLogin = (email: string, password: string) => {
     if (
-      users.some(
+      data.some(
         (user) =>
           user.email === email &&
           user.password === password &&
@@ -115,16 +53,16 @@ const LoginForm = () => {
           user.loggedIn === false
       )
     ) {
-      currentUser = users.find(
+      currentUser = data.find(
         (user) => user.email === email && user.password === password
       );
       if (currentUser !== undefined) {
-        alert(`Welcome Student ${currentUser.firstName}`);
+        alert(`Welcome Student ${currentUser.name}`);
         currentUser.loggedIn = true; //gotta send this to the database, students can't login again until after exam is done
       }
       navigate("/student");
     } else if (
-      users.some(
+      data.some(
         (user) =>
           user.email === email &&
           user.password === password &&
@@ -132,11 +70,11 @@ const LoginForm = () => {
           email.includes("@staff.uts.edu.au")
       )
     ) {
-      currentUser = users.find(
+      currentUser = data.find(
         (user) => user.email === email && user.password === password
       );
       if (currentUser !== undefined) {
-        alert(`Welcome Teacher ${currentUser.firstName}`);
+        alert(`Welcome Teacher ${currentUser.name}`);
         currentUser.loggedIn = true;
       }
       navigate("/teacher");
