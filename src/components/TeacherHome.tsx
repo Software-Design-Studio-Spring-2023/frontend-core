@@ -1,17 +1,40 @@
-import { Button, Grid, GridItem } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Grid,
+  GridItem,
+  HStack,
+  Heading,
+  Spacer,
+} from "@chakra-ui/react";
 import Webcam from "react-webcam";
 
-import { currentUser, users } from "./LoginForm";
+import { currentUser } from "./LoginForm";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import LogOut from "./alerts/LogOut";
+import StudentCard from "./StudentCard";
+import StudentMiniCard from "./StudentMiniCard";
+import useUsers from "../hooks/useUsers";
+import { HiEye } from "react-icons/hi";
 
 const TeacherHome = () => {
+  const borderColor = (warningColor: Number) => {
+    switch (warningColor) {
+      case 0:
+        return "green";
+      case 1:
+        return "#D69E2E";
+      case 2:
+        return "red";
+      default:
+        return "green"; // Default color in case warnings is undefined or out of range
+    }
+  };
   const location = useLocation();
   const navigate = useNavigate();
   const [itemClicked, setItemClicked] = useState(false);
-
-  // setItemClicked(false);
+  const { data, loading, error } = useUsers();
 
   if (currentUser?.loggedIn === false) {
     useEffect(() => {
@@ -35,8 +58,19 @@ const TeacherHome = () => {
 
   return (
     <>
-      <LogOut handleLogout={() => navigate("/")} />
+      <HStack>
+        <Box paddingLeft={"10px"}>
+          <HiEye color={"#81E6D9"} size={"3em"} />
+        </Box>
+        <Heading padding={"10px"}>Participants</Heading>
+        <Spacer />
+        <Box paddingRight={"30px"}>
+          <LogOut handleLogout={() => navigate("/")} />
+        </Box>
+      </HStack>
+
       <Grid
+        padding={"10px"}
         templateColumns={
           itemClicked
             ? //this is for the small grids
@@ -52,40 +86,48 @@ const TeacherHome = () => {
                 md: "repeat(3, 1fr)",
                 sm: "repeat(2, 1fr)",
               }
-            }
-            gap={4} // Add some gap between GridItems
-          >
-        {users.map(
+        }
+        gap={4} // Add some gap between GridItems
+      >
+        {data.map(
           (user) =>
-          user.userType === "student" && (
+            user.userType === "student" && (
               <GridItem
+                _hover={{
+                  transform: "scale(1.03)", // Increase the scale when hovered
+                  transition: "transform 0.1s", // Smooth transition
+                  boxShadow: ` 0 0 8px 1px ${borderColor(user.warnings)}`,
+                }}
+                borderRadius={"10px"}
                 cursor={"pointer"}
-                //manually set the width and height of the camera boxes in the display
-                // w={itemClicked ? "100%" : "100%"}
-                // h={itemClicked ? "100%" : "100%"}
                 key={user.id}
                 onClick={() => {
                   setItemClicked(true);
                   navigate(`/teacher/${user.id}`);
                 }}
               >
-                <Webcam />
-                {user.firstName}
+                {itemClicked ? (
+                  <StudentMiniCard name={user.name} warnings={user.warnings} />
+                ) : (
+                  <StudentCard name={user.name} warnings={user.warnings} />
+                )}
               </GridItem>
             )
         )}
       </Grid>
       <hr hidden={itemClicked ? false : true} />
-      <Button
-        hidden={itemClicked ? false : true}
-        onClick={() => {
-          setItemClicked(false);
-          navigate("/teacher");
-        }}
-        bgColor='gray.600'
-      >
-        Go Back
-      </Button>
+      <HStack padding={"10px"}>
+        <Button
+          hidden={itemClicked ? false : true}
+          onClick={() => {
+            setItemClicked(false);
+            navigate("/teacher");
+          }}
+          bgColor="gray.600"
+        >
+          Go Back
+        </Button>
+      </HStack>
       <Outlet />
     </>
   );

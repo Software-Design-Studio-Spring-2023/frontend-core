@@ -53,7 +53,7 @@ const StudentWebcam = () => {
   }
 
   if (currentUser !== undefined) {
-    name = currentUser.firstName;
+    name = currentUser.name;
     warnings = currentUser.warnings;
   }
   const webcamRef = useRef<(Webcam & HTMLVideoElement) | null>(null);
@@ -173,7 +173,13 @@ const StudentWebcam = () => {
   };
 
   return (
-    <VStack minHeight="100vh" justifyContent="center" alignItems="center" spacing={5}>
+    <VStack
+      minHeight="100vh"
+      justifyContent="center"
+      alignItems="center"
+      spacing={5}
+    >
+
       <div>
         <Webcam audio={false} ref={webcamRef} onUserMedia={handleWebcamLoad} />
         <canvas
@@ -194,7 +200,13 @@ const StudentWebcam = () => {
         <p>Warnings: {warnings}</p>
       </div>
       <div>
-        <Button colorScheme='teal' variant='solid' hidden={recording ? true : false} onClick={handleStartCapture}>
+        <Button
+          colorScheme="teal"
+          variant="solid"
+          hidden={recording ? true : false}
+          onClick={handleStartCapture}
+        >
+
           {"Start Exam"}
         </Button>
         <div hidden={recording ? false : true}>
