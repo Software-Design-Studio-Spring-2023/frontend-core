@@ -21,15 +21,16 @@ const App = () => {
         <Route path="/" element={<LoginForm />} />
         <Route path="/student" element={<StudentWebcam />} />
         <Route path="/teacher" element={<TeacherHome />}>
-          {data?.map(
+          {data.map(
             (user: User) =>
-            user.userType === "student" && (
-              <Route
-              path={user.id.toString()}
-              key={user.id}
-              element={<TeacherView user={user} />}
-              />
-            )
+              user.userType === "student" &&
+              user.terminated === false && (
+                <Route
+                  path={user.id.toString()}
+                  key={user.id}
+                  element={<TeacherView user={user} />}
+                />
+              )
           )}
         </Route>
         <Route path="/privacy" element={<TermsAndConditions />} />

@@ -91,7 +91,8 @@ const TeacherHome = () => {
       >
         {data.map(
           (user) =>
-            user.userType === "student" && (
+            user.userType === "student" &&
+            user.terminated === false && (
               <GridItem
                 _hover={{
                   transform: "scale(1.03)", // Increase the scale when hovered
