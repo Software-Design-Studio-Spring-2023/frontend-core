@@ -9,6 +9,8 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { useRef } from "react";
+import { update_loggedin } from "../../services/user-utils";
+import { currentUser } from "../LoginForm";
 
 interface Props {
   handleLogout: () => void;
@@ -21,6 +23,7 @@ const EndExam = ({ handleLogout }: Props) => {
   const handleConfirmLogout = () => {
     handleLogout();
     onClose();
+    update_loggedin(currentUser.id, false);
   };
 
   return (

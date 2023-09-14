@@ -19,3 +19,13 @@ export const update_warnings = async (id: number, warnings: number) => {
       throw error;
     }
   };
+
+  export const get_warnings = async (id: number) => {
+    try {
+      const response = await apiClient.get(`/get_warnings/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("There was an error fetching the warning count!", error);
+      throw error;
+    }
+  };

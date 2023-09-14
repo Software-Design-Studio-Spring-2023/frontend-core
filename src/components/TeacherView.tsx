@@ -8,15 +8,10 @@ import LogOut from "./alerts/LogOut";
 import IssueWarning from "./alerts/IssueWarning";
 import { VStack } from "@chakra-ui/react";
 import { update_warnings } from "../services/user-utils";
-// import { Button } from "@chakra-ui/react";
 
 interface Props {
   user: User;
 }
-
-// if (currentUser) {
-//   warnings = currentUser.warnings;
-// }
 
 let warnings: number;
 
@@ -45,6 +40,12 @@ const TeacherView = ({ user }: Props) => {
       navigate("/*");
     }, []);
   }
+
+  useEffect(() => {
+    if (user !== undefined) {
+      setWarning(user.warnings);
+    }
+  }, [user]);
 
   const [warning, setWarning] = useState(warnings);
 
@@ -78,8 +79,8 @@ const TeacherView = ({ user }: Props) => {
             handleWarning={() => {
               //this needs to be sent back to the database so the warnings reset clicking on a new user
               // this is the code for adding warning without database
-              if (warning <= 1) setWarning(warning + 1);
-              update_warnings(user.id, warning);
+              update_warnings(user.id, warning + 1);
+              setWarning(warnings + 1);
               if (user !== undefined) {
                 user.warnings = warning;
               }
