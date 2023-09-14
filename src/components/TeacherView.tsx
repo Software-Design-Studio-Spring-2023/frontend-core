@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import LogOut from "./alerts/LogOut";
 import IssueWarning from "./alerts/IssueWarning";
 import { VStack } from "@chakra-ui/react";
+import { update_warnings } from "../services/user-utils";
 // import { Button } from "@chakra-ui/react";
 
 interface Props {
@@ -77,8 +78,8 @@ const TeacherView = ({ user }: Props) => {
             handleWarning={() => {
               //this needs to be sent back to the database so the warnings reset clicking on a new user
               // this is the code for adding warning without database
-
               if (warning <= 1) setWarning(warning + 1);
+              update_warnings(user.id, warning);
               if (user !== undefined) {
                 user.warnings = warning;
               }
