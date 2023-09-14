@@ -35,6 +35,7 @@ const TeacherHome = () => {
   const navigate = useNavigate();
   const [itemClicked, setItemClicked] = useState(false);
   const [userClicked, setUserClicked] = useState("");
+  const [userClickedWarning, setuserClickedWarning] = useState(0);
 
   const { data, loading, error } = useUsers();
 
@@ -60,7 +61,12 @@ const TeacherHome = () => {
 
   return (
     <>
-      <HStack>
+      <Box position="absolute" top="0" left="50%" transform="translateX(-50%)">
+        <Heading padding={"10px"}>
+          {itemClicked ? `Warnings: ${userClickedWarning}` : ""}
+        </Heading>
+      </Box>
+      <HStack w="100%" justifyContent="space-between" alignItems="center">
         <Box paddingLeft={"10px"}>
           <HiEye color={"#81E6D9"} size={"3em"} />
         </Box>
@@ -68,21 +74,37 @@ const TeacherHome = () => {
           {itemClicked ? userClicked : "Participants"}
         </Heading>
         <Spacer />
-        <Box paddingRight={"30px"}>
+        <Button
+          marginRight={"10px"}
+          hidden={itemClicked ? false : true}
+          onClick={() => {
+            setItemClicked(false);
+            navigate("/teacher");
+          }}
+          bgColor="gray.600"
+        >
+          Go Back
+        </Button>
+        <Box marginRight={"30px"}>
           <LogOut handleLogout={() => navigate("/")} />
         </Box>
       </HStack>
+      <Outlet />
+      <Box padding={"10px"} paddingBottom={"0px"}>
+        <hr hidden={itemClicked ? false : true} />
+      </Box>
 
       <Grid
         padding={"10px"}
+        paddingTop={itemClicked ? "10px" : "0px"}
         templateColumns={
           itemClicked
             ? //this is for the small grids
               {
                 //this is responsive grid scaling for different sized devices
                 lg: "repeat(10, 1fr)",
-                md: "repeat(8, 1fr)",
-                sm: "repeat(7, 1fr)",
+                md: "repeat(5, 1fr)",
+                sm: "repeat(4, 1fr)",
               }
             : {
                 //this is responsive grid scaling for different sized devices
@@ -92,6 +114,10 @@ const TeacherHome = () => {
               }
         }
         gap={4} // Add some gap between GridItems
+        overflowX={itemClicked ? "scroll" : "hidden"} // Enable horizontal scrolling when itemClicked is true
+        style={
+          itemClicked ? { width: "calc(100% - 10px)", margin: "0 auto" } : {}
+        }
       >
         {data.map(
           (user) =>
@@ -109,6 +135,7 @@ const TeacherHome = () => {
                 onClick={() => {
                   setItemClicked(true);
                   setUserClicked(user.name);
+                  setuserClickedWarning(user.warnings);
                   navigate(`/teacher/${user.id}`);
                 }}
               >
@@ -121,20 +148,6 @@ const TeacherHome = () => {
             )
         )}
       </Grid>
-      <hr hidden={itemClicked ? false : true} />
-      <HStack padding={"10px"}>
-        <Button
-          hidden={itemClicked ? false : true}
-          onClick={() => {
-            setItemClicked(false);
-            navigate("/teacher");
-          }}
-          bgColor="gray.600"
-        >
-          Go Back
-        </Button>
-      </HStack>
-      <Outlet />
     </>
   );
 };
