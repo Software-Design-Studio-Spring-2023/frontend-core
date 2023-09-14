@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import LogOut from "./alerts/LogOut";
 import IssueWarning from "./alerts/IssueWarning";
 import { VStack } from "@chakra-ui/react";
-import { update_warnings } from "../services/user-utils";
+import { update_terminate, update_warnings } from "../services/user-utils";
 
 interface Props {
   user: User;
@@ -92,9 +92,11 @@ const TeacherView = ({ user }: Props) => {
             handleTerminate={() =>
               // add the logic here for stopping a webcam
               {
+                update_terminate(user.id, true);
                 if (user !== undefined) {
-                  user.loggedIn = false;
+                  user.terminated = true;
                 }
+                navigate("/teacher");
               }
             }
           />

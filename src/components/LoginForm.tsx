@@ -15,9 +15,6 @@ import {
 import { HiEye, HiOutlineEye } from "react-icons/hi";
 import { update_loggedin } from "../services/user-utils";
 
-//set logged in variable, which will be true throughout duration of exam. only way to revert false is by finishing exam
-// let users: User[];
-
 export var currentUser: User | undefined = {
   id: 0,
   name: "",
@@ -28,6 +25,7 @@ export var currentUser: User | undefined = {
   warnings: 0,
   imageURL: "",
   encodeIP: 0,
+  terminated: false,
 };
 // localhost:8080/api/all_users
 
@@ -43,7 +41,8 @@ const LoginForm = () => {
           user.password === password &&
           // user.userType === "student"
           email.includes("@student.uts.edu.au") &&
-          user.loggedIn === false
+          user.loggedIn === false &&
+          user.terminated === false
       )
     ) {
       currentUser = data.find(
@@ -80,11 +79,26 @@ const LoginForm = () => {
           user.password === password &&
           // user.userType === "student"
           email.includes("@student.uts.edu.au") &&
-          user.loggedIn === true
+          user.loggedIn === true &&
+          user.terminated === false
       )
     ) {
       //start of handler for students already logged in. will retrieve value from database
       alert("Student is already logged in!!");
+    } else if (
+      data.some(
+        (user) =>
+          user.email === email &&
+          user.password === password &&
+          // user.userType === "student"
+          email.includes("@student.uts.edu.au") &&
+          user.terminated === true
+      )
+    ) {
+      //start of handler for students already logged in. will retrieve value from database
+      alert(
+        "Your exam has been terminated. Contact the University for support."
+      );
     } else {
       alert("Invalid username or password");
     }
