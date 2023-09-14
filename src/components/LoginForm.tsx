@@ -12,11 +12,8 @@ import {
   InputRightElement,
   Heading,
 } from "@chakra-ui/react";
-import React from "react";
 import { HiEye, HiOutlineEye } from "react-icons/hi";
-
-//set logged in variable, which will be true throughout duration of exam. only way to revert false is by finishing exam
-// let users: User[];
+import { update_loggedin } from "../services/user-utils";
 
 export var currentUser: User | undefined = {
   id: 0,
@@ -28,19 +25,13 @@ export var currentUser: User | undefined = {
   warnings: 0,
   imageURL: "",
   encodeIP: 0,
+  terminated: false,
 };
 // localhost:8080/api/all_users
 
 const LoginForm = () => {
   const navigate = useNavigate();
   const { data, loading, error } = useUsers();
-
-  // console.log(error ? null : error);
-
-  // useEffect(() => {
-  //   navigate("/");
-  // }, []);
-  // const [loggedIn, setLoggedIn] = useState(false);
 
   const handleLogin = (email: string, password: string) => {
     if (
@@ -50,7 +41,8 @@ const LoginForm = () => {
           user.password === password &&
           // user.userType === "student"
           email.includes("@student.uts.edu.au") &&
-          user.loggedIn === false
+          user.loggedIn === false &&
+          user.terminated === false
       )
     ) {
       currentUser = data.find(
@@ -58,9 +50,10 @@ const LoginForm = () => {
       );
       if (currentUser !== undefined) {
         alert(`Welcome Student ${currentUser.name}`);
+        update_loggedin(currentUser.id, true);
         currentUser.loggedIn = true; //gotta send this to the database, students can't login again until after exam is done
       }
-      navigate("/student");
+      navigate("/privacy");
     } else if (
       data.some(
         (user) =>
@@ -75,15 +68,37 @@ const LoginForm = () => {
       );
       if (currentUser !== undefined) {
         alert(`Welcome Teacher ${currentUser.name}`);
+        update_loggedin(currentUser.id, true);
         currentUser.loggedIn = true;
       }
       navigate("/teacher");
     } else if (
-      currentUser?.loggedIn === true &&
-      currentUser?.userType === "student"
+      data.some(
+        (user) =>
+          user.email === email &&
+          user.password === password &&
+          // user.userType === "student"
+          email.includes("@student.uts.edu.au") &&
+          user.loggedIn === true &&
+          user.terminated === false
+      )
     ) {
       //start of handler for students already logged in. will retrieve value from database
       alert("Student is already logged in!!");
+    } else if (
+      data.some(
+        (user) =>
+          user.email === email &&
+          user.password === password &&
+          // user.userType === "student"
+          email.includes("@student.uts.edu.au") &&
+          user.terminated === true
+      )
+    ) {
+      //start of handler for students already logged in. will retrieve value from database
+      alert(
+        "Your exam has been terminated. Contact the University for support."
+      );
     } else {
       alert("Invalid username or password");
     }
@@ -91,7 +106,7 @@ const LoginForm = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [show, setShow] = React.useState(false);
+  const [show, setShow] = useState(false);
   // const handleClick = () => setShow(!show);
 
   return (

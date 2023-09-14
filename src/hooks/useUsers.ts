@@ -11,6 +11,7 @@ export interface User {
     imageURL: string;
     encodeIP: number;
     warnings: number;
+    terminated: boolean;
 }  
   
 const useUsers = () => (useData<User>("/all_users"))

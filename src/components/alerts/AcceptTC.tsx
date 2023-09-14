@@ -7,30 +7,28 @@ import {
   AlertDialogOverlay,
   useDisclosure,
   Button,
+  Text,
 } from "@chakra-ui/react";
 import { useRef } from "react";
-import { update_loggedin } from "../../services/user-utils";
-import { currentUser } from "../LoginForm";
 
 interface Props {
-  handleLogout: () => void;
+  handleCancel: () => void;
 }
 
-const EndExam = ({ handleLogout }: Props) => {
+const AcceptTC = ({ handleCancel }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef(null);
 
-  const handleConfirmLogout = () => {
-    handleLogout();
+  const handleConfirmTerminate = () => {
+    handleCancel();
     onClose();
-    update_loggedin(currentUser.id, false);
   };
 
   return (
     <>
-      <Button colorScheme="teal" variant="solid" onClick={onOpen}>
-        Log Out
-      </Button>
+      <button onClick={onOpen}>
+        <Text as='u'>Cancel</Text>
+        </button>
       <AlertDialog
         motionPreset="scale"
         isOpen={isOpen}
@@ -40,16 +38,18 @@ const EndExam = ({ handleLogout }: Props) => {
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Log Out
+              Are you sure?
             </AlertDialogHeader>
 
-            <AlertDialogBody>Are you sure you want to log out?</AlertDialogBody>
+            <AlertDialogBody>
+              You will be not permitted to start your exam without your consent.
+            </AlertDialogBody>
 
             <AlertDialogFooter>
               <Button ref={cancelRef} onClick={onClose}>
                 No
               </Button>
-              <Button colorScheme="red" onClick={handleConfirmLogout} ml={3}>
+              <Button colorScheme="red" onClick={handleConfirmTerminate} ml={3}>
                 Yes
               </Button>
             </AlertDialogFooter>
@@ -60,4 +60,4 @@ const EndExam = ({ handleLogout }: Props) => {
   );
 };
 
-export default EndExam;
+export default AcceptTC;
