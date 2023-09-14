@@ -12,8 +12,8 @@ import {
   InputRightElement,
   Heading,
 } from "@chakra-ui/react";
-import React from "react";
 import { HiEye, HiOutlineEye } from "react-icons/hi";
+import { update_loggedin } from "../services/user-utils";
 
 //set logged in variable, which will be true throughout duration of exam. only way to revert false is by finishing exam
 // let users: User[];
@@ -35,13 +35,6 @@ const LoginForm = () => {
   const navigate = useNavigate();
   const { data, loading, error } = useUsers();
 
-  // console.log(error ? null : error);
-
-  // useEffect(() => {
-  //   navigate("/");
-  // }, []);
-  // const [loggedIn, setLoggedIn] = useState(false);
-
   const handleLogin = (email: string, password: string) => {
     if (
       data.some(
@@ -58,6 +51,7 @@ const LoginForm = () => {
       );
       if (currentUser !== undefined) {
         alert(`Welcome Student ${currentUser.name}`);
+        update_loggedin(currentUser.id, true);
         currentUser.loggedIn = true; //gotta send this to the database, students can't login again until after exam is done
       }
       navigate("/privacy");
@@ -75,12 +69,19 @@ const LoginForm = () => {
       );
       if (currentUser !== undefined) {
         alert(`Welcome Teacher ${currentUser.name}`);
+        update_loggedin(currentUser.id, true);
         currentUser.loggedIn = true;
       }
       navigate("/teacher");
     } else if (
-      currentUser?.loggedIn === true &&
-      currentUser?.userType === "student"
+      data.some(
+        (user) =>
+          user.email === email &&
+          user.password === password &&
+          // user.userType === "student"
+          email.includes("@student.uts.edu.au") &&
+          user.loggedIn === true
+      )
     ) {
       //start of handler for students already logged in. will retrieve value from database
       alert("Student is already logged in!!");
@@ -91,7 +92,7 @@ const LoginForm = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [show, setShow] = React.useState(false);
+  const [show, setShow] = useState(false);
   // const handleClick = () => setShow(!show);
 
   return (
