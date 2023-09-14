@@ -61,18 +61,15 @@ const TeacherView = ({ user }: Props) => {
 
   return (
     <>
-      <VStack
-        minHeight="50vh"
-        justifyContent="center"
-        alignItems="center"
-        spacing={5}
-      >
-        <div>
-          <Webcam height={"50%"} width={"50%"} />
-          <label>{user.name}</label>
-        </div>
-        <div>
-          <p>Warnings: {warning}</p>
+      <VStack justifyContent="center" alignItems="center" spacing={2.5}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Webcam height={"90%"} width={"90%"} />
         </div>
         <div hidden={warning === 2 ? true : false}>
           <IssueWarning

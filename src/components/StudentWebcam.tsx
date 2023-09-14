@@ -5,7 +5,19 @@ import { currentUser } from "./LoginForm";
 
 import { useNavigate } from "react-router-dom";
 import EndExam from "./alerts/EndExam";
-import { Alert, AlertIcon, Button, VStack } from "@chakra-ui/react";
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
+  Box,
+  Button,
+  HStack,
+  Heading,
+  Spacer,
+  VStack,
+} from "@chakra-ui/react";
+import { HiEye } from "react-icons/hi";
 // import { useDisclosure } from "@chakra-ui/react";
 
 let name = "";
@@ -14,6 +26,15 @@ let warnings: number;
 
 const StudentWebcam = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showAlert, setShowAlert] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowAlert(false);
+    }, 10000); // Set timeout to 10 seconds
+
+    return () => clearTimeout(timer); // Clear the timer if the component is unmounted before 10 seconds
+  }, []);
 
   useEffect(() => {
     const handleBackButtonEvent = (e: PopStateEvent) => {
@@ -173,14 +194,35 @@ const StudentWebcam = () => {
   };
 
   return (
-    <VStack
-      minHeight="100vh"
-      justifyContent="center"
-      alignItems="center"
-      spacing={5}
-    >
+    <>
+      <HStack>
+        <Box paddingLeft={"10px"}>
+          <HiEye color={"#81E6D9"} size={"3em"} />
+        </Box>
+        <Heading padding={"10px"}>{currentUser.name}</Heading>
+        <Button
+          colorScheme="teal"
+          variant="solid"
+          padding={"10px"}
+          hidden={recording ? true : false}
+          onClick={handleStartCapture}
+        >
+          {"Start Exam"}
+        </Button>
+        <Spacer />
+        <Heading hidden={recording ? false : true}>
+          Warnings: {warnings}
+        </Heading>
+        <Spacer />
+        <Box paddingRight={"30px"}>
+          <div hidden={recording ? false : true}>
+            {/* {"Finish Exam"} */}
+            <EndExam handleTerminate={handleStopCapture} />
+          </div>
+        </Box>
+      </HStack>
 
-      <div>
+      <VStack padding={"20px"}>
         <Webcam audio={false} ref={webcamRef} onUserMedia={handleWebcamLoad} />
         <canvas
           ref={canvasRef}
@@ -189,32 +231,20 @@ const StudentWebcam = () => {
           style={{ display: "none" }}
         ></canvas>{" "}
         {/* Hide the canvas element */}
-      </div>
-      <div>
-        <p>{name}</p>
-      </div>
-      <div hidden={recording ? true : false}>
-        <p>This is where the checklist will be</p>
-      </div>
-      <div hidden={recording ? false : true}>
-        <p>Warnings: {warnings}</p>
-      </div>
-      <div>
-        <Button
-          colorScheme="teal"
-          variant="solid"
-          hidden={recording ? true : false}
-          onClick={handleStartCapture}
-        >
-
-          {"Start Exam"}
-        </Button>
-        <div hidden={recording ? false : true}>
-          {/* {"Finish Exam"} */}
-          <EndExam handleTerminate={handleStopCapture} />
+        <div hidden={recording ? true : false}>
+          <p>This is where the checklist will be</p>
         </div>
-      </div>
-    </VStack>
+        {showAlert && (
+          <Alert padding={"30px"} size={"medium"} status="warning">
+            <AlertIcon />
+            <AlertTitle>You have just received a warning!</AlertTitle>
+            <AlertDescription>
+              Suspicious activity has been detected on your video feed.
+            </AlertDescription>
+          </Alert>
+        )}
+      </VStack>
+    </>
   );
 };
 
