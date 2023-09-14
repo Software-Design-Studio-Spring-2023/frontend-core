@@ -34,6 +34,8 @@ const TeacherHome = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [itemClicked, setItemClicked] = useState(false);
+  const [userClicked, setUserClicked] = useState("");
+
   const { data, loading, error } = useUsers();
 
   if (currentUser?.loggedIn === false) {
@@ -62,7 +64,9 @@ const TeacherHome = () => {
         <Box paddingLeft={"10px"}>
           <HiEye color={"#81E6D9"} size={"3em"} />
         </Box>
-        <Heading padding={"10px"}>Participants</Heading>
+        <Heading padding={"10px"}>
+          {itemClicked ? userClicked : "Participants"}
+        </Heading>
         <Spacer />
         <Box paddingRight={"30px"}>
           <LogOut handleLogout={() => navigate("/")} />
@@ -104,6 +108,7 @@ const TeacherHome = () => {
                 key={user.id}
                 onClick={() => {
                   setItemClicked(true);
+                  setUserClicked(user.name);
                   navigate(`/teacher/${user.id}`);
                 }}
               >
