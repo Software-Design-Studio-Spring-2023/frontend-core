@@ -8,8 +8,8 @@ import {
 import TeacherHome from "./components/TeacherHome";
 import StudentWebcam from "./components/StudentWebcam";
 import PageNotFound from "./components/PageNotFound";
-
 import TeacherView from "./components/TeacherView";
+import TermsAndConditions from "./components/TermsAndConditions";
 import useUsers, { User } from "./hooks/useUsers";
 
 const App = () => {
@@ -23,15 +23,16 @@ const App = () => {
         <Route path="/teacher" element={<TeacherHome />}>
           {data?.map(
             (user: User) =>
-              user.userType === "student" && (
-                <Route
-                  path={user.id.toString()}
-                  key={user.id}
-                  element={<TeacherView user={user} />}
-                />
-              )
+            user.userType === "student" && (
+              <Route
+              path={user.id.toString()}
+              key={user.id}
+              element={<TeacherView user={user} />}
+              />
+            )
           )}
         </Route>
+        <Route path="/privacy" element={<TermsAndConditions />} />
         <Route path="/*" element={<PageNotFound />} />
       </Routes>
     </Router>

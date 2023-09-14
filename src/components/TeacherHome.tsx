@@ -18,15 +18,23 @@ import StudentMiniCard from "./StudentMiniCard";
 import useUsers from "../hooks/useUsers";
 import { HiEye } from "react-icons/hi";
 
-//
-
 const TeacherHome = () => {
+  const borderColor = (warningColor: Number) => {
+    switch (warningColor) {
+      case 0:
+        return "green";
+      case 1:
+        return "#D69E2E";
+      case 2:
+        return "red";
+      default:
+        return "green"; // Default color in case warnings is undefined or out of range
+    }
+  };
   const location = useLocation();
   const navigate = useNavigate();
   const [itemClicked, setItemClicked] = useState(false);
   const { data, loading, error } = useUsers();
-
-  // setItemClicked(false);
 
   if (currentUser?.loggedIn === false) {
     useEffect(() => {
@@ -85,12 +93,13 @@ const TeacherHome = () => {
           (user) =>
             user.userType === "student" && (
               <GridItem
-                // overflow={"hidden"}
-                // borderRadius={"4px"}
+                _hover={{
+                  transform: "scale(1.03)", // Increase the scale when hovered
+                  transition: "transform 0.1s", // Smooth transition
+                  boxShadow: ` 0 0 8px 1px ${borderColor(user.warnings)}`,
+                }}
+                borderRadius={"10px"}
                 cursor={"pointer"}
-                //manually set the width and height of the camera boxes in the display
-                // w={itemClicked ? "100%" : "100%"}
-                // h={itemClicked ? "100%" : "100%"}
                 key={user.id}
                 onClick={() => {
                   setItemClicked(true);

@@ -66,10 +66,8 @@ const TeacherView = ({ user }: Props) => {
         spacing={5}
       >
         <div>
-          <label>
-            <Webcam />
-            {user.name}
-          </label>
+          <Webcam height={"50%"} width={"50%"} />
+          <label>{user.name}</label>
         </div>
         <div>
           <p>Warnings: {warning}</p>
