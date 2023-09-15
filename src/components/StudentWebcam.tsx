@@ -18,6 +18,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { HiEye } from "react-icons/hi";
+import LoginSuccess from "./alerts/LoginSuccess";
 // import { useDisclosure } from "@chakra-ui/react";
 
 let name = "";
@@ -27,11 +28,13 @@ let warnings: number;
 const StudentWebcam = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showAlert, setShowAlert] = useState(true);
+  const [startCapture, setStartCapture] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowAlert(false);
-    }, 10000); // Set timeout to 10 seconds
+      setStartCapture(true);
+    }, 3000); // Set timeout to 10 seconds
 
     return () => clearTimeout(timer); // Clear the timer if the component is unmounted before 10 seconds
   }, []);
@@ -94,7 +97,7 @@ const StudentWebcam = () => {
     const video = webcamRef.current?.video;
     const canvas = canvasRef.current;
 
-    if (video && canvas) {
+    if (video && canvas && startCapture) {
       const context = canvas.getContext("2d");
 
       if (context) {
@@ -221,7 +224,7 @@ const StudentWebcam = () => {
           </div>
         </Box>
       </HStack>
-
+      <LoginSuccess />
       <VStack padding={"20px"}>
         <Webcam audio={false} ref={webcamRef} onUserMedia={handleWebcamLoad} />
         <canvas
@@ -234,7 +237,7 @@ const StudentWebcam = () => {
         <div hidden={recording ? true : false}>
           <p>This is where the checklist will be</p>
         </div>
-        {showAlert && (
+        {/* {showAlert && (
           <Alert padding={"30px"} size={"medium"} status="warning">
             <AlertIcon />
             <AlertTitle>You have just received a warning!</AlertTitle>
@@ -242,7 +245,7 @@ const StudentWebcam = () => {
               Suspicious activity has been detected on your video feed.
             </AlertDescription>
           </Alert>
-        )}
+        )} */}
       </VStack>
     </>
   );

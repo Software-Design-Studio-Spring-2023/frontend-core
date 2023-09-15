@@ -17,6 +17,7 @@ import StudentCard from "./StudentCard";
 import StudentMiniCard from "./StudentMiniCard";
 import useUsers from "../hooks/useUsers";
 import { HiEye } from "react-icons/hi";
+import LoginSuccess from "./alerts/LoginSuccess";
 
 const TeacherHome = () => {
   const borderColor = (warningColor: Number) => {
@@ -93,7 +94,9 @@ const TeacherHome = () => {
       <Box padding={"10px"} paddingBottom={"0px"}>
         <hr hidden={itemClicked ? false : true} />
       </Box>
-
+      <div hidden={itemClicked ? true : false}>
+        <LoginSuccess />
+      </div>
       <Grid
         padding={"10px"}
         paddingTop={itemClicked ? "10px" : "0px"}
@@ -114,7 +117,6 @@ const TeacherHome = () => {
               }
         }
         gap={4} // Add some gap between GridItems
-        overflowX={itemClicked ? "scroll" : "hidden"} // Enable horizontal scrolling when itemClicked is true
         style={
           itemClicked ? { width: "calc(100% - 10px)", margin: "0 auto" } : {}
         }
