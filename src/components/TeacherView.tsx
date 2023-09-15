@@ -6,7 +6,7 @@ import { currentUser } from "./LoginForm";
 import { useNavigate } from "react-router-dom";
 import LogOut from "./alerts/LogOut";
 import IssueWarning from "./alerts/IssueWarning";
-import { VStack } from "@chakra-ui/react";
+import { Box, Heading, VStack } from "@chakra-ui/react";
 import { update_terminate, update_warnings } from "../services/user-utils";
 
 interface Props {
@@ -61,6 +61,9 @@ const TeacherView = ({ user }: Props) => {
 
   return (
     <>
+      <Box position="absolute" top="0" left="50%" transform="translateX(-50%)">
+        <Heading padding={"10px"}>{`Warnings: ${user.warnings}`}</Heading>
+      </Box>
       <VStack justifyContent="center" alignItems="center" spacing={2.5}>
         <div
           style={{

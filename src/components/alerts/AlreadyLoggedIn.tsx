@@ -14,8 +14,8 @@ const AlreadyLoggedIn = () => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const interval = 10; // update every 50ms
-    const totalDuration = 3000; // 5 seconds in total
+    const interval = 10; // update every 10ms
+    const totalDuration = 3000; // 3 seconds in total
 
     // Initialize the progress state to totalDuration
     setProgress(totalDuration);

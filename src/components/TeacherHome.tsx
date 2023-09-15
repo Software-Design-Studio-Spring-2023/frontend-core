@@ -36,8 +36,6 @@ const TeacherHome = () => {
   const navigate = useNavigate();
   const [itemClicked, setItemClicked] = useState(false);
   const [userClicked, setUserClicked] = useState("");
-  const [userClickedWarning, setuserClickedWarning] = useState(0);
-
   const { data, loading, error } = useUsers();
 
   if (currentUser?.loggedIn === false) {
@@ -62,11 +60,6 @@ const TeacherHome = () => {
 
   return (
     <>
-      <Box position="absolute" top="0" left="50%" transform="translateX(-50%)">
-        <Heading padding={"10px"}>
-          {itemClicked ? `Warnings: ${userClickedWarning}` : ""}
-        </Heading>
-      </Box>
       <HStack w="100%" justifyContent="space-between" alignItems="center">
         <Box paddingLeft={"10px"}>
           <HiEye color={"#81E6D9"} size={"3em"} />
@@ -137,7 +130,6 @@ const TeacherHome = () => {
                 onClick={() => {
                   setItemClicked(true);
                   setUserClicked(user.name);
-                  setuserClickedWarning(user.warnings);
                   navigate(`/teacher/${user.id}`);
                 }}
               >
