@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useUsers, { User } from "../hooks/useUsers";
 import { useNavigate } from "react-router-dom";
 import {
@@ -11,9 +11,13 @@ import {
   HStack,
   InputRightElement,
   Heading,
+  Box,
 } from "@chakra-ui/react";
 import { HiEye, HiOutlineEye } from "react-icons/hi";
 import { update_loggedin } from "../services/user-utils";
+import LoginFailed from "./alerts/LoginFailed";
+import Terminated from "./alerts/Terminated";
+import AlreadyLoggedIn from "./alerts/AlreadyLoggedIn";
 
 export var currentUser: User | undefined = {
   id: 0,
@@ -31,9 +35,25 @@ export var currentUser: User | undefined = {
 
 const LoginForm = () => {
   const navigate = useNavigate();
+  const [failed, setFailed] = useState(false);
   const { data, loading, error } = useUsers();
+  const [email, setEmail] = useState("");
+  const [disabled, setDisabled] = useState(false);
+  const [password, setPassword] = useState("");
+  const [show, setShow] = useState(false);
+  const [examTerminated, setExamTerminated] = useState(false);
+  const [alreadyLogged, setAlreadyLogged] = useState(false);
 
-  const handleLogin = (email: string, password: string) => {
+  useEffect(() => {
+    if (email.trim() !== "" && password.trim() !== "") {
+      setDisabled(false);
+    } else {
+      setDisabled(true);
+    }
+  }, [email, password]);
+
+  const handleLogin = (event, email: string, password: string) => {
+    event.preventDefault();
     if (
       data.some(
         (user) =>
@@ -81,8 +101,12 @@ const LoginForm = () => {
           user.terminated === false
       )
     ) {
-      //start of handler for students already logged in. will retrieve value from database
-      alert("Student is already logged in!!");
+      setFailed(false);
+      setAlreadyLogged(false);
+      setExamTerminated(false);
+      setTimeout(() => {
+        setAlreadyLogged(true);
+      }, 0);
     } else if (
       data.some(
         (user) =>
@@ -93,77 +117,96 @@ const LoginForm = () => {
           user.terminated === true
       )
     ) {
-      //start of handler for students already logged in. will retrieve value from database
-      alert(
-        "Your exam has been terminated. Contact the University for support."
-      );
+      setFailed(false);
+      setExamTerminated(false);
+      setAlreadyLogged(false);
+      setTimeout(() => {
+        setExamTerminated(true);
+      }, 0);
+    } else if (email.trim() === "" || password.trim() === "") {
+      return;
     } else {
-      alert("Invalid username or password");
+      setFailed(false);
+      setExamTerminated(false);
+      setAlreadyLogged(false);
+      setTimeout(() => {
+        setFailed(true);
+      }, 0);
     }
   };
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [show, setShow] = useState(false);
-  // const handleClick = () => setShow(!show);
-
   return (
-    <VStack
-      minHeight="100vh"
-      justifyContent="center"
-      alignItems="center"
-      spacing={5}
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
     >
-      <HStack paddingTop={5}>
-        <HiEye color={"#81E6D9"} size={"3em"} />
-        <Heading fontStyle={"italic"} paddingBottom={2}>
-          eyedentify
-        </Heading>
-      </HStack>
-      <form>
-        <FormControl isRequired>
-          <FormLabel>Enter your UTS Email Address</FormLabel>
-          <Input
-            placeholder="Email Address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </FormControl>
-
-        <FormControl isRequired paddingTop={5} paddingBottom={5}>
-          <FormLabel>Password</FormLabel>
-          <InputGroup size="md">
-            <Input
-              pr="4.5rem"
-              onChange={(e) => setPassword(e.target.value)}
-              type={show ? "text" : "password"} // this might be a problem...
-              placeholder="Enter Password"
-              value={password}
-            />
-            <InputRightElement cursor={"pointer"} marginRight={2}>
-              <HiOutlineEye
-                size="1.5em"
-                color={show ? "gray" : "white"}
-                onMouseDown={() => setShow(true)}
-                onMouseUp={() => setShow(false)}
-                onMouseLeave={() => setShow(false)}
-              />
-            </InputRightElement>
-          </InputGroup>
-        </FormControl>
-
-        <HStack justifyContent="center" alignItems="center" spacing={5}>
-          <Button
-            onClick={() => handleLogin(email, password)}
-            type="submit"
-            colorScheme="teal"
-            variant="solid"
-          >
-            Login
-          </Button>
+      <Box position="absolute" top="10" width="100%" zIndex="1000">
+        {failed && <LoginFailed />}
+      </Box>
+      <Box position="absolute" top="10" width="100%" zIndex="1000">
+        {examTerminated && <Terminated />}
+      </Box>
+      <Box position="absolute" top="10" width="100%" zIndex="1000">
+        {alreadyLogged && <AlreadyLoggedIn />}
+      </Box>
+      <VStack justifyContent="center" alignItems="center" spacing={5}>
+        <HStack paddingTop={5}>
+          <HiEye color={"#81E6D9"} size={"3em"} />
+          <Heading fontStyle={"italic"} paddingBottom={2}>
+            eyedentify
+          </Heading>
         </HStack>
-      </form>
-    </VStack>
+        <form>
+          <FormControl isRequired>
+            <FormLabel>Enter your UTS Email Address</FormLabel>
+            <Input
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </FormControl>
+
+          <FormControl isRequired paddingTop={5} paddingBottom={5}>
+            <FormLabel>Password</FormLabel>
+            <InputGroup size="md">
+              <Input
+                pr="4.5rem"
+                onChange={(e) => setPassword(e.target.value)}
+                type={show ? "text" : "password"} // this might be a problem...
+                placeholder="Enter Password"
+                value={password}
+              />
+              <InputRightElement cursor={"pointer"} marginRight={2}>
+                <HiOutlineEye
+                  size="1.5em"
+                  color={show ? "gray" : "white"}
+                  onMouseDown={() => setShow(true)}
+                  onMouseUp={() => setShow(false)}
+                  onMouseLeave={() => setShow(false)}
+                />
+              </InputRightElement>
+            </InputGroup>
+          </FormControl>
+
+          <HStack justifyContent="center" alignItems="center" spacing={5}>
+            <Button
+              onClick={(e) => handleLogin(e, email, password)}
+              type="submit"
+              colorScheme={disabled ? "gray" : "teal"}
+              variant="solid"
+              disabled={disabled}
+            >
+              Login
+            </Button>
+          </HStack>
+        </form>
+      </VStack>
+    </div>
   );
 };
 

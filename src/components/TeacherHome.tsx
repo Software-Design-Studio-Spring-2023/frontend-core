@@ -94,7 +94,9 @@ const TeacherHome = () => {
       <Box padding={"10px"} paddingBottom={"0px"}>
         <hr hidden={itemClicked ? false : true} />
       </Box>
-      <LoginSuccess />
+      <div hidden={itemClicked ? true : false}>
+        <LoginSuccess />
+      </div>
       <Grid
         padding={"10px"}
         paddingTop={itemClicked ? "10px" : "0px"}
