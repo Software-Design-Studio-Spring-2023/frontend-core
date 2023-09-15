@@ -49,7 +49,6 @@ const LoginForm = () => {
         (user) => user.email === email && user.password === password
       );
       if (currentUser !== undefined) {
-        alert(`Welcome Student ${currentUser.name}`);
         update_loggedin(currentUser.id, true);
         currentUser.loggedIn = true; //gotta send this to the database, students can't login again until after exam is done
       }
@@ -67,7 +66,6 @@ const LoginForm = () => {
         (user) => user.email === email && user.password === password
       );
       if (currentUser !== undefined) {
-        alert(`Welcome Teacher ${currentUser.name}`);
         update_loggedin(currentUser.id, true);
         currentUser.loggedIn = true;
       }
