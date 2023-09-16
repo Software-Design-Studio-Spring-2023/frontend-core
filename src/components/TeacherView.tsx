@@ -4,10 +4,10 @@ import TerminateExam from "./alerts/TerminateExam";
 import { User } from "../hooks/useUsers";
 import { currentUser } from "./LoginForm";
 import { useNavigate } from "react-router-dom";
-import LogOut from "./alerts/LogOut";
+// import LogOut from "./alerts/LogOut";
 import IssueWarning from "./alerts/IssueWarning";
 import { Box, Heading, VStack } from "@chakra-ui/react";
-import { update_terminate, update_warnings } from "../services/user-utils";
+import patchData from "../hooks/patchData";
 
 interface Props {
   user: User;
@@ -79,7 +79,7 @@ const TeacherView = ({ user }: Props) => {
             handleWarning={() => {
               //this needs to be sent back to the database so the warnings reset clicking on a new user
               // this is the code for adding warning without database
-              update_warnings(user.id, warning + 1);
+              patchData({ warnings: warning + 1 }, "update_warnings", user.id);
               setWarning(warnings + 1);
               if (user !== undefined) {
                 user.warnings = warning;
@@ -92,7 +92,7 @@ const TeacherView = ({ user }: Props) => {
             handleTerminate={() =>
               // add the logic here for stopping a webcam
               {
-                update_terminate(user.id, true);
+                patchData({ terminated: true }, "update_terminate", user.id);
                 if (user !== undefined) {
                   user.terminated = true;
                 }

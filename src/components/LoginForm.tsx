@@ -14,10 +14,10 @@ import {
   Box,
 } from "@chakra-ui/react";
 import { HiEye, HiOutlineEye } from "react-icons/hi";
-import { update_loggedin } from "../services/user-utils";
 import LoginFailed from "./alerts/LoginFailed";
 import Terminated from "./alerts/Terminated";
 import AlreadyLoggedIn from "./alerts/AlreadyLoggedIn";
+import patchData from "../hooks/patchData";
 
 export var currentUser: User | undefined = {
   id: 0,
@@ -69,7 +69,7 @@ const LoginForm = () => {
         (user) => user.email === email && user.password === password
       );
       if (currentUser !== undefined) {
-        update_loggedin(currentUser.id, true);
+        patchData({ loggedIn: true }, "update_login", currentUser.id);
         currentUser.loggedIn = true; //gotta send this to the database, students can't login again until after exam is done
       }
       navigate("/privacy");
@@ -86,7 +86,7 @@ const LoginForm = () => {
         (user) => user.email === email && user.password === password
       );
       if (currentUser !== undefined) {
-        update_loggedin(currentUser.id, true);
+        patchData({ loggedIn: true }, "update_login", currentUser.id);
         currentUser.loggedIn = true;
       }
       navigate("/teacher");
