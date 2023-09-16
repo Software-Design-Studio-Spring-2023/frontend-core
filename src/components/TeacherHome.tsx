@@ -18,6 +18,7 @@ import StudentMiniCard from "./StudentMiniCard";
 import useUsers from "../hooks/useUsers";
 import { HiEye } from "react-icons/hi";
 import LoginSuccess from "./alerts/LoginSuccess";
+import CopyrightVersion from "./CopyrightVersion";
 
 const TeacherHome = () => {
   const borderColor = (warningColor: Number) => {
@@ -142,6 +143,9 @@ const TeacherHome = () => {
             )
         )}
       </Grid>
+      <Box paddingTop={"2%"}>
+        <CopyrightVersion />
+      </Box>
     </>
   );
 };

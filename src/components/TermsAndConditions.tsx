@@ -3,8 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { Box, Text, Button, HStack, Heading, VStack } from "@chakra-ui/react";
 import { HiEye } from "react-icons/hi";
 import AcceptTC from "./alerts/AcceptTC";
-import { update_loggedin } from "../services/user-utils";
 import { currentUser } from "./LoginForm";
+import patchData from "../hooks/patchData";
+import CopyrightVersion from "./CopyrightVersion";
 
 const TermsAndConditions: React.FC = () => {
   const navigate = useNavigate();
@@ -122,11 +123,12 @@ const TermsAndConditions: React.FC = () => {
           <AcceptTC
             handleCancel={() => {
               navigate("/");
-              update_loggedin(currentUser.id, false);
+              patchData({ loggedIn: false }, "update_login", currentUser.id);
             }}
           />
         </VStack>
       </Box>
+      <CopyrightVersion />
     </>
   );
 };

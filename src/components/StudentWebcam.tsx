@@ -19,6 +19,7 @@ import {
 } from "@chakra-ui/react";
 import { HiEye } from "react-icons/hi";
 import LoginSuccess from "./alerts/LoginSuccess";
+import CopyrightVersion from "./CopyrightVersion";
 // import { useDisclosure } from "@chakra-ui/react";
 
 let name = "";
@@ -247,6 +248,17 @@ const StudentWebcam = () => {
           </Alert>
         )} */}
       </VStack>
+      <Box
+        paddingTop={recording ? "10%" : "8%"} //need to make this fixed
+        style={{
+          position: "relative",
+          bottom: "0",
+          width: "100%",
+          textAlign: "center",
+        }}
+      >
+        <CopyrightVersion />
+      </Box>
     </>
   );
 };

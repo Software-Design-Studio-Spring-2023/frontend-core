@@ -12,12 +12,14 @@ import {
   InputRightElement,
   Heading,
   Box,
+  Text,
 } from "@chakra-ui/react";
 import { HiEye, HiOutlineEye } from "react-icons/hi";
 import LoginFailed from "./alerts/LoginFailed";
 import Terminated from "./alerts/Terminated";
 import AlreadyLoggedIn from "./alerts/AlreadyLoggedIn";
 import patchData from "../hooks/patchData";
+import CopyrightVersion from "./CopyrightVersion";
 
 export var currentUser: User | undefined = {
   id: 0,
@@ -143,6 +145,7 @@ const LoginForm = () => {
         minHeight: "100vh",
         alignItems: "center",
         justifyContent: "center",
+        overflow: "hidden",
       }}
     >
       <Box position="absolute" top="10" width="100%" zIndex="1000">
@@ -154,26 +157,36 @@ const LoginForm = () => {
       <Box position="absolute" top="10" width="100%" zIndex="1000">
         {alreadyLogged && <AlreadyLoggedIn />}
       </Box>
-      <VStack justifyContent="center" alignItems="center" spacing={5}>
-        <HStack paddingTop={5}>
-          <HiEye color={"#81E6D9"} size={"3em"} />
-          <Heading fontStyle={"italic"} paddingBottom={2}>
+      <VStack
+        justifyContent="center"
+        alignItems="center"
+        spacing={5}
+        marginBottom={16}
+      >
+        <HStack paddingTop={10}>
+          <HiEye color={"#81E6D9"} size={"6em"} />
+          <Heading fontSize={"7xl"} fontStyle={"italic"} paddingBottom={4}>
             eyedentify
           </Heading>
         </HStack>
         <form>
           <FormControl isRequired>
-            <FormLabel>Enter your UTS Email Address</FormLabel>
+            <FormLabel fontSize={"xl"} marginLeft={"-15%"}>
+              Enter your UTS Email Address
+            </FormLabel>
             <Input
+              width={"130%"}
+              marginLeft={"-15%"}
               placeholder="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </FormControl>
-
           <FormControl isRequired paddingTop={5} paddingBottom={5}>
-            <FormLabel>Password</FormLabel>
-            <InputGroup size="md">
+            <FormLabel fontSize={"xl"} marginLeft={"-15%"}>
+              Password
+            </FormLabel>
+            <InputGroup width={"130%"} marginLeft={"-15%"}>
               <Input
                 pr="4.5rem"
                 onChange={(e) => setPassword(e.target.value)}
@@ -197,6 +210,8 @@ const LoginForm = () => {
             <Button
               onClick={(e) => handleLogin(e, email, password)}
               type="submit"
+              fontSize={"lg"}
+              width={"50%"}
               colorScheme={disabled ? "gray" : "teal"}
               variant="solid"
               disabled={disabled}
@@ -206,6 +221,7 @@ const LoginForm = () => {
           </HStack>
         </form>
       </VStack>
+      <CopyrightVersion />
     </div>
   );
 };
