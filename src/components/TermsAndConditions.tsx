@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Box, Text, Button, HStack, Heading, VStack } from "@chakra-ui/react";
 import { HiEye } from "react-icons/hi";
@@ -17,6 +17,42 @@ const TermsAndConditions: React.FC = () => {
     // Navigate to the "/student" page
     navigate("/student");
   };
+
+  useEffect(() => {
+    const handleBackButtonEvent = (e: PopStateEvent) => {
+      e.preventDefault();
+
+      // Keep pushing the current state to history whenever popstate is triggered
+      window.history.pushState({}, "", window.location.pathname);
+    };
+
+    const handleBeforeUnloadEvent = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+      return "";
+    };
+
+    window.addEventListener("popstate", handleBackButtonEvent);
+    window.addEventListener("beforeunload", handleBeforeUnloadEvent);
+
+    // Push the current state once when component mounts
+    window.history.pushState({}, "", window.location.pathname);
+
+    return () => {
+      window.removeEventListener("popstate", handleBackButtonEvent);
+      window.removeEventListener("beforeunload", handleBeforeUnloadEvent);
+    };
+  }, []);
+
+  if (currentUser?.loggedIn === false) {
+    useEffect(() => {
+      navigate("/");
+    }, []);
+  } else if (currentUser?.userType === "teacher") {
+    useEffect(() => {
+      navigate("/*");
+    }, []);
+  }
 
   return (
     <>
