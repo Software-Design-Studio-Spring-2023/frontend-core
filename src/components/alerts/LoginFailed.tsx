@@ -6,7 +6,7 @@ import {
   Progress,
   Box,
 } from "@chakra-ui/react";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useState } from "react";
 
 const LoginFailed = () => {
@@ -14,8 +14,8 @@ const LoginFailed = () => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const interval = 10; // update every 50ms
-    const totalDuration = 3000; // 5 seconds in total
+    const interval = 10; // update every 10ms for the loading bar smooth animation
+    const totalDuration = 3000; // 3 seconds in total
 
     // Initialize the progress state to totalDuration
     setProgress(totalDuration);
@@ -65,7 +65,7 @@ const LoginFailed = () => {
           </Alert>
           <Progress
             size="xs"
-            value={(progress / 3000) * 100} // Adjust the denominator to your total duration
+            value={(progress / 3000) * 100} // Adjust denominator to total duration
             position="relative"
             width="100%"
             bottom="0"

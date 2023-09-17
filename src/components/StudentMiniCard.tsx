@@ -1,14 +1,9 @@
-import {
-  Card,
-  CardBody,
-  Heading,
-  VStack,
-  Text,
-  Box,
-  border,
-} from "@chakra-ui/react";
-import React from "react";
+//This is what will be rendered in the grid when viewing a student, and represents a student and their stream.
+//We will need to replace the Webcam and make the card loading as a student is connecting.
+
+import { Heading, Text, Box } from "@chakra-ui/react";
 import Webcam from "react-webcam";
+import setBorder from "../hooks/setBorder";
 
 interface Props {
   name: string;
@@ -16,23 +11,11 @@ interface Props {
 }
 
 const StudentMiniCard = ({ name, warnings }: Props) => {
-  const borderColor = () => {
-    switch (warnings) {
-      case 0:
-        return "green";
-      case 1:
-        return "#D69E2E";
-      case 2:
-        return "red";
-      default:
-        return "green"; // Default color in case warnings is undefined or out of range
-    }
-  };
   return (
     <>
       <Box
         overflow={"hidden"}
-        borderColor={borderColor()}
+        borderColor={setBorder(warnings)}
         borderWidth={"1px"}
         borderRadius={"lg"}
       >

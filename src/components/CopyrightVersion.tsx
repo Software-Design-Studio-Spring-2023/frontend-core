@@ -1,3 +1,5 @@
+// Copyright component and version identifier for the bottom of the page
+
 import { Box, Text } from "@chakra-ui/react";
 
 const CopyrightVersion = () => {

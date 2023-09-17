@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Box, Text, Button, HStack, Heading, VStack } from "@chakra-ui/react";
 import { HiEye } from "react-icons/hi";
-import AcceptTC from "./alerts/AcceptTC";
+import AcceptTC from "../components/alerts/AcceptTC";
 import { currentUser } from "./LoginForm";
 import patchData from "../hooks/patchData";
-import CopyrightVersion from "./CopyrightVersion";
+import CopyrightVersion from "../components/CopyrightVersion";
+import preventLoad from "../hooks/preventLoad";
+import preventAccess from "../hooks/preventAccess";
 
 const TermsAndConditions: React.FC = () => {
   const navigate = useNavigate();
@@ -18,41 +20,8 @@ const TermsAndConditions: React.FC = () => {
     navigate("/student");
   };
 
-  useEffect(() => {
-    const handleBackButtonEvent = (e: PopStateEvent) => {
-      e.preventDefault();
-
-      // Keep pushing the current state to history whenever popstate is triggered
-      window.history.pushState({}, "", window.location.pathname);
-    };
-
-    const handleBeforeUnloadEvent = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      e.returnValue = "";
-      return "";
-    };
-
-    window.addEventListener("popstate", handleBackButtonEvent);
-    window.addEventListener("beforeunload", handleBeforeUnloadEvent);
-
-    // Push the current state once when component mounts
-    window.history.pushState({}, "", window.location.pathname);
-
-    return () => {
-      window.removeEventListener("popstate", handleBackButtonEvent);
-      window.removeEventListener("beforeunload", handleBeforeUnloadEvent);
-    };
-  }, []);
-
-  if (currentUser?.loggedIn === false) {
-    useEffect(() => {
-      navigate("/");
-    }, []);
-  } else if (currentUser?.userType === "teacher") {
-    useEffect(() => {
-      navigate("/*");
-    }, []);
-  }
+  preventLoad(true, true);
+  preventAccess("student");
 
   return (
     <>

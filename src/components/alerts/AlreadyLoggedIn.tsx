@@ -6,7 +6,7 @@ import {
   Progress,
   Box,
 } from "@chakra-ui/react";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useState } from "react";
 
 const AlreadyLoggedIn = () => {

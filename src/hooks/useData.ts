@@ -1,13 +1,13 @@
+//this is a generic hook for retrieving backend data via axios
+
 import { SetStateAction, useEffect, useState } from "react";
 import apiClient from "../services/api-client";
 import { AxiosRequestConfig, CanceledError } from "axios";
 
-
-  
-  interface FetchResponse<T>{
-    count: number;
-    results: T[];
-  }
+interface FetchResponse<T>{
+  count: number;
+  results: T[];
+}
 
   const useData = <T>(endpoint: string, requestConfig?: AxiosRequestConfig, deps?: any[], pollInterval: number = 1000) => {
     const [data, setData] = useState<T[]>([]);

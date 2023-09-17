@@ -9,12 +9,14 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { useRef } from "react";
+import { User } from "../../hooks/useUsers";
 
 interface Props {
   handleWarning: () => void;
+  user: User;
 }
 
-const IssueWarning = ({ handleWarning }: Props) => {
+const IssueWarning = ({ handleWarning, user }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef(null);
 
@@ -25,7 +27,14 @@ const IssueWarning = ({ handleWarning }: Props) => {
 
   return (
     <>
-      <Button color='#FFF5F5' bgColor={"red.500"} variant='solid' onClick={onOpen}>Issue Warning</Button>
+      <Button
+        color="#FFF5F5"
+        bgColor={"red.500"}
+        variant="solid"
+        onClick={onOpen}
+      >
+        Issue Warning
+      </Button>
       <AlertDialog
         motionPreset="scale"
         isOpen={isOpen}
@@ -39,8 +48,7 @@ const IssueWarning = ({ handleWarning }: Props) => {
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              Are you sure you want to issue a warning to this student?
-              {/* We can include the actual persons name here when we set up the database */}
+              Are you sure you want to issue a warning to {user.name}?
             </AlertDialogBody>
 
             <AlertDialogFooter>

@@ -1,5 +1,5 @@
 import React from "react";
-import CopyrightVersion from "./CopyrightVersion";
+import CopyrightVersion from "../components/CopyrightVersion";
 
 const PageNotFound = () => {
   return (

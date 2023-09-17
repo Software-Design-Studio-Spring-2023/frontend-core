@@ -9,14 +9,14 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { useRef } from "react";
-import { currentUser } from "../LoginForm";
+import { currentUser } from "../../pages/LoginForm";
 import patchData from "../../hooks/patchData";
 
 interface Props {
   handleLogout: () => void;
 }
 
-const EndExam = ({ handleLogout }: Props) => {
+const LogOut = ({ handleLogout }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef(null);
 
@@ -60,4 +60,4 @@ const EndExam = ({ handleLogout }: Props) => {
   );
 };
 
-export default EndExam;
+export default LogOut;

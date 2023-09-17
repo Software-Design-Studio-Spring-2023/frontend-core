@@ -1,3 +1,5 @@
+//This is the main login page
+
 import { useEffect, useState } from "react";
 import useUsers, { User } from "../hooks/useUsers";
 import { useNavigate } from "react-router-dom";
@@ -15,11 +17,11 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { HiEye, HiOutlineEye } from "react-icons/hi";
-import LoginFailed from "./alerts/LoginFailed";
-import Terminated from "./alerts/Terminated";
-import AlreadyLoggedIn from "./alerts/AlreadyLoggedIn";
+import LoginFailed from "../components/alerts/LoginFailed";
+import Terminated from "../components/alerts/Terminated";
+import AlreadyLoggedIn from "../components/alerts/AlreadyLoggedIn";
 import patchData from "../hooks/patchData";
-import CopyrightVersion from "./CopyrightVersion";
+import CopyrightVersion from "../components/CopyrightVersion";
 
 export var currentUser: User | undefined = {
   id: 0,
@@ -32,8 +34,7 @@ export var currentUser: User | undefined = {
   imageURL: "",
   encodeIP: 0,
   terminated: false,
-};
-// localhost:8080/api/all_users
+}; //this is the logged in current user exported for the current sessiion, app-wide
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -46,6 +47,7 @@ const LoginForm = () => {
   const [examTerminated, setExamTerminated] = useState(false);
   const [alreadyLogged, setAlreadyLogged] = useState(false);
 
+  //disabled login button if no data
   useEffect(() => {
     if (email.trim() !== "" && password.trim() !== "") {
       setDisabled(false);
@@ -54,14 +56,14 @@ const LoginForm = () => {
     }
   }, [email, password]);
 
-  const handleLogin = (event, email: string, password: string) => {
+  //handler for all possible login conditions and events
+  const handleLogin = (event: any, email: string, password: string) => {
     event.preventDefault();
     if (
       data.some(
         (user) =>
           user.email === email &&
           user.password === password &&
-          // user.userType === "student"
           email.includes("@student.uts.edu.au") &&
           user.loggedIn === false &&
           user.terminated === false
@@ -72,7 +74,7 @@ const LoginForm = () => {
       );
       if (currentUser !== undefined) {
         patchData({ loggedIn: true }, "update_login", currentUser.id);
-        currentUser.loggedIn = true; //gotta send this to the database, students can't login again until after exam is done
+        currentUser.loggedIn = true;
       }
       navigate("/privacy");
     } else if (
@@ -80,7 +82,6 @@ const LoginForm = () => {
         (user) =>
           user.email === email &&
           user.password === password &&
-          // user.userType === "teacher"
           email.includes("@staff.uts.edu.au")
       )
     ) {
@@ -97,7 +98,6 @@ const LoginForm = () => {
         (user) =>
           user.email === email &&
           user.password === password &&
-          // user.userType === "student"
           email.includes("@student.uts.edu.au") &&
           user.loggedIn === true &&
           user.terminated === false
@@ -114,7 +114,6 @@ const LoginForm = () => {
         (user) =>
           user.email === email &&
           user.password === password &&
-          // user.userType === "student"
           email.includes("@student.uts.edu.au") &&
           user.terminated === true
       )
@@ -148,6 +147,7 @@ const LoginForm = () => {
         overflow: "hidden",
       }}
     >
+      {/* Login errors */}
       <Box position="absolute" top="10" width="100%" zIndex="1000">
         {failed && <LoginFailed />}
       </Box>
@@ -163,12 +163,14 @@ const LoginForm = () => {
         spacing={5}
         marginBottom={16}
       >
+        {/* Logo */}
         <HStack paddingTop={10}>
           <HiEye color={"#81E6D9"} size={"6em"} />
           <Heading fontSize={"7xl"} fontStyle={"italic"} paddingBottom={4}>
             eyedentify
           </Heading>
         </HStack>
+        {/* Login form */}
         <form>
           <FormControl isRequired>
             <FormLabel fontSize={"xl"} marginLeft={"-15%"}>
@@ -190,7 +192,7 @@ const LoginForm = () => {
               <Input
                 pr="4.5rem"
                 onChange={(e) => setPassword(e.target.value)}
-                type={show ? "text" : "password"} // this might be a problem...
+                type={show ? "text" : "password"}
                 placeholder="Enter Password"
                 value={password}
               />
@@ -206,7 +208,12 @@ const LoginForm = () => {
             </InputGroup>
           </FormControl>
 
-          <HStack justifyContent="center" alignItems="center" spacing={5}>
+          <HStack
+            paddingTop={"8px"}
+            justifyContent="center"
+            alignItems="center"
+            spacing={5}
+          >
             <Button
               onClick={(e) => handleLogin(e, email, password)}
               type="submit"
