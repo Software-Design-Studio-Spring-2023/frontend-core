@@ -9,12 +9,14 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { useRef } from "react";
+import { User } from "../../hooks/useUsers";
 
 interface Props {
   handleTerminate: () => void;
+  user: User;
 }
 
-const EndExam = ({ handleTerminate }: Props) => {
+const TerminateExam = ({ handleTerminate, user }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef(null);
 
@@ -25,13 +27,14 @@ const EndExam = ({ handleTerminate }: Props) => {
 
   return (
     <>
-      <Button 
-        color='#FFF5F5' 
-        bgColor={"red.500"} 
-        variant='outline'
-        borderColor={"red.100"} 
-        onClick={onOpen}>
-          Terminate Exam
+      <Button
+        color="#FFF5F5"
+        bgColor={"red.500"}
+        variant="outline"
+        borderColor={"red.100"}
+        onClick={onOpen}
+      >
+        Terminate Exam
       </Button>
       <AlertDialog
         motionPreset="scale"
@@ -46,8 +49,7 @@ const EndExam = ({ handleTerminate }: Props) => {
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              Are you sure you want to terminate this student's exam?
-              {/* We can include the actual persons name here when we set up the database */}
+              Are you sure you want to terminate this {user.name}'s exam?
             </AlertDialogBody>
 
             <AlertDialogFooter>
@@ -66,4 +68,4 @@ const EndExam = ({ handleTerminate }: Props) => {
   );
 };
 
-export default EndExam;
+export default TerminateExam;

@@ -1,3 +1,5 @@
+//This is where the teachers will view an enlarged grid of all students
+
 import {
   Box,
   Button,
@@ -12,41 +14,25 @@ import Webcam from "react-webcam";
 import { currentUser } from "./LoginForm";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import LogOut from "./alerts/LogOut";
-import StudentCard from "./StudentCard";
-import StudentMiniCard from "./StudentMiniCard";
+import LogOut from "../components/alerts/LogOut";
+import StudentCard from "../components/StudentCard";
+import StudentMiniCard from "../components/StudentMiniCard";
 import useUsers from "../hooks/useUsers";
 import { HiEye } from "react-icons/hi";
-import LoginSuccess from "./alerts/LoginSuccess";
+import LoginSuccess from "../components/alerts/LoginSuccess";
+import CopyrightVersion from "../components/CopyrightVersion";
+import preventLoad from "../hooks/preventLoad";
+import preventAccess from "../hooks/preventAccess";
+import setBorder from "../hooks/setBorder";
 
 const TeacherHome = () => {
-  const borderColor = (warningColor: Number) => {
-    switch (warningColor) {
-      case 0:
-        return "green";
-      case 1:
-        return "#D69E2E";
-      case 2:
-        return "red";
-      default:
-        return "green"; // Default color in case warnings is undefined or out of range
-    }
-  };
   const location = useLocation();
   const navigate = useNavigate();
   const [itemClicked, setItemClicked] = useState(false);
   const [userClicked, setUserClicked] = useState("");
   const { data, loading, error } = useUsers();
-
-  if (currentUser?.loggedIn === false) {
-    useEffect(() => {
-      navigate("/");
-    }, []);
-  } else if (currentUser?.userType === "student") {
-    useEffect(() => {
-      navigate("/*");
-    }, []);
-  }
+  preventLoad(true, true);
+  preventAccess("student");
 
   useEffect(() => {
     if (location.pathname === "/teacher") {
@@ -58,8 +44,10 @@ const TeacherHome = () => {
     setItemClicked(false);
   }, []);
 
+  //
   return (
     <>
+      {/* Navbar */}
       <HStack w="100%" justifyContent="space-between" alignItems="center">
         <Box paddingLeft={"10px"}>
           <HiEye color={"#81E6D9"} size={"3em"} />
@@ -83,6 +71,7 @@ const TeacherHome = () => {
           <LogOut handleLogout={() => navigate("/")} />
         </Box>
       </HStack>
+      {/* Where Teacher view appears */}
       <Outlet />
       <Box padding={"10px"} paddingBottom={"0px"}>
         <hr hidden={itemClicked ? false : true} />
@@ -90,6 +79,7 @@ const TeacherHome = () => {
       <div hidden={itemClicked ? true : false}>
         <LoginSuccess />
       </div>
+      {/* The grid */}
       <Grid
         padding={"10px"}
         paddingTop={itemClicked ? "10px" : "0px"}
@@ -109,7 +99,7 @@ const TeacherHome = () => {
                 sm: "repeat(2, 1fr)",
               }
         }
-        gap={4} // Add some gap between GridItems
+        gap={4}
         style={
           itemClicked ? { width: "calc(100% - 10px)", margin: "0 auto" } : {}
         }
@@ -122,7 +112,7 @@ const TeacherHome = () => {
                 _hover={{
                   transform: "scale(1.03)", // Increase the scale when hovered
                   transition: "transform 0.1s", // Smooth transition
-                  boxShadow: ` 0 0 8px 1px ${borderColor(user.warnings)}`,
+                  boxShadow: ` 0 0 8px 1px ${setBorder(user.warnings)}`,
                 }}
                 borderRadius={"10px"}
                 cursor={"pointer"}
@@ -130,7 +120,7 @@ const TeacherHome = () => {
                 onClick={() => {
                   setItemClicked(true);
                   setUserClicked(user.name);
-                  navigate(`/teacher/${user.id}`);
+                  navigate(`/teacher/${user.id}`); //opens teacher view for student on click
                 }}
               >
                 {itemClicked ? (
@@ -142,6 +132,9 @@ const TeacherHome = () => {
             )
         )}
       </Grid>
+      <Box paddingTop={"2%"}>
+        <CopyrightVersion />
+      </Box>
     </>
   );
 };

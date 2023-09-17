@@ -1,15 +1,17 @@
-import LoginForm from "./components/LoginForm";
+//main app hub
+
+import LoginForm from "./pages/LoginForm";
 import {
   BrowserRouter as Router,
   Route,
   Routes,
   Outlet,
 } from "react-router-dom";
-import TeacherHome from "./components/TeacherHome";
-import StudentWebcam from "./components/StudentWebcam";
-import PageNotFound from "./components/PageNotFound";
-import TeacherView from "./components/TeacherView";
-import TermsAndConditions from "./components/TermsAndConditions";
+import TeacherHome from "./pages/TeacherHome";
+import StudentWebcam from "./pages/StudentWebcam";
+import PageNotFound from "./pages/PageNotFound";
+import TeacherView from "./pages/TeacherView";
+import TermsAndConditions from "./pages/TermsAndConditions";
 import useUsers, { User } from "./hooks/useUsers";
 
 const App = () => {

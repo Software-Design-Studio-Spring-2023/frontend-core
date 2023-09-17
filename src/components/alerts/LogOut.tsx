@@ -9,21 +9,21 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { useRef } from "react";
-import { update_loggedin } from "../../services/user-utils";
-import { currentUser } from "../LoginForm";
+import { currentUser } from "../../pages/LoginForm";
+import patchData from "../../hooks/patchData";
 
 interface Props {
   handleLogout: () => void;
 }
 
-const EndExam = ({ handleLogout }: Props) => {
+const LogOut = ({ handleLogout }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef(null);
 
   const handleConfirmLogout = () => {
     handleLogout();
     onClose();
-    update_loggedin(currentUser.id, false);
+    patchData({ loggedIn: false }, "update_login", currentUser.id);
   };
 
   return (
@@ -60,4 +60,4 @@ const EndExam = ({ handleLogout }: Props) => {
   );
 };
 
-export default EndExam;
+export default LogOut;

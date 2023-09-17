@@ -1,3 +1,4 @@
+//The User object and lift of users from the database are exported from here
 
 import useData from "./useData";
 

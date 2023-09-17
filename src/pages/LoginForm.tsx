@@ -1,3 +1,5 @@
+//This is the main login page
+
 import { useEffect, useState } from "react";
 import useUsers, { User } from "../hooks/useUsers";
 import { useNavigate } from "react-router-dom";
@@ -12,12 +14,14 @@ import {
   InputRightElement,
   Heading,
   Box,
+  Text,
 } from "@chakra-ui/react";
 import { HiEye, HiOutlineEye } from "react-icons/hi";
-import { update_loggedin } from "../services/user-utils";
-import LoginFailed from "./alerts/LoginFailed";
-import Terminated from "./alerts/Terminated";
-import AlreadyLoggedIn from "./alerts/AlreadyLoggedIn";
+import LoginFailed from "../components/alerts/LoginFailed";
+import Terminated from "../components/alerts/Terminated";
+import AlreadyLoggedIn from "../components/alerts/AlreadyLoggedIn";
+import patchData from "../hooks/patchData";
+import CopyrightVersion from "../components/CopyrightVersion";
 
 export var currentUser: User | undefined = {
   id: 0,
@@ -30,8 +34,7 @@ export var currentUser: User | undefined = {
   imageURL: "",
   encodeIP: 0,
   terminated: false,
-};
-// localhost:8080/api/all_users
+}; //this is the logged in current user exported for the current sessiion, app-wide
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -44,6 +47,7 @@ const LoginForm = () => {
   const [examTerminated, setExamTerminated] = useState(false);
   const [alreadyLogged, setAlreadyLogged] = useState(false);
 
+  //disabled login button if no data
   useEffect(() => {
     if (email.trim() !== "" && password.trim() !== "") {
       setDisabled(false);
@@ -52,14 +56,14 @@ const LoginForm = () => {
     }
   }, [email, password]);
 
-  const handleLogin = (event, email: string, password: string) => {
+  //handler for all possible login conditions and events
+  const handleLogin = (event: any, email: string, password: string) => {
     event.preventDefault();
     if (
       data.some(
         (user) =>
           user.email === email &&
           user.password === password &&
-          // user.userType === "student"
           email.includes("@student.uts.edu.au") &&
           user.loggedIn === false &&
           user.terminated === false
@@ -69,8 +73,8 @@ const LoginForm = () => {
         (user) => user.email === email && user.password === password
       );
       if (currentUser !== undefined) {
-        update_loggedin(currentUser.id, true);
-        currentUser.loggedIn = true; //gotta send this to the database, students can't login again until after exam is done
+        patchData({ loggedIn: true }, "update_login", currentUser.id);
+        currentUser.loggedIn = true;
       }
       navigate("/privacy");
     } else if (
@@ -78,7 +82,6 @@ const LoginForm = () => {
         (user) =>
           user.email === email &&
           user.password === password &&
-          // user.userType === "teacher"
           email.includes("@staff.uts.edu.au")
       )
     ) {
@@ -86,7 +89,7 @@ const LoginForm = () => {
         (user) => user.email === email && user.password === password
       );
       if (currentUser !== undefined) {
-        update_loggedin(currentUser.id, true);
+        patchData({ loggedIn: true }, "update_login", currentUser.id);
         currentUser.loggedIn = true;
       }
       navigate("/teacher");
@@ -95,7 +98,6 @@ const LoginForm = () => {
         (user) =>
           user.email === email &&
           user.password === password &&
-          // user.userType === "student"
           email.includes("@student.uts.edu.au") &&
           user.loggedIn === true &&
           user.terminated === false
@@ -112,7 +114,6 @@ const LoginForm = () => {
         (user) =>
           user.email === email &&
           user.password === password &&
-          // user.userType === "student"
           email.includes("@student.uts.edu.au") &&
           user.terminated === true
       )
@@ -143,8 +144,10 @@ const LoginForm = () => {
         minHeight: "100vh",
         alignItems: "center",
         justifyContent: "center",
+        overflow: "hidden",
       }}
     >
+      {/* Login errors */}
       <Box position="absolute" top="10" width="100%" zIndex="1000">
         {failed && <LoginFailed />}
       </Box>
@@ -154,30 +157,42 @@ const LoginForm = () => {
       <Box position="absolute" top="10" width="100%" zIndex="1000">
         {alreadyLogged && <AlreadyLoggedIn />}
       </Box>
-      <VStack justifyContent="center" alignItems="center" spacing={5}>
-        <HStack paddingTop={5}>
-          <HiEye color={"#81E6D9"} size={"3em"} />
-          <Heading fontStyle={"italic"} paddingBottom={2}>
+      <VStack
+        justifyContent="center"
+        alignItems="center"
+        spacing={5}
+        marginBottom={16}
+      >
+        {/* Logo */}
+        <HStack paddingTop={10}>
+          <HiEye color={"#81E6D9"} size={"6em"} />
+          <Heading fontSize={"7xl"} fontStyle={"italic"} paddingBottom={4}>
             eyedentify
           </Heading>
         </HStack>
+        {/* Login form */}
         <form>
           <FormControl isRequired>
-            <FormLabel>Enter your UTS Email Address</FormLabel>
+            <FormLabel fontSize={"xl"} marginLeft={"-15%"}>
+              Enter your UTS Email Address
+            </FormLabel>
             <Input
+              width={"130%"}
+              marginLeft={"-15%"}
               placeholder="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </FormControl>
-
           <FormControl isRequired paddingTop={5} paddingBottom={5}>
-            <FormLabel>Password</FormLabel>
-            <InputGroup size="md">
+            <FormLabel fontSize={"xl"} marginLeft={"-15%"}>
+              Password
+            </FormLabel>
+            <InputGroup width={"130%"} marginLeft={"-15%"}>
               <Input
                 pr="4.5rem"
                 onChange={(e) => setPassword(e.target.value)}
-                type={show ? "text" : "password"} // this might be a problem...
+                type={show ? "text" : "password"}
                 placeholder="Enter Password"
                 value={password}
               />
@@ -193,10 +208,17 @@ const LoginForm = () => {
             </InputGroup>
           </FormControl>
 
-          <HStack justifyContent="center" alignItems="center" spacing={5}>
+          <HStack
+            paddingTop={"8px"}
+            justifyContent="center"
+            alignItems="center"
+            spacing={5}
+          >
             <Button
               onClick={(e) => handleLogin(e, email, password)}
               type="submit"
+              fontSize={"lg"}
+              width={"50%"}
               colorScheme={disabled ? "gray" : "teal"}
               variant="solid"
               disabled={disabled}
@@ -206,6 +228,7 @@ const LoginForm = () => {
           </HStack>
         </form>
       </VStack>
+      <CopyrightVersion />
     </div>
   );
 };

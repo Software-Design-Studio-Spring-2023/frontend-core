@@ -1,13 +1,17 @@
+//when a teacher clicks on a student from the grid, they are directed to this page
+
 import { useEffect, useState } from "react";
 import Webcam from "react-webcam";
-import TerminateExam from "./alerts/TerminateExam";
+import TerminateExam from "../components/alerts/TerminateExam";
 import { User } from "../hooks/useUsers";
 import { currentUser } from "./LoginForm";
 import { useNavigate } from "react-router-dom";
-import LogOut from "./alerts/LogOut";
-import IssueWarning from "./alerts/IssueWarning";
+// import LogOut from "./alerts/LogOut";
+import IssueWarning from "../components/alerts/IssueWarning";
 import { Box, Heading, VStack } from "@chakra-ui/react";
-import { update_terminate, update_warnings } from "../services/user-utils";
+import patchData from "../hooks/patchData";
+import preventLoad from "../hooks/preventLoad";
+import preventAccess from "../hooks/preventAccess";
 
 interface Props {
   user: User;
@@ -16,30 +20,10 @@ interface Props {
 let warnings: number;
 
 const TeacherView = ({ user }: Props) => {
-  useEffect(() => {
-    const handleBeforeUnloadEvent = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      e.returnValue = "";
-      return "";
-    };
-    window.addEventListener("beforeunload", handleBeforeUnloadEvent);
-
-    return () => {
-      // window.removeEventListener("popstate", handleBackButtonEvent);
-      window.removeEventListener("beforeunload", handleBeforeUnloadEvent);
-    };
-  }, []);
+  preventAccess("student");
+  preventLoad(false, true);
 
   const navigate = useNavigate();
-  if (currentUser?.loggedIn === false) {
-    useEffect(() => {
-      navigate("/");
-    }, []);
-  } else if (currentUser?.userType === "student") {
-    useEffect(() => {
-      navigate("/*");
-    }, []);
-  }
 
   useEffect(() => {
     if (user !== undefined) {
@@ -76,10 +60,9 @@ const TeacherView = ({ user }: Props) => {
         </div>
         <div hidden={warning === 2 ? true : false}>
           <IssueWarning
+            user={user}
             handleWarning={() => {
-              //this needs to be sent back to the database so the warnings reset clicking on a new user
-              // this is the code for adding warning without database
-              update_warnings(user.id, warning + 1);
+              patchData({ warnings: warning + 1 }, "update_warnings", user.id);
               setWarning(warnings + 1);
               if (user !== undefined) {
                 user.warnings = warning;
@@ -89,10 +72,11 @@ const TeacherView = ({ user }: Props) => {
         </div>
         <div hidden={safe}>
           <TerminateExam
+            user={user}
             handleTerminate={() =>
               // add the logic here for stopping a webcam
               {
-                update_terminate(user.id, true);
+                patchData({ terminated: true }, "update_terminate", user.id);
                 if (user !== undefined) {
                   user.terminated = true;
                 }

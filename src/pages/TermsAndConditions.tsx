@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Box, Text, Button, HStack, Heading, VStack } from "@chakra-ui/react";
 import { HiEye } from "react-icons/hi";
-import AcceptTC from "./alerts/AcceptTC";
-import { update_loggedin } from "../services/user-utils";
+import AcceptTC from "../components/alerts/AcceptTC";
 import { currentUser } from "./LoginForm";
+import patchData from "../hooks/patchData";
+import CopyrightVersion from "../components/CopyrightVersion";
+import preventLoad from "../hooks/preventLoad";
+import preventAccess from "../hooks/preventAccess";
 
 const TermsAndConditions: React.FC = () => {
   const navigate = useNavigate();
@@ -16,6 +19,9 @@ const TermsAndConditions: React.FC = () => {
     // Navigate to the "/student" page
     navigate("/student");
   };
+
+  preventLoad(true, true);
+  preventAccess("student");
 
   return (
     <>
@@ -122,11 +128,12 @@ const TermsAndConditions: React.FC = () => {
           <AcceptTC
             handleCancel={() => {
               navigate("/");
-              update_loggedin(currentUser.id, false);
+              patchData({ loggedIn: false }, "update_login", currentUser.id);
             }}
           />
         </VStack>
       </Box>
+      <CopyrightVersion />
     </>
   );
 };

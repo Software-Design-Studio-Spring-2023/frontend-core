@@ -1,10 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
-
 import { currentUser } from "./LoginForm";
-
-import { useNavigate } from "react-router-dom";
-import EndExam from "./alerts/EndExam";
+import EndExam from "../components/alerts/EndExam";
 import {
   Alert,
   AlertDescription,
@@ -18,8 +15,11 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { HiEye } from "react-icons/hi";
-import LoginSuccess from "./alerts/LoginSuccess";
-// import { useDisclosure } from "@chakra-ui/react";
+import LoginSuccess from "../components/alerts/LoginSuccess";
+import CopyrightVersion from "../components/CopyrightVersion";
+import preventLoad from "../hooks/preventLoad";
+import preventAccess from "../hooks/preventAccess";
+import { useNavigate } from "react-router-dom";
 
 let name = "";
 
@@ -29,6 +29,7 @@ const StudentWebcam = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showAlert, setShowAlert] = useState(true);
   const [startCapture, setStartCapture] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -39,42 +40,8 @@ const StudentWebcam = () => {
     return () => clearTimeout(timer); // Clear the timer if the component is unmounted before 10 seconds
   }, []);
 
-  useEffect(() => {
-    const handleBackButtonEvent = (e: PopStateEvent) => {
-      e.preventDefault();
-
-      // Keep pushing the current state to history whenever popstate is triggered
-      window.history.pushState({}, "", window.location.pathname);
-    };
-
-    const handleBeforeUnloadEvent = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      e.returnValue = "";
-      return "";
-    };
-
-    window.addEventListener("popstate", handleBackButtonEvent);
-    window.addEventListener("beforeunload", handleBeforeUnloadEvent);
-
-    // Push the current state once when component mounts
-    window.history.pushState({}, "", window.location.pathname);
-
-    return () => {
-      window.removeEventListener("popstate", handleBackButtonEvent);
-      window.removeEventListener("beforeunload", handleBeforeUnloadEvent);
-    };
-  }, []);
-
-  const navigate = useNavigate();
-  if (currentUser?.loggedIn === false) {
-    useEffect(() => {
-      navigate("/");
-    }, []);
-  } else if (currentUser?.userType === "teacher") {
-    useEffect(() => {
-      navigate("/*");
-    }, []);
-  }
+  preventLoad(true, true);
+  preventAccess("teacher");
 
   if (currentUser !== undefined) {
     name = currentUser.name;
@@ -165,14 +132,6 @@ const StudentWebcam = () => {
     if (capturedChunksRef.current.length) {
       downloadVideo();
     }
-    // else {
-    //   // Optional: add a slight delay before checking again
-    //   setTimeout(() => {
-    //     if (capturedChunksRef.current.length) {
-    //       downloadVideo();
-    //     }
-    //   }, 1000);
-    // }
   };
 
   const handleStopCapture = () => {
@@ -190,10 +149,7 @@ const StudentWebcam = () => {
         setFrameCaptureInterval(null);
       }
     }
-    // if (currentUser?.loggedIn === true) {
-    // currentUser.loggedIn = false;
     navigate("/");
-    // }
   };
 
   return (
@@ -219,7 +175,6 @@ const StudentWebcam = () => {
         <Spacer />
         <Box paddingRight={"30px"}>
           <div hidden={recording ? false : true}>
-            {/* {"Finish Exam"} */}
             <EndExam handleTerminate={handleStopCapture} />
           </div>
         </Box>
@@ -247,6 +202,17 @@ const StudentWebcam = () => {
           </Alert>
         )} */}
       </VStack>
+      <Box
+        paddingTop={recording ? "10%" : "8%"} //need to make this fixed
+        style={{
+          position: "relative",
+          bottom: "0",
+          width: "100%",
+          textAlign: "center",
+        }}
+      >
+        <CopyrightVersion />
+      </Box>
     </>
   );
 };

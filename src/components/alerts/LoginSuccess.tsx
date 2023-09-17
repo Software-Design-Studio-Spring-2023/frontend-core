@@ -8,7 +8,7 @@ import {
 } from "@chakra-ui/react";
 import React, { useEffect } from "react";
 import { useState } from "react";
-import { currentUser } from "../LoginForm";
+import { currentUser } from "../../pages/LoginForm";
 
 const LoginSuccess = () => {
   const [showAlert, setShowAlert] = useState(true);
