@@ -16,6 +16,8 @@ import {
 } from "@chakra-ui/react";
 import { HiEye } from "react-icons/hi";
 import LoginSuccess from "../components/alerts/LoginSuccess";
+import WarningOne from "../components/alerts/WarningOne";
+import WarningTwo from "../components/alerts/WarningTwo";
 import CopyrightVersion from "../components/CopyrightVersion";
 import preventLoad from "../hooks/preventLoad";
 import preventAccess from "../hooks/preventAccess";
@@ -180,6 +182,13 @@ const StudentWebcam = () => {
         </Box>
       </HStack>
       <LoginSuccess />
+      {/* Warning Alerts */}
+      <Box position="absolute" top="10" width="100%" zIndex="1000">
+        {warnings === 1 && <WarningOne />}
+      </Box>
+      <Box position="absolute" top="10" width="100%" zIndex="1000">
+        {warnings === 2 && <WarningTwo />}
+      </Box>
       <VStack padding={"20px"}>
         <Webcam audio={false} ref={webcamRef} onUserMedia={handleWebcamLoad} />
         <canvas
