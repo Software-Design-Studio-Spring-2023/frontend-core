@@ -24,6 +24,7 @@ import CopyrightVersion from "../components/CopyrightVersion";
 import preventLoad from "../hooks/preventLoad";
 import preventAccess from "../hooks/preventAccess";
 import setBorder from "../hooks/setBorder";
+import CountDownApp from "../hooks/CountDownApp";
 
 const TeacherHome = () => {
   const location = useLocation();
@@ -56,6 +57,7 @@ const TeacherHome = () => {
           {itemClicked ? userClicked : "Participants"}
         </Heading>
         <Spacer />
+        <CountDownApp></CountDownApp>
         <Button
           marginRight={"10px"}
           hidden={itemClicked ? false : true}
