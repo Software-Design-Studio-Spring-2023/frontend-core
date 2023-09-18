@@ -209,7 +209,7 @@ const StudentWebcam = () => {
         >
           {"Start Exam"}
         </Button>
-        <CopyrightVersion bottomVal={2} />
+        <CopyrightVersion bottomVal={-2} />
       </VStack>
     </>
   );
