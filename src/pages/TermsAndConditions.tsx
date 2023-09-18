@@ -13,15 +13,15 @@ const TermsAndConditions: React.FC = () => {
   const navigate = useNavigate();
   const [accepted, setAccepted] = useState(false);
 
+  preventAccess("staff");
+
   const handleAccept = () => {
     // Set the accepted state to true
     setAccepted(true);
+    patchData({ loggedIn: true }, "update_login", currentUser.id);
     // Navigate to the "/student" page
     navigate("/student");
   };
-
-  preventLoad(true, true);
-  preventAccess("student");
 
   return (
     <>
@@ -36,7 +36,7 @@ const TermsAndConditions: React.FC = () => {
           alignItems="center"
           spacing={5}
           paddingInline={100}
-          paddingBottom={100}
+          paddingBottom={14}
         >
           <Text as="b" fontSize="xl">
             Privacy Terms and Conditions
