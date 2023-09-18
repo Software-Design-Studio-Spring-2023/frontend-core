@@ -154,7 +154,13 @@ const StudentWebcam = () => {
 
   return (
     <>
-      <Box position="absolute" top="0" left="50%" transform="translateX(-50%)">
+      <Box
+        hidden={recording ? false : true}
+        position="absolute"
+        top="0"
+        left="50%"
+        transform="translateX(-50%)"
+      >
         <Heading
           padding={"10px"}
         >{`Warnings: ${currentUser.warnings}`}</Heading>
@@ -203,8 +209,8 @@ const StudentWebcam = () => {
         >
           {"Start Exam"}
         </Button>
+        <CopyrightVersion bottomVal={2} />
       </VStack>
-      <CopyrightVersion />
     </>
   );
 };

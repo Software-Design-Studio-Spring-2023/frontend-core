@@ -5,7 +5,7 @@ const PageNotFound = () => {
   return (
     <div>
       <p>404 Page not found</p>
-      <CopyrightVersion />
+      <CopyrightVersion bottomVal={2} />
     </div>
   );
 };
