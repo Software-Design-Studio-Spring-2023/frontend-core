@@ -81,8 +81,6 @@ const TeacherHome = () => {
       </div>
       {/* The grid */}
       <Grid
-        minHeight={"91vh"}
-        padding={"10px"}
         paddingTop={itemClicked ? "10px" : "0px"}
         templateColumns={
           itemClicked
@@ -133,9 +131,7 @@ const TeacherHome = () => {
             )
         )}
       </Grid>
-      <Box>
-        <CopyrightVersion />
-      </Box>
+      <CopyrightVersion bottomVal={0} />
     </>
   );
 };

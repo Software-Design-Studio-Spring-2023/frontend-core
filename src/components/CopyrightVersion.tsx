@@ -1,11 +1,14 @@
 import { Box, Text } from "@chakra-ui/react";
+interface Props {
+  bottomVal: number;
+}
 
-const CopyrightVersion = () => {
+const CopyrightVersion = ({ bottomVal }: Props) => {
   return (
     <>
       <Box
         position="absolute"
-        bottom="2"
+        bottom={bottomVal}
         width="100%"
         zIndex="1000"
         display="flex"
@@ -16,7 +19,7 @@ const CopyrightVersion = () => {
       </Box>
       <Box
         position="absolute"
-        bottom="2"
+        bottom={bottomVal}
         right="6"
         zIndex="1000"
         display="flex"
