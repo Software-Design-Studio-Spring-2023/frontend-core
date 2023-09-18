@@ -48,7 +48,7 @@ const StudentWebcam = () => {
         const data = await res.json();
 
         room = new Room();
-        console.log(data.token);
+
         room.connect("wss://eyedentify-90kai7lw.livekit.cloud", data.token);
 
         const localParticipant = room.localParticipant;
@@ -60,7 +60,7 @@ const StudentWebcam = () => {
 
         // ... other LiveKit events you want to handle
       } catch (error) {
-        console.error("Error connecting to LiveKit room:", error);
+        console.error("Error connecting to LiveKit room:", console.log(error));
       }
     };
 
