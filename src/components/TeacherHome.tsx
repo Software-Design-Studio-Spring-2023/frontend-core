@@ -9,6 +9,10 @@ import StudentCard from "./StudentCard";
 import StudentMiniCard from "./StudentMiniCard";
 import useUsers from "../hooks/useUsers";
 
+import style from "style.css";
+
+import { useCountdown } from "./useCountdown";
+import CountDownApp from "./CountDownApp";
 //
 
 const TeacherHome = () => {
@@ -16,6 +20,20 @@ const TeacherHome = () => {
   const navigate = useNavigate();
   const [itemClicked, setItemClicked] = useState(false);
   const { data, loading, error } = useUsers();
+
+  const initialTotalTimeMS = 9000 * 1000;
+  const timeMS = useCountdown(initialTotalTimeMS, () =>
+    console.log("Times up!!")
+  );
+
+  let timeTotalSeconds = timeMS / 1000;
+  let timeTotalMinutes = Math.floor(timeTotalSeconds / 60);
+  let timeTotalHours = Math.floor(timeTotalMinutes / 60);
+
+  let displayMinutes = timeTotalMinutes % 60;
+  let displaySeconds = timeTotalSeconds % 60;
+
+  console.log("Seconds: ", timeMS / 1000);
 
   // setItemClicked(false);
 
@@ -42,6 +60,7 @@ const TeacherHome = () => {
   return (
     <>
       <LogOut handleLogout={() => navigate("/")} />
+
       <Heading padding={"10px"}>Participants</Heading>
       <Grid
         padding={"10px"}
