@@ -133,7 +133,7 @@ const TermsAndConditions: React.FC = () => {
           />
         </VStack>
       </Box>
-      <CopyrightVersion bottomVal={2} />
+      <CopyrightVersion bottomVal={0} />
     </>
   );
 };

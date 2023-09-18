@@ -131,7 +131,7 @@ const TeacherHome = () => {
             )
         )}
       </Grid>
-      <CopyrightVersion bottomVal={0} />
+      <CopyrightVersion bottomVal={-8} />
     </>
   );
 };

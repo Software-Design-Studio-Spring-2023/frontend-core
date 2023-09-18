@@ -227,7 +227,7 @@ const LoginForm = () => {
           </HStack>
         </form>
       </VStack>
-      <CopyrightVersion bottomVal={2} />
+      <CopyrightVersion bottomVal={-2} />
     </div>
   );
 };
