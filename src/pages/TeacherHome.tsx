@@ -10,7 +10,6 @@ import {
   Spacer,
 } from "@chakra-ui/react";
 import Webcam from "react-webcam";
-
 import { currentUser } from "./LoginForm";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -58,6 +57,7 @@ const TeacherHome = () => {
         </Heading>
         <Spacer />
         <CountDownApp></CountDownApp>
+
         <Button
           marginRight={"10px"}
           hidden={itemClicked ? false : true}
