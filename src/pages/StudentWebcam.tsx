@@ -20,16 +20,58 @@ import CopyrightVersion from "../components/CopyrightVersion";
 import preventLoad from "../hooks/preventLoad";
 import preventAccess from "../hooks/preventAccess";
 import { useNavigate } from "react-router-dom";
+import { Room } from "livekit-client";
 
 let name = "";
 
+let room: Room | null = null;
+
 let warnings: number;
+
+let userId = currentUser.id;
 
 const StudentWebcam = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showAlert, setShowAlert] = useState(true);
   const [startCapture, setStartCapture] = useState(false);
+
+  const [lkParticipant, setLkParticipant] = useState<any>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const initializeLiveKitRoom = async () => {
+      try {
+        // obtain a token from your server
+        const res = await fetch(
+          `http://localhost:8080/api/get_livekit_token/${currentUser.id}`
+        );
+        const data = await res.json();
+
+        room = new Room();
+        console.log(data.token);
+        room.connect("wss://eyedentify-90kai7lw.livekit.cloud", data.token);
+
+        const localParticipant = room.localParticipant;
+        setLkParticipant(localParticipant);
+
+        room.on("participantConnected", (participant) => {
+          console.log(`participant connected ${participant.identity}`);
+        });
+
+        // ... other LiveKit events you want to handle
+      } catch (error) {
+        console.error("Error connecting to LiveKit room:", error);
+      }
+    };
+
+    initializeLiveKitRoom();
+
+    return () => {
+      if (room) {
+        room.disconnect();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
