@@ -41,7 +41,7 @@ const StudentWebcam = () => {
   }, []);
 
   preventLoad(true, true);
-  preventAccess("teacher");
+  preventAccess("staff");
 
   if (currentUser !== undefined) {
     name = currentUser.name;
@@ -154,24 +154,16 @@ const StudentWebcam = () => {
 
   return (
     <>
+      <Box position="absolute" top="0" left="50%" transform="translateX(-50%)">
+        <Heading
+          padding={"10px"}
+        >{`Warnings: ${currentUser.warnings}`}</Heading>
+      </Box>
       <HStack>
         <Box paddingLeft={"10px"}>
           <HiEye color={"#81E6D9"} size={"3em"} />
         </Box>
         <Heading padding={"10px"}>{currentUser.name}</Heading>
-        <Button
-          colorScheme="teal"
-          variant="solid"
-          padding={"10px"}
-          hidden={recording ? true : false}
-          onClick={handleStartCapture}
-        >
-          {"Start Exam"}
-        </Button>
-        <Spacer />
-        <Heading hidden={recording ? false : true}>
-          Warnings: {warnings}
-        </Heading>
         <Spacer />
         <Box paddingRight={"30px"}>
           <div hidden={recording ? false : true}>
@@ -180,7 +172,8 @@ const StudentWebcam = () => {
         </Box>
       </HStack>
       <LoginSuccess />
-      <VStack padding={"20px"}>
+
+      <VStack padding={"20px"} minHeight="91vh">
         <Webcam audio={false} ref={webcamRef} onUserMedia={handleWebcamLoad} />
         <canvas
           ref={canvasRef}
@@ -201,18 +194,17 @@ const StudentWebcam = () => {
             </AlertDescription>
           </Alert>
         )} */}
+        <Button
+          colorScheme="teal"
+          variant="solid"
+          padding={"10px"}
+          hidden={recording ? true : false}
+          onClick={handleStartCapture}
+        >
+          {"Start Exam"}
+        </Button>
       </VStack>
-      <Box
-        paddingTop={recording ? "10%" : "8%"} //need to make this fixed
-        style={{
-          position: "relative",
-          bottom: "0",
-          width: "100%",
-          textAlign: "center",
-        }}
-      >
-        <CopyrightVersion />
-      </Box>
+      <CopyrightVersion />
     </>
   );
 };

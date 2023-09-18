@@ -73,7 +73,6 @@ const LoginForm = () => {
         (user) => user.email === email && user.password === password
       );
       if (currentUser !== undefined) {
-        patchData({ loggedIn: true }, "update_login", currentUser.id);
         currentUser.loggedIn = true;
       }
       navigate("/privacy");
