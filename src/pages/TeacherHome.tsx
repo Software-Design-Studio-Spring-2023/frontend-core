@@ -84,6 +84,8 @@ const TeacherHome = () => {
       {/* The grid */}
       <Grid
         paddingTop={itemClicked ? "10px" : "0px"}
+        paddingLeft={"10px"}
+        paddingRight={"10px"}
         templateColumns={
           itemClicked
             ? //this is for the small grids
