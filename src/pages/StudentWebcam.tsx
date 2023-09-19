@@ -43,7 +43,7 @@ const StudentWebcam = () => {
       try {
         // obtain a token from your server
         const res = await fetch(
-          `http://localhost:8080/api/get_livekit_token/${currentUser.id}`
+          `http://localhost:8080/api/get_student_token/${currentUser.id}`
         );
         const data = await res.json();
 
