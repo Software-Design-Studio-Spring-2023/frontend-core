@@ -4,13 +4,23 @@
 import { Card, CardBody, Heading, VStack, Text } from "@chakra-ui/react";
 import Webcam from "react-webcam";
 import setBorder from "../hooks/setBorder";
+import { useRef, useEffect } from "react";
 
 interface Props {
   name: string;
   warnings: number;
+  stream: MediaStream | null;
 }
 
-const StudentCard = ({ name, warnings }: Props) => {
+const StudentCard = ({ name, warnings, stream }: Props) => {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    if (videoRef.current && stream) {
+      videoRef.current.srcObject = stream;
+    }
+  }, [stream]);
+
   return (
     <Card
       overflow={"hidden"}
@@ -18,7 +28,7 @@ const StudentCard = ({ name, warnings }: Props) => {
       borderWidth={"1px"}
       borderRadius={"10px"}
     >
-      <Webcam />
+      <video ref={videoRef} autoPlay muted />
       <CardBody>
         <VStack>
           <Heading marginTop={"-8px"}>{name}</Heading>

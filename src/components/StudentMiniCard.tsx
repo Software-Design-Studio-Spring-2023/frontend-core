@@ -4,13 +4,23 @@
 import { Heading, Text, Box } from "@chakra-ui/react";
 import Webcam from "react-webcam";
 import setBorder from "../hooks/setBorder";
+import { useRef, useEffect } from "react";
 
 interface Props {
   name: string;
   warnings: number;
+  stream: MediaStream | null;
 }
 
-const StudentMiniCard = ({ name, warnings }: Props) => {
+const StudentMiniCard = ({ name, warnings, stream }: Props) => {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    if (videoRef.current && stream) {
+      videoRef.current.srcObject = stream;
+    }
+  }, [stream]);
+
   return (
     <>
       <Box
@@ -19,7 +29,7 @@ const StudentMiniCard = ({ name, warnings }: Props) => {
         borderWidth={"1px"}
         borderRadius={"lg"}
       >
-        <Webcam />
+        <video ref={videoRef} autoPlay muted />
         <Heading paddingTop={"2px"} paddingLeft={"2px"} fontSize="1xl">
           {name}
         </Heading>

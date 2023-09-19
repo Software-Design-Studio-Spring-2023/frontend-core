@@ -39,48 +39,43 @@ const StudentWebcam = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const initializeLiveKitRoom = async () => {
-      try {
-        // obtain a token from your server
-        const res = await fetch(
-          `http://localhost:8080/api/get_student_token/${currentUser.id}`
-        );
-        const data = await res.json();
+    const initialiseLiveKitRoom = () => {
+      fetch(`http://localhost:8080/api/get_student_token/${currentUser.id}`)
+        .then((res) => res.json())
+        .then((data) => {
+          room = new Room();
 
-        room = new Room();
+          room
+            .connect("wss://eyedentify-90kai7lw.livekit.cloud", data.token)
+            .then(() => {
+              const localParticipant = room.localParticipant;
+              setLkParticipant(localParticipant);
 
-        room.connect("wss://eyedentify-90kai7lw.livekit.cloud", data.token);
+              room.on("participantConnected", (participant) => {
+                console.log(`participant connected ${participant.identity}`);
+              });
 
-        const localParticipant = room.localParticipant;
-        setLkParticipant(localParticipant);
-
-        room.on("participantConnected", (participant) => {
-          console.log(`participant connected ${participant.identity}`);
+              // ... other LiveKit events you want to handle
+            })
+            .catch((error) => {
+              console.error("Error connecting to LiveKit room:", error);
+            });
+        })
+        .catch((error) => {
+          console.error("Error fetching token:", error);
         });
-
-        // ... other LiveKit events you want to handle
-      } catch (error) {
-        console.error("Error connecting to LiveKit room:", console.log(error));
-      }
     };
-
-    initializeLiveKitRoom();
-
-    return () => {
-      if (room) {
-        room.disconnect();
-      }
-    };
+    initialiseLiveKitRoom();
   }, []);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowAlert(false);
-      setStartCapture(true);
-    }, 3000); // Set timeout to 10 seconds
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setShowAlert(false);
+  //     setStartCapture(true);
+  //   }, 3000); // Set timeout to 10 seconds
 
-    return () => clearTimeout(timer); // Clear the timer if the component is unmounted before 10 seconds
-  }, []);
+  //   return () => clearTimeout(timer); // Clear the timer if the component is unmounted before 10 seconds
+  // }, []);
 
   preventLoad(true, true);
   preventAccess("staff");
@@ -100,37 +95,41 @@ const StudentWebcam = () => {
   );
   const capturedChunksRef = useRef<BlobPart[]>([]);
 
-  const frames: string[] = [];
+  // const frames: string[] = [];
 
-  const captureFrame = () => {
-    const video = webcamRef.current?.video;
-    const canvas = canvasRef.current;
+  // const captureFrame = () => {
+  //   const video = webcamRef.current?.video;
+  //   const canvas = canvasRef.current;
 
-    if (video && canvas && startCapture) {
-      const context = canvas.getContext("2d");
+  //   if (video && canvas && startCapture) {
+  //     const context = canvas.getContext("2d");
 
-      if (context) {
-        // Draw the video frame to the canvas.
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  //     if (context) {
+  //       // Draw the video frame to the canvas.
+  //       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // You can now save the image data from the canvas or do further processing.
-        const imageDataUrl = canvas.toDataURL("image/png");
-        frames.push(imageDataUrl);
-        console.log(frames);
-        // code for downloading the frame, for now its being pushed to an array
-        // const downloadLink = document.createElement("a");
-        // downloadLink.href = imageDataUrl;
-        // downloadLink.download = "captured_frame.png"; // You can change the name here
-        // downloadLink.click();
-      }
-    }
-  };
+  //       // You can now save the image data from the canvas or do further processing.
+  //       const imageDataUrl = canvas.toDataURL("image/png");
+  //       frames.push(imageDataUrl);
+  //       console.log(frames);
+  //       // code for downloading the frame, for now its being pushed to an array
+  //       // const downloadLink = document.createElement("a");
+  //       // downloadLink.href = imageDataUrl;
+  //       // downloadLink.download = "captured_frame.png"; // You can change the name here
+  //       // downloadLink.click();
+  //     }
+  //   }
+  // };
 
   const handleWebcamLoad = () => {
     // This will be triggered once the webcam is loaded and ready.
     //useful for immediate user identification
-    const intervalId = window.setInterval(captureFrame, 1000 / 30); // for 30 fps
-    setFrameCaptureInterval(intervalId);
+    // const intervalId = window.setInterval(captureFrame, 1000 / 30); // for 30 fps
+    // setFrameCaptureInterval(intervalId);
+    if (webcamRef.current && webcamRef.current.stream && lkParticipant) {
+      const videoTrack = webcamRef.current.stream.getVideoTracks()[0];
+      lkParticipant.publishTrack(videoTrack);
+    }
   };
 
   const handleStartCapture = () => {
@@ -180,11 +179,18 @@ const StudentWebcam = () => {
     if (mediaRecorder && webcamRef.current?.stream) {
       mediaRecorder.stop();
       setRecording(false);
-      captureFrame();
+      // captureFrame();
       //this is to permanently shut the camera off once exam is confirmed done
       const stream = webcamRef.current?.stream;
       const tracks = stream.getTracks();
-      tracks.forEach((track) => track.stop());
+      if (lkParticipant) {
+        tracks.forEach((track) => {
+          lkParticipant.unpublishTrack(track);
+          track.stop();
+        });
+      } else {
+        tracks.forEach((track) => track.stop());
+      }
 
       if (frameCaptureInterval) {
         window.clearInterval(frameCaptureInterval);
