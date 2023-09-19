@@ -27,8 +27,6 @@ import CountDownApp from "../hooks/CountDownApp";
 import { Participant, Room } from "livekit-client";
 import { LiveKitRoom } from "@livekit/components-react";
 
-let room: Room;
-
 const TeacherHome = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -37,6 +35,7 @@ const TeacherHome = () => {
   const { data, loading, error } = useUsers();
   const [participants, setParticipants] = useState({});
   const [isConnected, setIsConnected] = useState(false);
+  const [room, setRoom] = useState<Room | null>(null);
 
   preventLoad(true, true);
   preventAccess("student");
@@ -55,11 +54,12 @@ const TeacherHome = () => {
         const tokenData = await response.json(); // assuming the response is in JSON format
         setToken(tokenData.token); // update the state with the fetched token
 
-        room = new Room();
+        const room = new Room();
         await room.connect(
           "wss://eyedentify-90kai7lw.livekit.cloud",
           tokenData.token
         );
+        setRoom(room);
 
         console.log("Room instance:", room);
       } catch (error) {
@@ -102,6 +102,12 @@ const TeacherHome = () => {
 
   const fetchStreams = (identity) => {
     const participant = participants[identity];
+    console.log(
+      "Fetch stream for identity:",
+      identity,
+      "Participant:",
+      participant
+    );
     return (
       participant?.videoTracks.values().next().value?.track?.mediaStreamTrack ||
       null

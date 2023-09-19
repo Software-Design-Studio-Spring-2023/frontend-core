@@ -26,7 +26,7 @@ import StudentConnect from "../components/StudentConnect";
 
 let name = "";
 
-let room: Room | null = null;
+// let room: Room | null = null;
 
 let warnings: number;
 
@@ -36,8 +36,11 @@ const StudentWebcam = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showAlert, setShowAlert] = useState(true);
   const [startCapture, setStartCapture] = useState(false);
+  const [room, setRoom] = useState<Room | null>(null);
 
   const [lkParticipant, setLkParticipant] = useState<any>(null);
+  const [isConnected, setIsConnected] = useState(false);
+
   const navigate = useNavigate();
 
   const [token, setToken] = useState(null);
@@ -53,6 +56,15 @@ const StudentWebcam = () => {
         }
         const tokenData = await response.json(); // assuming the response is in JSON format
         setToken(tokenData.token); // update the state with the fetched token
+
+        const room = new Room();
+        await room.connect(
+          "wss://eyedentify-90kai7lw.livekit.cloud",
+          tokenData.token
+        );
+        setRoom(room);
+
+        console.log("Room instance:", room);
       } catch (error) {
         console.error("Error fetching the token:", error);
       }
@@ -115,10 +127,34 @@ const StudentWebcam = () => {
   // };
 
   const handleWebcamLoad = () => {
-    // This will be triggered once the webcam is loaded and ready.
-    //useful for immediate user identification
-    // const intervalId = window.setInterval(captureFrame, 1000 / 30); // for 30 fps
-    // setFrameCaptureInterval(intervalId);
+    console.log("Webcam loaded. isConnected:", isConnected);
+
+    if (isConnected && webcamRef.current && room) {
+      const stream = webcamRef.current.stream;
+      console.log("Stream:", stream);
+
+      if (stream) {
+        const track = stream.getVideoTracks()[0];
+        console.log("Track:", track);
+
+        if (track) {
+          room.localParticipant
+            .publishTrack(track)
+            .then(() => {
+              console.log("Track published successfully.");
+            })
+            .catch((error) => {
+              console.error("Error publishing video track:", error);
+            });
+        } else {
+          console.error("No video track found in the stream.");
+        }
+      } else {
+        console.error("Webcam stream is undefined");
+      }
+    } else {
+      console.error("Webcam not loaded or room not connected.");
+    }
   };
 
   const handleStartCapture = () => {
@@ -199,6 +235,7 @@ const StudentWebcam = () => {
         connect={true}
         serverUrl={"wss://eyedentify-90kai7lw.livekit.cloud"}
         options={{ disconnectOnPageLeave: false }}
+        onConnected={() => setIsConnected(true)}
       />
       <Box
         hidden={recording ? false : true}

@@ -28,7 +28,7 @@ const StudentCard = ({ name, warnings, stream }: Props) => {
       borderWidth={"1px"}
       borderRadius={"10px"}
     >
-      <video ref={videoRef} autoPlay muted />
+      <video ref={videoRef} autoPlay={true} muted={true} />
       <CardBody>
         <VStack>
           <Heading marginTop={"-8px"}>{name}</Heading>
