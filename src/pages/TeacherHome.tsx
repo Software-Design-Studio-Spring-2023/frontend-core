@@ -24,7 +24,7 @@ import preventLoad from "../hooks/preventLoad";
 import preventAccess from "../hooks/preventAccess";
 import setBorder from "../hooks/setBorder";
 import CountDownApp from "../hooks/CountDownApp";
-import { Participant, Room } from "livekit-client";
+import { DefaultReconnectPolicy, Participant, Room } from "livekit-client";
 import { LiveKitRoom } from "@livekit/components-react";
 
 const TeacherHome = () => {
@@ -59,6 +59,14 @@ const TeacherHome = () => {
           "wss://eyedentify-90kai7lw.livekit.cloud",
           tokenData.token
         );
+        room.options = {
+          dynacast: true,
+          stopLocalTrackOnUnpublish: true,
+          reconnectPolicy: new DefaultReconnectPolicy(),
+          expWebAudioMix: false,
+          adaptiveStream: true,
+          disconnectOnPageLeave: false,
+        };
         setRoom(room);
 
         console.log("Room instance:", room);

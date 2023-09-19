@@ -21,7 +21,7 @@ import CopyrightVersion from "../components/CopyrightVersion";
 import preventLoad from "../hooks/preventLoad";
 import preventAccess from "../hooks/preventAccess";
 import { useNavigate } from "react-router-dom";
-import { Room } from "livekit-client";
+import { DefaultReconnectPolicy, Room } from "livekit-client";
 import StudentConnect from "../components/StudentConnect";
 
 let name = "";
@@ -62,6 +62,14 @@ const StudentWebcam = () => {
           "wss://eyedentify-90kai7lw.livekit.cloud",
           tokenData.token
         );
+        room.options = {
+          dynacast: true,
+          stopLocalTrackOnUnpublish: true,
+          reconnectPolicy: new DefaultReconnectPolicy(),
+          expWebAudioMix: false,
+          adaptiveStream: true,
+          disconnectOnPageLeave: false,
+        };
         setRoom(room);
 
         console.log("Room instance:", room);
@@ -126,36 +134,45 @@ const StudentWebcam = () => {
   //   }
   // };
 
-  const handleWebcamLoad = () => {
-    console.log("Webcam loaded. isConnected:", isConnected);
+  useEffect(() => {
+    const publishTrackToRoom = async () => {
+      if (isConnected && webcamRef.current && room) {
+        const stream = webcamRef.current.stream;
+        console.log("Stream:", stream);
 
-    if (isConnected && webcamRef.current && room) {
-      const stream = webcamRef.current.stream;
-      console.log("Stream:", stream);
+        if (stream) {
+          const track = stream.getVideoTracks()[0];
+          console.log("Track:", track);
 
-      if (stream) {
-        const track = stream.getVideoTracks()[0];
-        console.log("Track:", track);
-
-        if (track) {
-          room.localParticipant
-            .publishTrack(track)
-            .then(() => {
-              console.log("Track published successfully.");
-            })
-            .catch((error) => {
-              console.error("Error publishing video track:", error);
-            });
+          if (track) {
+            try {
+              // Adding a timeout here
+              setTimeout(async () => {
+                try {
+                  await room.localParticipant.publishTrack(track);
+                  console.log("Track published successfully.");
+                } catch (error) {
+                  console.error("Error publishing video track:", error);
+                }
+              }, 2000); // 2000 milliseconds = 2 seconds delay
+            } catch (error) {
+              console.error("Error with timeout function:", error);
+            }
+          } else {
+            console.error("No video track found in the stream.");
+          }
         } else {
-          console.error("No video track found in the stream.");
+          console.error("Webcam stream is undefined");
         }
       } else {
-        console.error("Webcam stream is undefined");
+        console.error("Webcam not loaded or room not connected.");
       }
-    } else {
-      console.error("Webcam not loaded or room not connected.");
+    };
+
+    if (isConnected) {
+      publishTrackToRoom();
     }
-  };
+  }, [isConnected, room, webcamRef]);
 
   const handleStartCapture = () => {
     if (webcamRef.current && webcamRef.current.stream) {
@@ -234,8 +251,8 @@ const StudentWebcam = () => {
         connectOptions={{ autoSubscribe: false }}
         connect={true}
         serverUrl={"wss://eyedentify-90kai7lw.livekit.cloud"}
-        options={{ disconnectOnPageLeave: false }}
         onConnected={() => setIsConnected(true)}
+        room={room}
       />
       <Box
         hidden={recording ? false : true}
@@ -263,7 +280,6 @@ const StudentWebcam = () => {
       <LoginSuccess />
 
       <VStack padding={"20px"} minHeight="91vh">
-        <Webcam audio={false} ref={webcamRef} onUserMedia={handleWebcamLoad} />
         <canvas
           ref={canvasRef}
           width={640}
