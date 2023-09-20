@@ -81,6 +81,8 @@ const StudentWebcam = () => {
           // optimize publishing bandwidth and CPU for published tracks
           dynacast: true,
 
+          disconnectOnPageLeave: false,
+
           // default capture settings
           videoCaptureDefaults: {
             resolution: VideoPresets.h720.resolution,
@@ -104,13 +106,20 @@ const StudentWebcam = () => {
         await p.setMicrophoneEnabled(false);
         await p.setScreenShareEnabled(false);
 
-        room.on(RoomEvent.Disconnected, handleDisconnect);
+        const videoTrack = p.videoTracks.values().next().value.track;
+
+        if (videoTrack) {
+          await videoTrack.restartTrack({
+            facingMode: "user",
+          });
+        }
       } catch (error) {
         console.error("Error connecting to room:", room);
       }
     };
+
     connectToRoom();
-  }, [token !== null]);
+  }, [token]);
 
   // useEffect(() => {
   //   const timer = setTimeout(() => {

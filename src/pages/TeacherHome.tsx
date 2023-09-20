@@ -27,8 +27,12 @@ import CountDownApp from "../hooks/CountDownApp";
 import {
   DefaultReconnectPolicy,
   Participant,
+  RemoteParticipant,
+  RemoteTrack,
+  RemoteTrackPublication,
   Room,
   RoomEvent,
+  Track,
   VideoPresets,
 } from "livekit-client";
 import { LiveKitRoom } from "@livekit/components-react";
@@ -42,6 +46,7 @@ const TeacherHome = () => {
   const [participants, setParticipants] = useState({});
   const [isConnected, setIsConnected] = useState(false);
   const [room, setRoom] = useState<Room | null>(null);
+  const [streams, setStreams] = useState({});
 
   preventLoad(true, true);
   preventAccess("student");
@@ -77,6 +82,8 @@ const TeacherHome = () => {
           // optimize publishing bandwidth and CPU for published tracks
           dynacast: true,
 
+          disconnectOnPageLeave: false,
+
           // default capture settings
           videoCaptureDefaults: {
             resolution: VideoPresets.h720.resolution,
@@ -87,10 +94,37 @@ const TeacherHome = () => {
           "wss://eyedentify-90kai7lw.livekit.cloud",
           token
         );
-        room.on(RoomEvent.Disconnected, handleDisconnect);
 
         await room.connect("wss://eyedentify-90kai7lw.livekit.cloud", token);
         console.log("connected to room", room.name);
+
+        room
+          .on(RoomEvent.Disconnected, handleDisconnect)
+          .on(RoomEvent.TrackSubscribed, handleTrackSubscribed);
+
+        function handleTrackSubscribed(
+          track: RemoteTrack,
+          publication: RemoteTrackPublication,
+          participant: RemoteParticipant
+        ) {
+          if (track.kind === Track.Kind.Video) {
+            // Get the user ID from the participant identity (assuming it's stored there)
+            const userId = parseInt(participant.identity);
+
+            // Create the video or audio element
+            const element = track.attach();
+            console.log(
+              "Element Type:",
+              typeof element,
+              element instanceof MediaStream
+            );
+            // Update the streams state variable with the new element
+            setStreams((prevStreams) => ({
+              ...prevStreams,
+              [userId]: element,
+            }));
+          }
+        }
       } catch (error) {
         console.error("Error connecting to room:", room);
       }
@@ -98,49 +132,13 @@ const TeacherHome = () => {
     connectToRoom();
   }, [token !== null]);
 
-  useEffect(() => {
-    if (room) {
-      const handleParticipantConnected = (participant: Participant) => {
-        setParticipants((prevParticipants) => ({
-          ...prevParticipants,
-          [participant.identity]: participant,
-        }));
-      };
-
-      const handleParticipantDisconnected = (participant: Participant) => {
-        setParticipants((prevParticipants) => {
-          const updatedParticipants = { ...prevParticipants };
-          delete updatedParticipants[participant.identity];
-          return updatedParticipants;
-        });
-      };
-
-      room.on("participantConnected", handleParticipantConnected);
-      room.on("participantDisconnected", handleParticipantDisconnected);
-    }
-
-    // Cleanup event listeners on component unmount
-    // return () => {
-    //   if (room) {
-    //     room.off('participantConnected', handleParticipantConnected);
-    //     room.off('participantDisconnected', handleParticipantDisconnected);
-    //   }
-    // };
-  }, []);
-
-  const fetchStreams = (identity) => {
-    const participant = participants[identity];
-    // console.log(
-    //   "Fetch stream for identity:",
-    //   identity,
-    //   "Participant:",
-    //   participant
-    // );
-    return (
-      participant?.videoTracks.values().next().value?.track?.mediaStreamTrack ||
-      null
-    );
-  };
+  // Cleanup event listeners on component unmount
+  // return () => {
+  //   if (room) {
+  //     room.off('participantConnected', handleParticipantConnected);
+  //     room.off('participantDisconnected', handleParticipantDisconnected);
+  //   }
+  // };
 
   useEffect(() => {
     if (isConnected) {
@@ -244,13 +242,13 @@ const TeacherHome = () => {
                   <StudentMiniCard
                     name={user.name}
                     warnings={user.warnings}
-                    stream={fetchStreams(user.id)}
+                    stream={streams[user.id]}
                   />
                 ) : (
                   <StudentCard
                     name={user.name}
                     warnings={user.warnings}
-                    stream={fetchStreams(user.id)}
+                    stream={streams[user.id]}
                   />
                 )}
               </GridItem>
