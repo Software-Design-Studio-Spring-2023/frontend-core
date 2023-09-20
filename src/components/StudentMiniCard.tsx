@@ -13,11 +13,12 @@ interface Props {
 }
 
 const StudentMiniCard = ({ name, warnings, stream }: Props) => {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const videoRef = useRef(null);
 
   useEffect(() => {
-    if (videoRef.current && stream) {
-      videoRef.current.srcObject = stream;
+    if (stream && videoRef.current) {
+      videoRef.current.innerHTML = ""; // clear the inner HTML to ensure no other elements
+      videoRef.current.appendChild(stream);
     }
   }, [stream]);
 
@@ -29,7 +30,7 @@ const StudentMiniCard = ({ name, warnings, stream }: Props) => {
         borderWidth={"1px"}
         borderRadius={"lg"}
       >
-        <video ref={videoRef} autoPlay muted />
+        <div ref={videoRef}></div>
         <Heading paddingTop={"2px"} paddingLeft={"2px"} fontSize="1xl">
           {name}
         </Heading>
