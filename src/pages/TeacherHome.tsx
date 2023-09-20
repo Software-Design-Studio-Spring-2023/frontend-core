@@ -24,7 +24,13 @@ import preventLoad from "../hooks/preventLoad";
 import preventAccess from "../hooks/preventAccess";
 import setBorder from "../hooks/setBorder";
 import CountDownApp from "../hooks/CountDownApp";
-import { DefaultReconnectPolicy, Participant, Room } from "livekit-client";
+import {
+  DefaultReconnectPolicy,
+  Participant,
+  Room,
+  RoomEvent,
+  VideoPresets,
+} from "livekit-client";
 import { LiveKitRoom } from "@livekit/components-react";
 
 const TeacherHome = () => {
@@ -53,30 +59,44 @@ const TeacherHome = () => {
         }
         const tokenData = await response.json(); // assuming the response is in JSON format
         setToken(tokenData.token); // update the state with the fetched token
-
-        const room = new Room();
-        await room.connect(
-          "wss://eyedentify-90kai7lw.livekit.cloud",
-          tokenData.token
-        );
-        room.options = {
-          dynacast: true,
-          stopLocalTrackOnUnpublish: true,
-          reconnectPolicy: new DefaultReconnectPolicy(),
-          expWebAudioMix: false,
-          adaptiveStream: true,
-          disconnectOnPageLeave: false,
-        };
-        setRoom(room);
-
-        console.log("Room instance:", room);
+        // console.log(token);
       } catch (error) {
         console.error("Error fetching the token:", error);
       }
     };
-
     fetchToken();
   }, [currentUser.id]);
+
+  useEffect(() => {
+    const connectToRoom = async () => {
+      try {
+        const room = new Room({
+          // automatically manage subscribed video quality
+          adaptiveStream: true,
+
+          // optimize publishing bandwidth and CPU for published tracks
+          dynacast: true,
+
+          // default capture settings
+          videoCaptureDefaults: {
+            resolution: VideoPresets.h720.resolution,
+          },
+        });
+        setRoom(room);
+        room.prepareConnection(
+          "wss://eyedentify-90kai7lw.livekit.cloud",
+          token
+        );
+        room.on(RoomEvent.Disconnected, handleDisconnect);
+
+        await room.connect("wss://eyedentify-90kai7lw.livekit.cloud", token);
+        console.log("connected to room", room.name);
+      } catch (error) {
+        console.error("Error connecting to room:", room);
+      }
+    };
+    connectToRoom();
+  }, [token !== null]);
 
   useEffect(() => {
     if (room) {
@@ -110,12 +130,12 @@ const TeacherHome = () => {
 
   const fetchStreams = (identity) => {
     const participant = participants[identity];
-    console.log(
-      "Fetch stream for identity:",
-      identity,
-      "Participant:",
-      participant
-    );
+    // console.log(
+    //   "Fetch stream for identity:",
+    //   identity,
+    //   "Participant:",
+    //   participant
+    // );
     return (
       participant?.videoTracks.values().next().value?.track?.mediaStreamTrack ||
       null
@@ -143,22 +163,6 @@ const TeacherHome = () => {
   //
   return (
     <>
-      <LiveKitRoom
-        video={false}
-        audio={false}
-        token={token}
-        connectOptions={{ autoSubscribe: false }}
-        connect={true}
-        serverUrl={"wss://eyedentify-90kai7lw.livekit.cloud"}
-        options={{ disconnectOnPageLeave: false }}
-        room={room}
-        onConnected={() => {
-          // setRoom(room);
-          console.log("Connected to the room");
-          console.log("Current room instance:", room);
-          setIsConnected(true);
-        }}
-      />
       {/* Navbar */}
       <HStack w="100%" justifyContent="space-between" alignItems="center">
         <Box paddingLeft={"10px"}>
@@ -259,3 +263,7 @@ const TeacherHome = () => {
 };
 
 export default TeacherHome;
+
+function handleDisconnect() {
+  console.log("disconnected from room");
+}

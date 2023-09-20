@@ -21,7 +21,14 @@ import CopyrightVersion from "../components/CopyrightVersion";
 import preventLoad from "../hooks/preventLoad";
 import preventAccess from "../hooks/preventAccess";
 import { useNavigate } from "react-router-dom";
-import { DefaultReconnectPolicy, Room } from "livekit-client";
+import {
+  DefaultReconnectPolicy,
+  LocalParticipant,
+  LocalTrackPublication,
+  Room,
+  RoomEvent,
+  VideoPresets,
+} from "livekit-client";
 import StudentConnect from "../components/StudentConnect";
 
 let name = "";
@@ -56,30 +63,54 @@ const StudentWebcam = () => {
         }
         const tokenData = await response.json(); // assuming the response is in JSON format
         setToken(tokenData.token); // update the state with the fetched token
-
-        const room = new Room();
-        await room.connect(
-          "wss://eyedentify-90kai7lw.livekit.cloud",
-          tokenData.token
-        );
-        room.options = {
-          dynacast: true,
-          stopLocalTrackOnUnpublish: true,
-          reconnectPolicy: new DefaultReconnectPolicy(),
-          expWebAudioMix: false,
-          adaptiveStream: true,
-          disconnectOnPageLeave: false,
-        };
-        setRoom(room);
-
-        console.log("Room instance:", room);
+        // console.log(token);
       } catch (error) {
         console.error("Error fetching the token:", error);
       }
     };
-
     fetchToken();
   }, [currentUser.id]);
+
+  useEffect(() => {
+    const connectToRoom = async () => {
+      try {
+        const room = new Room({
+          // automatically manage subscribed video quality
+          adaptiveStream: true,
+
+          // optimize publishing bandwidth and CPU for published tracks
+          dynacast: true,
+
+          // default capture settings
+          videoCaptureDefaults: {
+            resolution: VideoPresets.h720.resolution,
+          },
+        });
+        setRoom(room);
+        room.prepareConnection(
+          "wss://eyedentify-90kai7lw.livekit.cloud",
+          token
+        );
+        room.on(RoomEvent.Disconnected, handleDisconnect);
+
+        await room.connect("wss://eyedentify-90kai7lw.livekit.cloud", token);
+        console.log("connected to room", room.name);
+
+        // publish local camera and mic tracks
+        const p = room.localParticipant;
+        // turn on the local user's camera and mic, this may trigger a browser prompt
+        // to ensure permissions are granted
+        await p.setCameraEnabled(true);
+        await p.setMicrophoneEnabled(false);
+        await p.setScreenShareEnabled(false);
+
+        room.on(RoomEvent.Disconnected, handleDisconnect);
+      } catch (error) {
+        console.error("Error connecting to room:", room);
+      }
+    };
+    connectToRoom();
+  }, [token !== null]);
 
   // useEffect(() => {
   //   const timer = setTimeout(() => {
@@ -244,16 +275,6 @@ const StudentWebcam = () => {
 
   return (
     <>
-      <LiveKitRoom
-        video={true}
-        audio={false}
-        token={token}
-        connectOptions={{ autoSubscribe: false }}
-        connect={true}
-        serverUrl={"wss://eyedentify-90kai7lw.livekit.cloud"}
-        onConnected={() => setIsConnected(true)}
-        room={room}
-      />
       <Box
         hidden={recording ? false : true}
         position="absolute"
@@ -278,7 +299,7 @@ const StudentWebcam = () => {
         </Box>
       </HStack>
       <LoginSuccess />
-
+      <Webcam audio={false} ref={webcamRef} />
       <VStack padding={"20px"} minHeight="91vh">
         <canvas
           ref={canvasRef}
@@ -315,3 +336,7 @@ const StudentWebcam = () => {
 };
 
 export default StudentWebcam;
+
+function handleDisconnect() {
+  console.log("disconnected from room");
+}
