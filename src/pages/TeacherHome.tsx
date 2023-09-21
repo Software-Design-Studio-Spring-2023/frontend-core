@@ -103,6 +103,20 @@ const TeacherHome = () => {
           .on(RoomEvent.Disconnected, handleDisconnect)
           .on(RoomEvent.TrackSubscribed, handleTrackSubscribed);
 
+        room.participants.forEach(handleExistingParticipant);
+
+        function handleExistingParticipant(participant: RemoteParticipant) {
+          participant.tracks.forEach((publication) => {
+            if (publication.track) {
+              handleTrackSubscribed(
+                publication.track,
+                publication,
+                participant
+              );
+            }
+          });
+        }
+
         function handleTrackSubscribed(
           track: RemoteTrack,
           publication: RemoteTrackPublication,
