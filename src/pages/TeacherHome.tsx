@@ -250,18 +250,19 @@ const TeacherHome = () => {
                 _hover={{
                   transform: "scale(1.03)", // Increase the scale when hovered
                   transition: "transform 0.1s", // Smooth transition
-                  boxShadow: streams[user.id]
-                    ? ` 0 0 8px 1px ${setBorder(user.warnings)}`
-                    : "",
                 }}
                 borderRadius={"10px"}
                 cursor={"pointer"}
                 key={user.id}
-                onClick={() => {
-                  setItemClicked(true);
-                  setUserClicked(user.name);
-                  navigate(`/teacher/${user.id}`); //opens teacher view for student on click
-                }}
+                onClick={
+                  streams[user.id]
+                    ? () => {
+                        setItemClicked(true);
+                        setUserClicked(user.name);
+                        navigate(`/teacher/${user.id}`); //opens teacher view for student on click
+                      }
+                    : null
+                }
               >
                 {itemClicked ? (
                   userClicked === user.name ? (
