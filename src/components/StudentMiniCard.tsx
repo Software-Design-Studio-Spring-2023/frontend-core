@@ -1,7 +1,7 @@
 //This is what will be rendered in the grid when viewing a student, and represents a student and their stream.
 //We will need to replace the Webcam and make the card loading as a student is connecting.
 
-import { Heading, Text, Box } from "@chakra-ui/react";
+import { Heading, Text, Box, Skeleton } from "@chakra-ui/react";
 import Webcam from "react-webcam";
 import setBorder from "../hooks/setBorder";
 import { useRef, useEffect } from "react";
@@ -10,9 +10,10 @@ interface Props {
   name: string;
   warnings: number;
   stream: MediaStream | null;
+  loading: boolean;
 }
 
-const StudentMiniCard = ({ name, warnings, stream }: Props) => {
+const StudentMiniCard = ({ name, warnings, stream, loading }: Props) => {
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -22,7 +23,30 @@ const StudentMiniCard = ({ name, warnings, stream }: Props) => {
     }
   }, [stream]);
 
-  return (
+  return loading ? (
+    <>
+      <Box
+        overflow={"hidden"}
+        borderColor={"gray.200"}
+        borderWidth={"1px"}
+        borderRadius={"lg"}
+      >
+        <Skeleton height="auto" width="100%" />
+        <Skeleton
+          paddingTop={"2px"}
+          paddingLeft={"2px"}
+          height="20px"
+          width="60%"
+        />
+        <Skeleton
+          paddingLeft={"2px"}
+          paddingBottom={"2px"}
+          height="15px"
+          width="50%"
+        />
+      </Box>
+    </>
+  ) : (
     <>
       <Box
         overflow={"hidden"}

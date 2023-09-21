@@ -267,6 +267,7 @@ const TeacherHome = () => {
                       name={user.name}
                       warnings={user.warnings}
                       stream={streams[user.id]}
+                      loading={streams[user.id] ? false : true}
                     />
                   )
                 ) : (
@@ -274,6 +275,7 @@ const TeacherHome = () => {
                     name={user.name}
                     warnings={user.warnings}
                     stream={streams[user.id]}
+                    loading={streams[user.id] ? false : true}
                   />
                 )}
               </GridItem>
