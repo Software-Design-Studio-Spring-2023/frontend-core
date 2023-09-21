@@ -1,6 +1,6 @@
 //when a teacher clicks on a student from the grid, they are directed to this page
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import TerminateExam from "../components/alerts/TerminateExam";
 import { User } from "../hooks/useUsers";
@@ -12,6 +12,7 @@ import { Box, Heading, VStack } from "@chakra-ui/react";
 import patchData from "../hooks/patchData";
 import preventLoad from "../hooks/preventLoad";
 import preventAccess from "../hooks/preventAccess";
+import { StreamsContext } from "../contexts/StreamContext";
 
 interface Props {
   user: User;
@@ -20,6 +21,23 @@ interface Props {
 let warnings: number;
 
 const TeacherView = ({ user }: Props) => {
+  const streams = useContext(StreamsContext);
+
+  console.log("Streams in TeacherView:", streams);
+
+  const stream = streams[user.id];
+
+  console.log("Specific stream for user:", stream);
+
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    if (stream && videoRef.current) {
+      videoRef.current.innerHTML = ""; // clear the inner HTML to ensure no other elements
+      videoRef.current.appendChild(stream);
+    }
+  }, [stream]);
+
   preventAccess("student");
   preventLoad(false, true);
 
@@ -56,7 +74,7 @@ const TeacherView = ({ user }: Props) => {
             alignItems: "center",
           }}
         >
-          <Webcam height={"90%"} width={"90%"} />
+          <div ref={videoRef} style={{ width: "200%", height: "auto" }} />
         </div>
         <div hidden={warning === 2 ? true : false}>
           <IssueWarning

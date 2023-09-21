@@ -29,7 +29,7 @@ const StudentCard = ({ name, warnings, stream }: Props) => {
       borderWidth={"1px"}
       borderRadius={"10px"}
     >
-      <div ref={videoRef}></div>
+      <div ref={videoRef} style={{ width: "100%", height: "auto" }}></div>
       <CardBody>
         <VStack>
           <Heading marginTop={"-8px"}>{name}</Heading>

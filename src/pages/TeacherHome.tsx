@@ -36,6 +36,7 @@ import {
   VideoPresets,
 } from "livekit-client";
 import { LiveKitRoom } from "@livekit/components-react";
+import { StreamsContext } from "../contexts/StreamContext";
 
 const TeacherHome = () => {
   const location = useLocation();
@@ -160,69 +161,75 @@ const TeacherHome = () => {
 
   //
   return (
-    <>
-      {/* Navbar */}
-      <HStack w="100%" justifyContent="space-between" alignItems="center">
-        <Box paddingLeft={"10px"}>
-          <HiEye color={"#81E6D9"} size={"3em"} />
-        </Box>
-        <Heading padding={"10px"}>
-          {itemClicked ? userClicked : "Participants"}
-        </Heading>
-        <Spacer />
-        {/* <CountDownApp></CountDownApp> */}
+    <StreamsContext.Provider value={streams}>
+      <>
+        {/* Navbar */}
+        <HStack w="100%" justifyContent="space-between" alignItems="center">
+          <Box paddingLeft={"20px"}>
+            <HiEye color={"#81E6D9"} size={"3em"} />
+          </Box>
+          <Heading padding={"10px"}>
+            {itemClicked ? userClicked : "Participants"}
+          </Heading>
+          <Spacer />
+          {/* <CountDownApp></CountDownApp> */}
 
-        <Button
-          marginRight={"10px"}
-          hidden={itemClicked ? false : true}
-          onClick={() => {
-            setItemClicked(false);
-            navigate("/teacher");
-          }}
-          bgColor="gray.600"
-        >
-          Go Back
-        </Button>
-        <Box marginRight={"30px"}>
-          <LogOut handleLogout={() => navigate("/")} />
+          <Button
+            marginRight={"10px"}
+            hidden={itemClicked ? false : true}
+            onClick={() => {
+              setItemClicked(false);
+              navigate("/teacher");
+            }}
+            bgColor="gray.600"
+          >
+            Go Back
+          </Button>
+          <Box marginRight={"30px"}>
+            <LogOut handleLogout={() => navigate("/")} />
+          </Box>
+        </HStack>
+        {/* Where Teacher view appears */}
+        <Outlet />
+        <Box padding={"10px"} paddingBottom={"0px"}>
+          <hr hidden={itemClicked ? false : true} />
         </Box>
-      </HStack>
-      {/* Where Teacher view appears */}
-      <Outlet />
-      <Box padding={"10px"} paddingBottom={"0px"}>
-        <hr hidden={itemClicked ? false : true} />
-      </Box>
-      <div hidden={itemClicked ? true : false}>
-        <LoginSuccess />
-      </div>
-      {/* The grid */}
-      <Grid
-        paddingTop={itemClicked ? "10px" : "0px"}
-        templateColumns={
-          itemClicked
-            ? //this is for the small grids
-              {
-                //this is responsive grid scaling for different sized devices
-                lg: "repeat(10, 1fr)",
-                md: "repeat(5, 1fr)",
-                sm: "repeat(4, 1fr)",
-              }
-            : {
-                //this is responsive grid scaling for different sized devices
-                lg: "repeat(5, 1fr)",
-                md: "repeat(3, 1fr)",
-                sm: "repeat(2, 1fr)",
-              }
-        }
-        gap={4}
-        style={
-          itemClicked ? { width: "calc(100% - 10px)", margin: "0 auto" } : {}
-        }
-      >
-        {data.map(
-          (user) =>
-            user.userType === "student" &&
-            user.terminated === false && (
+        <div hidden={itemClicked ? true : false}>
+          <LoginSuccess />
+        </div>
+        {/* The grid */}
+        <Grid
+          paddingTop={itemClicked ? "10px" : "0px"}
+          templateColumns={
+            itemClicked
+              ? //this is for the small grids
+                {
+                  //this is responsive grid scaling for different sized devices
+                  lg: "repeat(10, 1fr)",
+                  md: "repeat(5, 1fr)",
+                  sm: "repeat(4, 1fr)",
+                }
+              : {
+                  //this is responsive grid scaling for different sized devices
+                  lg: "repeat(5, 1fr)",
+                  md: "repeat(3, 1fr)",
+                  sm: "repeat(2, 1fr)",
+                }
+          }
+          gap={4}
+          style={
+            itemClicked ? { width: "calc(100% - 10px)", margin: "0 auto" } : {}
+          }
+        >
+          {data.map((user) => {
+            if (user.userType !== "student" || user.terminated === true) {
+              return null;
+            }
+
+            if (itemClicked && userClicked === user.name) {
+              return null; // This will not render the GridItem at all for the clicked user
+            }
+            return (
               <GridItem
                 _hover={{
                   transform: "scale(1.03)", // Increase the scale when hovered
@@ -239,11 +246,15 @@ const TeacherHome = () => {
                 }}
               >
                 {itemClicked ? (
-                  <StudentMiniCard
-                    name={user.name}
-                    warnings={user.warnings}
-                    stream={streams[user.id]}
-                  />
+                  userClicked === user.name ? (
+                    <></>
+                  ) : (
+                    <StudentMiniCard
+                      name={user.name}
+                      warnings={user.warnings}
+                      stream={streams[user.id]}
+                    />
+                  )
                 ) : (
                   <StudentCard
                     name={user.name}
@@ -252,11 +263,12 @@ const TeacherHome = () => {
                   />
                 )}
               </GridItem>
-            )
-        )}
-      </Grid>
-      <CopyrightVersion bottomVal={-8} />
-    </>
+            );
+          })}
+        </Grid>
+        <CopyrightVersion bottomVal={-8} />
+      </>
+    </StreamsContext.Provider>
   );
 };
 

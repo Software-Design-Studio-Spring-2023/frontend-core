@@ -30,7 +30,7 @@ const StudentMiniCard = ({ name, warnings, stream }: Props) => {
         borderWidth={"1px"}
         borderRadius={"lg"}
       >
-        <div ref={videoRef}></div>
+        <div ref={videoRef} style={{ width: "100%", height: "auto" }}></div>
         <Heading paddingTop={"2px"} paddingLeft={"2px"} fontSize="1xl">
           {name}
         </Heading>
