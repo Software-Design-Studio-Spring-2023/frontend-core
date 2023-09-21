@@ -214,6 +214,8 @@ const TeacherHome = () => {
         {/* The grid */}
         <Grid
           paddingTop={itemClicked ? "10px" : "0px"}
+          paddingLeft={"10px"}
+          paddingRight={"10px"}
           templateColumns={
             itemClicked
               ? //this is for the small grids
@@ -248,7 +250,9 @@ const TeacherHome = () => {
                 _hover={{
                   transform: "scale(1.03)", // Increase the scale when hovered
                   transition: "transform 0.1s", // Smooth transition
-                  boxShadow: ` 0 0 8px 1px ${setBorder(user.warnings)}`,
+                  boxShadow: streams[user.id]
+                    ? ` 0 0 8px 1px ${setBorder(user.warnings)}`
+                    : "",
                 }}
                 borderRadius={"10px"}
                 cursor={"pointer"}

@@ -33,11 +33,11 @@ const StudentCard = ({ name, warnings, stream, loading }: Props) => {
   return loading ? (
     <Card
       overflow={"hidden"}
-      borderColor={"gray.200"}
+      borderColor={"RGBA(0, 0, 0, 0.80)"}
       borderWidth={"1px"}
       borderRadius={"10px"}
     >
-      <Skeleton height="auto" width="100%" />
+      <Skeleton height="200px" overflow="hidden" />
       <CardBody>
         <VStack>
           <Skeleton height="20px" width="60%" />

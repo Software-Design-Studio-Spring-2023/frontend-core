@@ -27,20 +27,21 @@ const StudentMiniCard = ({ name, warnings, stream, loading }: Props) => {
     <>
       <Box
         overflow={"hidden"}
-        borderColor={"gray.200"}
+        borderColor={"RGBA(0, 0, 0, 0.80)"}
         borderWidth={"1px"}
         borderRadius={"lg"}
       >
-        <Skeleton height="auto" width="100%" />
+        <Skeleton height="80px" overflow="hidden" />
+
         <Skeleton
-          paddingTop={"2px"}
-          paddingLeft={"2px"}
+          marginTop={"2px"}
+          marginLeft={"2px"}
           height="20px"
           width="60%"
         />
         <Skeleton
-          paddingLeft={"2px"}
-          paddingBottom={"2px"}
+          marginLeft={"2px"}
+          marginBottom={"2px"}
           height="15px"
           width="50%"
         />
