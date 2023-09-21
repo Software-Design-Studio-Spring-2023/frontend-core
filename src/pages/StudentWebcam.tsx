@@ -308,7 +308,8 @@ const StudentWebcam = () => {
         </Box>
       </HStack>
       <LoginSuccess />
-
+      {/* {currentUser.warnings === 1 && <WarningOne/>}
+      {currentUser.warnings === 2 && <WarningTwo/>} */}
       <VStack padding={"20px"} minHeight="91vh">
         <Webcam audio={false} ref={webcamRef} />
         <canvas
