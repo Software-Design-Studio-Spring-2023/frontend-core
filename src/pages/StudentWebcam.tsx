@@ -308,8 +308,9 @@ const StudentWebcam = () => {
         </Box>
       </HStack>
       <LoginSuccess />
-      <Webcam audio={false} ref={webcamRef} />
+
       <VStack padding={"20px"} minHeight="91vh">
+        <Webcam audio={false} ref={webcamRef} />
         <canvas
           ref={canvasRef}
           width={640}
