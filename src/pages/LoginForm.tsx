@@ -20,6 +20,7 @@ import { HiEye, HiOutlineEye } from "react-icons/hi";
 import LoginFailed from "../components/alerts/LoginFailed";
 import Terminated from "../components/alerts/Terminated";
 import AlreadyLoggedIn from "../components/alerts/AlreadyLoggedIn";
+import ExamStartedError from "../components/alerts/ExamStartedError"
 import patchData from "../hooks/patchData";
 import CopyrightVersion from "../components/CopyrightVersion";
 
@@ -46,6 +47,7 @@ const LoginForm = () => {
   const [show, setShow] = useState(false);
   const [examTerminated, setExamTerminated] = useState(false);
   const [alreadyLogged, setAlreadyLogged] = useState(false);
+  const [examStarted, setexamStarted] = useState(false);
 
   //disabled login button if no data
   useEffect(() => {
