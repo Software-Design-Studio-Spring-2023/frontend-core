@@ -24,6 +24,7 @@ import CopyrightVersion from "../components/CopyrightVersion";
 import preventLoad from "../hooks/preventLoad";
 import preventAccess from "../hooks/preventAccess";
 import setBorder from "../hooks/setBorder";
+import CountDownApp from "../hooks/CountDownApp";
 
 const TeacherHome = () => {
   const location = useLocation();
@@ -56,6 +57,7 @@ const TeacherHome = () => {
           {itemClicked ? userClicked : "Participants"}
         </Heading>
         <Spacer />
+        <CountDownApp></CountDownApp>
         <Button
           marginRight={"10px"}
           hidden={itemClicked ? false : true}
@@ -81,8 +83,9 @@ const TeacherHome = () => {
       </div>
       {/* The grid */}
       <Grid
-        padding={"10px"}
         paddingTop={itemClicked ? "10px" : "0px"}
+        paddingLeft={"10px"}
+        paddingRight={"10px"}
         templateColumns={
           itemClicked
             ? //this is for the small grids
@@ -132,9 +135,7 @@ const TeacherHome = () => {
             )
         )}
       </Grid>
-      <Box paddingTop={"2%"}>
-        <CopyrightVersion />
-      </Box>
+      <CopyrightVersion bottomVal={-8} />
     </>
   );
 };

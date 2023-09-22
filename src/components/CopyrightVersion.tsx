@@ -1,13 +1,14 @@
-// Copyright component and version identifier for the bottom of the page
-
 import { Box, Text } from "@chakra-ui/react";
+interface Props {
+  bottomVal: number;
+}
 
-const CopyrightVersion = () => {
+const CopyrightVersion = ({ bottomVal }: Props) => {
   return (
     <>
       <Box
         position="absolute"
-        bottom="2"
+        bottom={bottomVal}
         width="100%"
         zIndex="1000"
         display="flex"
@@ -18,13 +19,12 @@ const CopyrightVersion = () => {
       </Box>
       <Box
         position="absolute"
-        bottom="2"
+        bottom={bottomVal}
         right="6"
-        width="100%"
         zIndex="1000"
         display="flex"
-        justifyContent="right"
-        alignItems="right"
+        justifyContent="flex-end"
+        alignItems="center"
       >
         <Text>Version X.X Alpha</Text>
       </Box>
