@@ -237,55 +237,57 @@ const TeacherHome = () => {
             itemClicked ? { width: "calc(100% - 10px)", margin: "0 auto" } : {}
           }
         >
-          {data.map((user) => {
-            if (user.userType !== "student" || user.terminated === true) {
-              return null;
-            }
+          {data
+            .sort((a, b) => (streams[b.id] ? 1 : streams[a.id] ? -1 : 0))
+            .map((user) => {
+              if (user.userType !== "student" || user.terminated === true) {
+                return null;
+              }
 
-            if (itemClicked && userClicked === user.name) {
-              return null; // This will not render the GridItem at all for the clicked user
-            }
-            return (
-              <GridItem
-                _hover={{
-                  transform: "scale(1.03)", // Increase the scale when hovered
-                  transition: "transform 0.1s", // Smooth transition
-                }}
-                borderRadius={"10px"}
-                cursor={"pointer"}
-                key={user.id}
-                onClick={
-                  streams[user.id]
-                    ? () => {
-                        setItemClicked(true);
-                        setUserClicked(user.name);
-                        navigate(`/teacher/${user.id}`); //opens teacher view for student on click
-                      }
-                    : null
-                }
-              >
-                {itemClicked ? (
-                  userClicked === user.name ? (
-                    <></>
+              if (itemClicked && userClicked === user.name) {
+                return null; // This will not render the GridItem at all for the clicked user
+              }
+              return (
+                <GridItem
+                  _hover={{
+                    transform: "scale(1.03)", // Increase the scale when hovered
+                    transition: "transform 0.1s", // Smooth transition
+                  }}
+                  borderRadius={"10px"}
+                  cursor={"pointer"}
+                  key={user.id}
+                  onClick={
+                    streams[user.id]
+                      ? () => {
+                          setItemClicked(true);
+                          setUserClicked(user.name);
+                          navigate(`/teacher/${user.id}`); //opens teacher view for student on click
+                        }
+                      : null
+                  }
+                >
+                  {itemClicked ? (
+                    userClicked === user.name ? (
+                      <></>
+                    ) : (
+                      <StudentMiniCard
+                        name={user.name}
+                        warnings={user.warnings}
+                        stream={streams[user.id]}
+                        loading={streams[user.id] ? false : true}
+                      />
+                    )
                   ) : (
-                    <StudentMiniCard
+                    <StudentCard
                       name={user.name}
                       warnings={user.warnings}
                       stream={streams[user.id]}
                       loading={streams[user.id] ? false : true}
                     />
-                  )
-                ) : (
-                  <StudentCard
-                    name={user.name}
-                    warnings={user.warnings}
-                    stream={streams[user.id]}
-                    loading={streams[user.id] ? false : true}
-                  />
-                )}
-              </GridItem>
-            );
-          })}
+                  )}
+                </GridItem>
+              );
+            })}
         </Grid>
         <CopyrightVersion bottomVal={-8} />
       </>
