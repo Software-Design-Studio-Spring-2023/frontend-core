@@ -311,7 +311,14 @@ const StudentWebcam = () => {
       {/* {currentUser.warnings === 1 && <WarningOne/>}
       {currentUser.warnings === 2 && <WarningTwo/>} */}
       <VStack padding={"20px"} minHeight="91vh">
-        <Webcam audio={false} ref={webcamRef} />
+        <Box
+          borderRadius={"10px"}
+          overflow={"hidden"}
+          borderWidth={"4px"}
+          borderColor={"#1A202C"}
+        >
+          <Webcam audio={false} ref={webcamRef} />
+        </Box>
         <canvas
           ref={canvasRef}
           width={640}

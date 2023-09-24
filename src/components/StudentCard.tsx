@@ -47,15 +47,28 @@ const StudentCard = ({ name, warnings, stream, loading }: Props) => {
     </Card>
   ) : (
     <Card
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
       overflow={"hidden"}
       borderColor={setBorder(warnings)}
       borderWidth={"1px"}
       borderRadius={"10px"}
     >
-      <div ref={videoRef} style={{ width: "100%", height: "auto" }}></div>
       <CardBody>
+        <div
+          ref={videoRef}
+          style={{
+            borderRadius: "10px",
+            overflow: "hidden",
+            width: "100%",
+            height: "auto",
+          }}
+        ></div>
         <VStack>
-          <Heading marginTop={"-8px"}>{name}</Heading>
+          <Heading marginTop={"8px"}>{name}</Heading>
           <Text>Warnings: {warnings}</Text>
         </VStack>
       </CardBody>

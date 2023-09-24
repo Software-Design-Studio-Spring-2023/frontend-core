@@ -26,7 +26,11 @@ const CopyrightVersion = ({ bottomVal }: Props) => {
         justifyContent="flex-end"
         alignItems="center"
       >
-        <Text>Version X.X Alpha</Text>
+        <Text
+          hidden={/Android|iPhone/i.test(navigator.userAgent) ? true : false}
+        >
+          Version X.X Alpha
+        </Text>
       </Box>
     </>
   );

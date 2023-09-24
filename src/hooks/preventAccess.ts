@@ -15,6 +15,10 @@ const preventAccess = (userType: string) => {
         useEffect(() => {
         navigate("/*");
         }, []);
+    } else if (currentUser?.userType === "student" && /Android|iPhone/i.test(navigator.userAgent)) {
+        useEffect(() => {
+        navigate("/*");
+        }, []);
     }
 }
 

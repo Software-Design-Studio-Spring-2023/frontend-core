@@ -50,12 +50,25 @@ const StudentMiniCard = ({ name, warnings, stream, loading }: Props) => {
   ) : (
     <>
       <Box
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
         overflow={"hidden"}
         borderColor={setBorder(warnings)}
         borderWidth={"1px"}
         borderRadius={"lg"}
       >
-        <div ref={videoRef} style={{ width: "200%", height: "auto" }}></div>
+        <div
+          ref={videoRef}
+          style={{
+            borderRadius: "2px",
+            overflow: "hidden",
+            width: "100%",
+            height: "auto",
+          }}
+        ></div>
         <Heading paddingTop={"2px"} paddingLeft={"2px"} fontSize="1xl">
           {name}
         </Heading>
