@@ -249,12 +249,16 @@ const TeacherHome = () => {
               }
               return (
                 <GridItem
-                  _hover={{
-                    transform: "scale(1.03)", // Increase the scale when hovered
-                    transition: "transform 0.1s", // Smooth transition
-                  }}
+                  _hover={
+                    streams[user.id]
+                      ? {
+                          transform: "scale(1.03)", // Increase the scale when hovered
+                          transition: "transform 0.1s", // Smooth transition
+                        }
+                      : {}
+                  }
                   borderRadius={"10px"}
-                  cursor={"pointer"}
+                  cursor={streams[user.id] ? "pointer" : "auto"}
                   key={user.id}
                   onClick={
                     streams[user.id]

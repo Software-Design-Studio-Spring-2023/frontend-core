@@ -22,21 +22,44 @@ let warnings: number;
 
 const TeacherView = ({ user }: Props) => {
   const streams = useContext(StreamsContext);
-
-  console.log("Streams in TeacherView:", streams);
-
   const stream = streams[user.id];
-
-  console.log("Specific stream for user:", stream);
-
   const videoRef = useRef(null);
 
   useEffect(() => {
     if (stream && videoRef.current) {
       videoRef.current.innerHTML = ""; // clear the inner HTML to ensure no other elements
+
       videoRef.current.appendChild(stream);
     }
   }, [stream]);
+
+  useEffect(() => {
+    const videoContainer = videoRef.current;
+    if (videoContainer) {
+      const videoElement = videoContainer.querySelector("video");
+      if (videoElement) {
+        // Set the initial width
+        videoElement.style.width = "200%";
+
+        // Set up the mutation observer
+        const observer = new MutationObserver(() => {
+          // Check and reapply the width whenever it changes
+          if (videoElement.style.width !== "200%") {
+            videoElement.style.width = "200%";
+          }
+        });
+
+        // Start observing for style changes
+        observer.observe(videoElement, {
+          attributes: true,
+          attributeFilter: ["style"],
+        });
+
+        // Cleanup the observer on component unmount
+        return () => observer.disconnect();
+      }
+    }
+  }, [videoRef.current, stream]);
 
   preventAccess("student");
   preventLoad(false, true);
@@ -68,14 +91,14 @@ const TeacherView = ({ user }: Props) => {
       </Box>
       <VStack justifyContent="center" alignItems="center" spacing={2.5}>
         <div
+          ref={videoRef}
           style={{
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            width: "40%",
           }}
-        >
-          <div ref={videoRef} style={{ width: "200%", height: "auto" }} />
-        </div>
+        />
         <div hidden={warning === 2 ? true : false}>
           <IssueWarning
             user={user}
