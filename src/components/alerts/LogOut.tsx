@@ -32,13 +32,13 @@ const LogOut = ({ handleLogout }: Props) => {
         colorScheme="teal"
         variant="solid"
         onClick={onOpen}
-        size={/Android|iPhone/i.test(navigator.userAgent) ? "sm" : ""}
+        size={/Android|iPhone/i.test(navigator.userAgent) ? "sm" : "md"}
       >
         Log Out
       </Button>
       <AlertDialog
         motionPreset="scale"
-        size={/Android|iPhone/i.test(navigator.userAgent) ? "xs" : ""}
+        size={/Android|iPhone/i.test(navigator.userAgent) ? "xs" : "lg"}
         isOpen={isOpen}
         leastDestructiveRef={cancelRef}
         onClose={onClose}

@@ -180,15 +180,21 @@ const TeacherHome = () => {
         {/* Navbar */}
         <HStack w="100%" justifyContent="space-between" alignItems="center">
           <Box paddingLeft={"20px"}>
-            <HiEye color={"#81E6D9"} size={"2.5em"} />
+            <HiEye
+              color={"#81E6D9"}
+              size={
+                /Android|iPhone/i.test(navigator.userAgent) ? "2.5em" : "3em"
+              }
+            />
           </Box>
           <Heading
             padding={"10px"}
             marginLeft={
               /Android|iPhone/i.test(navigator.userAgent) ? "-6px" : ""
             }
+            marginBottom={/Android|iPhone/i.test(navigator.userAgent) ? "" : 1}
             overflow={"hidden"}
-            size={/Android|iPhone/i.test(navigator.userAgent) ? "lg" : ""}
+            size={/Android|iPhone/i.test(navigator.userAgent) ? "lg" : "xl"}
           >
             {itemClicked ? userClicked : "Participants"}
           </Heading>
@@ -204,7 +210,7 @@ const TeacherHome = () => {
               navigate("/teacher");
             }}
             bgColor="gray.600"
-            size={/Android|iPhone/i.test(navigator.userAgent) ? "sm" : ""}
+            size={/Android|iPhone/i.test(navigator.userAgent) ? "sm" : "md"}
           >
             {/Android|iPhone/i.test(navigator.userAgent) ? "Back " : "Go Back"}
           </Button>
