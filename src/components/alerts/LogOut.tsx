@@ -28,7 +28,12 @@ const LogOut = ({ handleLogout }: Props) => {
 
   return (
     <>
-      <Button colorScheme="teal" variant="solid" onClick={onOpen}>
+      <Button
+        colorScheme="teal"
+        variant="solid"
+        onClick={onOpen}
+        size={/Android|iPhone/i.test(navigator.userAgent) ? "sm" : ""}
+      >
         Log Out
       </Button>
       <AlertDialog

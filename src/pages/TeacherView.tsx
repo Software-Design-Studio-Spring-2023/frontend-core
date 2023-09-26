@@ -86,17 +86,23 @@ const TeacherView = ({ user }: Props) => {
 
   return (
     <>
-      <Box position="absolute" top="0" left="50%" transform="translateX(-50%)">
+      <Box
+        position="absolute"
+        top={/Android|iPhone/i.test(navigator.userAgent) ? 10 : 0}
+        left="50%"
+        transform="translateX(-50%)"
+      >
         <Heading padding={"10px"}>{`Warnings: ${user.warnings}`}</Heading>
       </Box>
       <VStack justifyContent="center" alignItems="center" spacing={2.5}>
         <div
           ref={videoRef}
           style={{
+            marginTop: /Android|iPhone/i.test(navigator.userAgent) ? 48 : 0,
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            width: "40%",
+            width: /Android|iPhone/i.test(navigator.userAgent) ? "80%" : "40%",
             borderRadius: "10px",
             overflow: "hidden",
           }}
