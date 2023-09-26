@@ -184,6 +184,9 @@ const TeacherHome = () => {
           </Box>
           <Heading
             padding={"10px"}
+            marginLeft={
+              /Android|iPhone/i.test(navigator.userAgent) ? "-6px" : ""
+            }
             overflow={"hidden"}
             size={/Android|iPhone/i.test(navigator.userAgent) ? "lg" : ""}
           >
@@ -215,7 +218,11 @@ const TeacherHome = () => {
           <hr hidden={itemClicked ? false : true} />
         </Box>
         <div hidden={itemClicked ? true : false}>
-          <LoginSuccess />
+          {/Android|iPhone/i.test(navigator.userAgent) ? (
+            <></>
+          ) : (
+            <LoginSuccess />
+          )}
         </div>
         {/* The grid */}
         <Grid

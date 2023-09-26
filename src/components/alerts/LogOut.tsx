@@ -38,6 +38,7 @@ const LogOut = ({ handleLogout }: Props) => {
       </Button>
       <AlertDialog
         motionPreset="scale"
+        size={/Android|iPhone/i.test(navigator.userAgent) ? "xs" : ""}
         isOpen={isOpen}
         leastDestructiveRef={cancelRef}
         onClose={onClose}
