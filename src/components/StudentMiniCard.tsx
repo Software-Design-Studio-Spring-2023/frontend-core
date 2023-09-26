@@ -1,20 +1,23 @@
 //This is what will be rendered in the grid when viewing a student, and represents a student and their stream.
 //We will need to replace the Webcam and make the card loading as a student is connecting.
 
-import { Heading, Text, Box, Skeleton } from "@chakra-ui/react";
+import { Heading, Text, Box, Skeleton, VStack } from "@chakra-ui/react";
 import Webcam from "react-webcam";
 import setBorder from "../hooks/setBorder";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useContext } from "react";
+import { StreamsContext } from "../contexts/StreamContext";
 
 interface Props {
   name: string;
   warnings: number;
-  stream: MediaStream | null;
+  id: number;
   loading: boolean;
 }
 
-const StudentMiniCard = ({ name, warnings, stream, loading }: Props) => {
+const StudentMiniCard = ({ name, id, warnings, loading }: Props) => {
   const videoRef = useRef(null);
+  const streams = useContext(StreamsContext);
+  const stream = streams[id];
 
   useEffect(() => {
     if (stream && videoRef.current) {
@@ -50,31 +53,28 @@ const StudentMiniCard = ({ name, warnings, stream, loading }: Props) => {
   ) : (
     <>
       <Box
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
         overflow={"hidden"}
         borderColor={setBorder(warnings)}
         borderWidth={"1px"}
         borderRadius={"lg"}
       >
-        <div
-          ref={videoRef}
-          style={{
-            borderRadius: "2px",
-            overflow: "hidden",
-            width: "100%",
-            height: "auto",
-          }}
-        ></div>
-        <Heading paddingTop={"2px"} paddingLeft={"2px"} fontSize="1xl">
-          {name}
-        </Heading>
-        <Text paddingLeft={"2px"} paddingBottom={"2px"} fontSize={"x-small"}>
-          Warnings: {warnings}
-        </Text>
+        <VStack spacing={0.5} align="start">
+          <div
+            ref={videoRef}
+            style={{
+              borderRadius: "2px",
+              overflow: "hidden",
+              width: "100%",
+              height: "auto",
+            }}
+          ></div>
+          <Heading paddingLeft={"2px"} fontSize="1xl">
+            {name}
+          </Heading>
+          <Text paddingLeft={"2px"} paddingBottom={"2px"} fontSize={"x-small"}>
+            Warnings: {warnings}
+          </Text>
+        </VStack>
       </Box>
     </>
   );

@@ -11,17 +11,21 @@ import {
 } from "@chakra-ui/react";
 import Webcam from "react-webcam";
 import setBorder from "../hooks/setBorder";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useContext } from "react";
+import { StreamsContext } from "../contexts/StreamContext";
 
 interface Props {
   name: string;
   warnings: number;
-  stream: MediaStream | null;
+  id: number;
+
   loading: boolean;
 }
 
-const StudentCard = ({ name, warnings, stream, loading }: Props) => {
+const StudentCard = ({ name, warnings, id, loading }: Props) => {
   const videoRef = useRef(null);
+  const streams = useContext(StreamsContext);
+  const stream = streams[id];
 
   useEffect(() => {
     if (stream && videoRef.current) {

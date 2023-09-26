@@ -97,6 +97,8 @@ const TeacherView = ({ user }: Props) => {
             justifyContent: "center",
             alignItems: "center",
             width: "40%",
+            borderRadius: "10px",
+            overflow: "hidden",
           }}
         />
         <div hidden={warning === 2 ? true : false}>

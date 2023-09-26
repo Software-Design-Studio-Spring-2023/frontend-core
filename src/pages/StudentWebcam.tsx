@@ -314,8 +314,8 @@ const StudentWebcam = () => {
         <Box
           borderRadius={"10px"}
           overflow={"hidden"}
-          borderWidth={"4px"}
-          borderColor={"#1A202C"}
+          // borderWidth={"4px"}
+          // borderColor={"#1A202C"}
         >
           <Webcam audio={false} ref={webcamRef} />
         </Box>

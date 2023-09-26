@@ -277,7 +277,7 @@ const TeacherHome = () => {
                       <StudentMiniCard
                         name={user.name}
                         warnings={user.warnings}
-                        stream={streams[user.id]}
+                        id={user.id}
                         loading={streams[user.id] ? false : true}
                       />
                     )
@@ -285,7 +285,7 @@ const TeacherHome = () => {
                     <StudentCard
                       name={user.name}
                       warnings={user.warnings}
-                      stream={streams[user.id]}
+                      id={user.id}
                       loading={streams[user.id] ? false : true}
                     />
                   )}
