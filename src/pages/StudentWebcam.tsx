@@ -14,6 +14,7 @@ import {
   Spacer,
   VStack,
 } from "@chakra-ui/react";
+import { LiveKitRoom } from "@livekit/components-react";
 import { HiEye } from "react-icons/hi";
 import LoginSuccess from "../components/alerts/LoginSuccess";
 import WarningOne from "../components/alerts/WarningOne";
@@ -22,25 +23,114 @@ import CopyrightVersion from "../components/CopyrightVersion";
 import preventLoad from "../hooks/preventLoad";
 import preventAccess from "../hooks/preventAccess";
 import { useNavigate } from "react-router-dom";
+import {
+  DefaultReconnectPolicy,
+  LocalParticipant,
+  LocalTrackPublication,
+  Room,
+  RoomEvent,
+  VideoPresets,
+} from "livekit-client";
+import StudentConnect from "../components/StudentConnect";
 
 let name = "";
 
+// let room: Room | null = null;
+
 let warnings: number;
+
+let userId = currentUser.id;
 
 const StudentWebcam = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showAlert, setShowAlert] = useState(true);
   const [startCapture, setStartCapture] = useState(false);
+  const [room, setRoom] = useState<Room | null>(null);
+
+  const [lkParticipant, setLkParticipant] = useState<any>(null);
+  const [isConnected, setIsConnected] = useState(false);
+
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowAlert(false);
-      setStartCapture(true);
-    }, 3000); // Set timeout to 10 seconds
+  const [token, setToken] = useState(null);
 
-    return () => clearTimeout(timer); // Clear the timer if the component is unmounted before 10 seconds
-  }, []);
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8080/api/get_student_token/${currentUser.id}`
+        );
+        if (!response.ok) {
+          throw new Error("Network response was not ok " + response.statusText);
+        }
+        const tokenData = await response.json(); // assuming the response is in JSON format
+        setToken(tokenData.token); // update the state with the fetched token
+        // console.log(token);
+      } catch (error) {
+        console.error("Error fetching the token:", error);
+      }
+    };
+    fetchToken();
+  }, [currentUser.id]);
+
+  useEffect(() => {
+    const connectToRoom = async () => {
+      try {
+        const room = new Room({
+          // automatically manage subscribed video quality
+          adaptiveStream: true,
+
+          // optimize publishing bandwidth and CPU for published tracks
+          dynacast: true,
+
+          disconnectOnPageLeave: false,
+
+          // default capture settings
+          videoCaptureDefaults: {
+            resolution: VideoPresets.h720.resolution,
+          },
+        });
+        setRoom(room);
+        room.prepareConnection(
+          "wss://eyedentify-90kai7lw.livekit.cloud",
+          token
+        );
+        room.on(RoomEvent.Disconnected, handleDisconnect);
+
+        await room.connect("wss://eyedentify-90kai7lw.livekit.cloud", token);
+        console.log("connected to room", room.name);
+
+        // publish local camera and mic tracks
+        const p = room.localParticipant;
+        // turn on the local user's camera and mic, this may trigger a browser prompt
+        // to ensure permissions are granted
+        await p.setCameraEnabled(true);
+        await p.setMicrophoneEnabled(false);
+        await p.setScreenShareEnabled(false);
+
+        const videoTrack = p.videoTracks.values().next().value.track;
+
+        if (videoTrack) {
+          await videoTrack.restartTrack({
+            facingMode: "user",
+          });
+        }
+      } catch (error) {
+        console.error("Error connecting to room:", room);
+      }
+    };
+
+    connectToRoom();
+  }, [token]);
+
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setShowAlert(false);
+  //     setStartCapture(true);
+  //   }, 3000); // Set timeout to 10 seconds
+
+  //   return () => clearTimeout(timer); // Clear the timer if the component is unmounted before 10 seconds
+  // }, []);
 
   preventLoad(true, true);
   preventAccess("staff");
@@ -60,38 +150,71 @@ const StudentWebcam = () => {
   );
   const capturedChunksRef = useRef<BlobPart[]>([]);
 
-  const frames: string[] = [];
+  // const frames: string[] = [];
 
-  const captureFrame = () => {
-    const video = webcamRef.current?.video;
-    const canvas = canvasRef.current;
+  // const captureFrame = () => {
+  //   const video = webcamRef.current?.video;
+  //   const canvas = canvasRef.current;
 
-    if (video && canvas && startCapture) {
-      const context = canvas.getContext("2d");
+  //   if (video && canvas && startCapture) {
+  //     const context = canvas.getContext("2d");
 
-      if (context) {
-        // Draw the video frame to the canvas.
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  //     if (context) {
+  //       // Draw the video frame to the canvas.
+  //       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // You can now save the image data from the canvas or do further processing.
-        const imageDataUrl = canvas.toDataURL("image/png");
-        frames.push(imageDataUrl);
-        console.log(frames);
-        // code for downloading the frame, for now its being pushed to an array
-        // const downloadLink = document.createElement("a");
-        // downloadLink.href = imageDataUrl;
-        // downloadLink.download = "captured_frame.png"; // You can change the name here
-        // downloadLink.click();
+  //       // You can now save the image data from the canvas or do further processing.
+  //       const imageDataUrl = canvas.toDataURL("image/png");
+  //       frames.push(imageDataUrl);
+  //       console.log(frames);
+  //       // code for downloading the frame, for now its being pushed to an array
+  //       // const downloadLink = document.createElement("a");
+  //       // downloadLink.href = imageDataUrl;
+  //       // downloadLink.download = "captured_frame.png"; // You can change the name here
+  //       // downloadLink.click();
+  //     }
+  //   }
+  // };
+
+  useEffect(() => {
+    const publishTrackToRoom = async () => {
+      if (isConnected && webcamRef.current && room) {
+        const stream = webcamRef.current.stream;
+        console.log("Stream:", stream);
+
+        if (stream) {
+          const track = stream.getVideoTracks()[0];
+          console.log("Track:", track);
+
+          if (track) {
+            try {
+              // Adding a timeout here
+              setTimeout(async () => {
+                try {
+                  await room.localParticipant.publishTrack(track);
+                  console.log("Track published successfully.");
+                } catch (error) {
+                  console.error("Error publishing video track:", error);
+                }
+              }, 2000); // 2000 milliseconds = 2 seconds delay
+            } catch (error) {
+              console.error("Error with timeout function:", error);
+            }
+          } else {
+            console.error("No video track found in the stream.");
+          }
+        } else {
+          console.error("Webcam stream is undefined");
+        }
+      } else {
+        console.error("Webcam not loaded or room not connected.");
       }
-    }
-  };
+    };
 
-  const handleWebcamLoad = () => {
-    // This will be triggered once the webcam is loaded and ready.
-    //useful for immediate user identification
-    const intervalId = window.setInterval(captureFrame, 1000 / 30); // for 30 fps
-    setFrameCaptureInterval(intervalId);
-  };
+    if (isConnected) {
+      publishTrackToRoom();
+    }
+  }, [isConnected, room, webcamRef]);
 
   const handleStartCapture = () => {
     if (webcamRef.current && webcamRef.current.stream) {
@@ -140,11 +263,18 @@ const StudentWebcam = () => {
     if (mediaRecorder && webcamRef.current?.stream) {
       mediaRecorder.stop();
       setRecording(false);
-      captureFrame();
+      // captureFrame();
       //this is to permanently shut the camera off once exam is confirmed done
       const stream = webcamRef.current?.stream;
       const tracks = stream.getTracks();
-      tracks.forEach((track) => track.stop());
+      if (lkParticipant) {
+        tracks.forEach((track) => {
+          lkParticipant.unpublishTrack(track);
+          track.stop();
+        });
+      } else {
+        tracks.forEach((track) => track.stop());
+      }
 
       if (frameCaptureInterval) {
         window.clearInterval(frameCaptureInterval);
@@ -180,6 +310,7 @@ const StudentWebcam = () => {
         </Box>
       </HStack>
       <LoginSuccess />
+
       {/* Warning Alerts */}
       <Box position="absolute" top="10" width="100%" zIndex="1000">
         {warnings === 1 && <WarningOne />}
@@ -187,9 +318,17 @@ const StudentWebcam = () => {
       <Box position="absolute" top="10" width="100%" zIndex="1000">
         {warnings === 2 && <WarningTwo />}
       </Box>
-      <VStack padding={"20px"}>
-
-        <Webcam audio={false} ref={webcamRef} onUserMedia={handleWebcamLoad} />
+      {/* {currentUser.warnings === 1 && <WarningOne/>}
+      {currentUser.warnings === 2 && <WarningTwo/>} */}
+      <VStack padding={"20px"} minHeight="91vh">
+        <Box
+          borderRadius={"10px"}
+          overflow={"hidden"}
+          // borderWidth={"4px"}
+          // borderColor={"#1A202C"}
+        >
+          <Webcam audio={false} ref={webcamRef} />
+        </Box>
         <canvas
           ref={canvasRef}
           width={640}
@@ -225,3 +364,7 @@ const StudentWebcam = () => {
 };
 
 export default StudentWebcam;
+
+function handleDisconnect() {
+  console.log("disconnected from room");
+}

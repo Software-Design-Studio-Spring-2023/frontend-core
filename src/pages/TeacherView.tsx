@@ -1,6 +1,6 @@
 //when a teacher clicks on a student from the grid, they are directed to this page
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import TerminateExam from "../components/alerts/TerminateExam";
 import { User } from "../hooks/useUsers";
@@ -12,6 +12,7 @@ import { Box, Heading, VStack } from "@chakra-ui/react";
 import patchData from "../hooks/patchData";
 import preventLoad from "../hooks/preventLoad";
 import preventAccess from "../hooks/preventAccess";
+import { StreamsContext } from "../contexts/StreamContext";
 
 interface Props {
   user: User;
@@ -20,6 +21,46 @@ interface Props {
 let warnings: number;
 
 const TeacherView = ({ user }: Props) => {
+  const streams = useContext(StreamsContext);
+  const stream = streams[user.id];
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    if (stream && videoRef.current) {
+      videoRef.current.innerHTML = ""; // clear the inner HTML to ensure no other elements
+
+      videoRef.current.appendChild(stream);
+    }
+  }, [stream]);
+
+  useEffect(() => {
+    const videoContainer = videoRef.current;
+    if (videoContainer) {
+      const videoElement = videoContainer.querySelector("video");
+      if (videoElement) {
+        // Set the initial width
+        videoElement.style.width = "200%";
+
+        // Set up the mutation observer
+        const observer = new MutationObserver(() => {
+          // Check and reapply the width whenever it changes
+          if (videoElement.style.width !== "200%") {
+            videoElement.style.width = "200%";
+          }
+        });
+
+        // Start observing for style changes
+        observer.observe(videoElement, {
+          attributes: true,
+          attributeFilter: ["style"],
+        });
+
+        // Cleanup the observer on component unmount
+        return () => observer.disconnect();
+      }
+    }
+  }, [videoRef.current, stream]);
+
   preventAccess("student");
   preventLoad(false, true);
 
@@ -50,14 +91,16 @@ const TeacherView = ({ user }: Props) => {
       </Box>
       <VStack justifyContent="center" alignItems="center" spacing={2.5}>
         <div
+          ref={videoRef}
           style={{
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            width: "40%",
+            borderRadius: "10px",
+            overflow: "hidden",
           }}
-        >
-          <Webcam height={"90%"} width={"90%"} />
-        </div>
+        />
         <div hidden={warning === 2 ? true : false}>
           <IssueWarning
             user={user}
