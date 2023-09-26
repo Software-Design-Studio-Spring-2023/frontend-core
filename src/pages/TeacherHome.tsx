@@ -214,7 +214,11 @@ const TeacherHome = () => {
           >
             {/Android|iPhone/i.test(navigator.userAgent) ? "Back " : "Go Back"}
           </Button>
-          <Box marginRight={"30px"}>
+          <Box
+            marginRight={
+              /Android|iPhone/i.test(navigator.userAgent) ? "14px" : "30px"
+            }
+          >
             <LogOut handleLogout={() => navigate("/")} />
           </Box>
         </HStack>
