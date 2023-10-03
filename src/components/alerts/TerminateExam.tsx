@@ -38,6 +38,7 @@ const TerminateExam = ({ handleTerminate, user }: Props) => {
       </Button>
       <AlertDialog
         motionPreset="scale"
+        size={/Android|iPhone/i.test(navigator.userAgent) ? "xs" : "lg"}
         isOpen={isOpen}
         leastDestructiveRef={cancelRef}
         onClose={onClose}

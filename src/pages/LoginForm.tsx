@@ -20,7 +20,7 @@ import { HiEye, HiOutlineEye } from "react-icons/hi";
 import LoginFailed from "../components/alerts/LoginFailed";
 import Terminated from "../components/alerts/Terminated";
 import AlreadyLoggedIn from "../components/alerts/AlreadyLoggedIn";
-import ExamStartedError from "../components/alerts/ExamStartedError"
+import ExamStartedError from "../components/alerts/ExamStartedError";
 import patchData from "../hooks/patchData";
 import CopyrightVersion from "../components/CopyrightVersion";
 
@@ -166,30 +166,61 @@ const LoginForm = () => {
       >
         {/* Logo */}
         <HStack paddingTop={10}>
-          <HiEye color={"#81E6D9"} size={"6em"} />
-          <Heading fontSize={"7xl"} fontStyle={"italic"} paddingBottom={4}>
+          <HiEye
+            color={"#81E6D9"}
+            size={/Android|iPhone/i.test(navigator.userAgent) ? "4em" : "6em"}
+          />
+          <Heading
+            marginTop={/Android|iPhone/i.test(navigator.userAgent) ? 2 : ""}
+            fontSize={
+              /Android|iPhone/i.test(navigator.userAgent) ? "4xl" : "7xl"
+            }
+            fontStyle={"italic"}
+            paddingBottom={4}
+          >
             eyedentify
           </Heading>
         </HStack>
         {/* Login form */}
         <form>
           <FormControl isRequired>
-            <FormLabel fontSize={"xl"} marginLeft={"-15%"}>
+            <FormLabel
+              fontSize={"xl"}
+              marginLeft={
+                /Android|iPhone/i.test(navigator.userAgent) ? "" : "-15%"
+              }
+            >
               Enter your UTS Email Address
             </FormLabel>
             <Input
-              width={"130%"}
-              marginLeft={"-15%"}
+              width={
+                /Android|iPhone/i.test(navigator.userAgent) ? "100%" : "130%"
+              }
+              marginLeft={
+                /Android|iPhone/i.test(navigator.userAgent) ? "" : "-15%"
+              }
               placeholder="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </FormControl>
           <FormControl isRequired paddingTop={5} paddingBottom={5}>
-            <FormLabel fontSize={"xl"} marginLeft={"-15%"}>
+            <FormLabel
+              fontSize={"xl"}
+              marginLeft={
+                /Android|iPhone/i.test(navigator.userAgent) ? "" : "-15%"
+              }
+            >
               Password
             </FormLabel>
-            <InputGroup width={"130%"} marginLeft={"-15%"}>
+            <InputGroup
+              width={
+                /Android|iPhone/i.test(navigator.userAgent) ? "100%" : "130%"
+              }
+              marginLeft={
+                /Android|iPhone/i.test(navigator.userAgent) ? "" : "-15%"
+              }
+            >
               <Input
                 pr="4.5rem"
                 onChange={(e) => setPassword(e.target.value)}
