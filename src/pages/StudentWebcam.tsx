@@ -110,13 +110,17 @@ const StudentWebcam = () => {
 
         const videoTrack = p.videoTracks.values().next().value.track;
 
-        if (videoTrack) {
+        if (
+          videoTrack.facingMode === "environment" ||
+          videoTrack.facingMode === "left" ||
+          videoTrack.facingMode === "right"
+        ) {
           await videoTrack.restartTrack({
             facingMode: "user",
           });
         }
       } catch (error) {
-        console.error("Error connecting to room:", room);
+        console.error("Error connecting to room:", room.name);
       }
     };
 
