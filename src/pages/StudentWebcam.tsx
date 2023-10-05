@@ -58,7 +58,7 @@ const StudentWebcam = () => {
     const fetchToken = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/api/get_student_token/${currentUser.id}`
+          `https://eyedentify-69d961d5a478.herokuapp.com/api/get_student_token/${currentUser.id}`
         );
         if (!response.ok) {
           throw new Error("Network response was not ok " + response.statusText);
