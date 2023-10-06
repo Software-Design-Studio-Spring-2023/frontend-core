@@ -81,7 +81,7 @@ const TeacherHome = () => {
 
           // default capture settings
           videoCaptureDefaults: {
-            resolution: VideoPresets.h720.resolution,
+            facingMode: "user",
           },
         });
         setRoom(room);
