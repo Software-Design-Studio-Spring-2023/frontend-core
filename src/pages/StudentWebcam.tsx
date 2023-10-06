@@ -86,7 +86,7 @@ const StudentWebcam = () => {
           },
 
           publishDefaults: {
-            videoEncoding: VideoPresets.h2160.encoding,
+            videoEncoding: { maxBitrate: 8_000_000, maxFramerate: 90 },
           },
         });
         setRoom(room);
