@@ -78,16 +78,15 @@ const StudentWebcam = () => {
       try {
         const room = new Room({
           // automatically manage subscribed video quality
-          adaptiveStream: true,
+          adaptiveStream: false,
 
           // optimize publishing bandwidth and CPU for published tracks
-          dynacast: true,
+          dynacast: false,
 
           disconnectOnPageLeave: false,
 
           // default capture settings
           videoCaptureDefaults: {
-            // resolution: VideoPresets.h2160.resolution,
             facingMode: "user",
           },
         });
