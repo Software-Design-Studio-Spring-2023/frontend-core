@@ -77,18 +77,17 @@ const TeacherHome = () => {
     const connectToRoom = async () => {
       try {
         const room = new Room({
+          // automatically manage subscribed video quality
+          adaptiveStream: true,
+
+          // optimize publishing bandwidth and CPU for published tracks
+          dynacast: true,
+
           disconnectOnPageLeave: false,
 
           // default capture settings
           videoCaptureDefaults: {
             facingMode: "user",
-          },
-          publishDefaults: {
-            videoEncoding: {
-              maxBitrate: 8_000_000,
-              maxFramerate: 90,
-              priority: "high",
-            },
           },
         });
         setRoom(room);
