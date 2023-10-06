@@ -84,6 +84,12 @@ const StudentWebcam = () => {
           dynacast: true,
 
           disconnectOnPageLeave: false,
+
+          // default capture settings
+          videoCaptureDefaults: {
+            resolution: VideoPresets.h2160.resolution,
+            facingMode: "user",
+          },
         });
         setRoom(room);
         room.prepareConnection(
@@ -102,14 +108,6 @@ const StudentWebcam = () => {
         await p.setCameraEnabled(true);
         await p.setMicrophoneEnabled(false);
         await p.setScreenShareEnabled(false);
-
-        const videoTrack = p.videoTracks.values().next().value.track;
-
-        if (videoTrack) {
-          await videoTrack.restartTrack({
-            facingMode: "user",
-          });
-        }
       } catch (error) {
         console.error("Error connecting to room:", room);
       }
