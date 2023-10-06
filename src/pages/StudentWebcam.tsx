@@ -116,7 +116,7 @@ const StudentWebcam = () => {
           });
         }
       } catch (error) {
-        console.error("Error connecting to room:", room);
+        console.error("Error connecting to room:", room.name);
       }
     };
 
