@@ -77,12 +77,6 @@ const TeacherHome = () => {
     const connectToRoom = async () => {
       try {
         const room = new Room({
-          // automatically manage subscribed video quality
-          adaptiveStream: true,
-
-          // optimize publishing bandwidth and CPU for published tracks
-          dynacast: true,
-
           disconnectOnPageLeave: false,
 
           // default capture settings

@@ -77,12 +77,6 @@ const StudentWebcam = () => {
     const connectToRoom = async () => {
       try {
         const room = new Room({
-          // automatically manage subscribed video quality
-          adaptiveStream: false,
-
-          // optimize publishing bandwidth and CPU for published tracks
-          dynacast: false,
-
           disconnectOnPageLeave: false,
 
           // default capture settings
