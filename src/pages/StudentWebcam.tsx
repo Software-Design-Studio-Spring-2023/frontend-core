@@ -319,7 +319,7 @@ const StudentWebcam = () => {
           // borderWidth={"4px"}
           // borderColor={"#1A202C"}
         >
-          <Webcam audio={false} ref={webcamRef} />
+          {/* <Webcam audio={false} ref={webcamRef} /> */}
         </Box>
         <canvas
           ref={canvasRef}
