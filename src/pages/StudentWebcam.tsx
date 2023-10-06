@@ -110,7 +110,7 @@ const StudentWebcam = () => {
         await p.setMicrophoneEnabled(false);
         await p.setScreenShareEnabled(false);
       } catch (error) {
-        console.error("Error connecting to room:", room);
+        console.error(error);
       }
     };
 
