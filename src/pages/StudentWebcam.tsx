@@ -81,7 +81,6 @@ const StudentWebcam = () => {
 
           // default capture settings
           videoCaptureDefaults: {
-            resolution: VideoPresets.h2160.resolution,
             facingMode: "user",
           },
 
