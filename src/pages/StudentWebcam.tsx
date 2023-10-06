@@ -46,6 +46,7 @@ const StudentWebcam = () => {
   const [showAlert, setShowAlert] = useState(true);
   const [startCapture, setStartCapture] = useState(false);
   const [room, setRoom] = useState<Room | null>(null);
+  const localVideoRef = useRef(null);
 
   const [lkParticipant, setLkParticipant] = useState<any>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -107,6 +108,12 @@ const StudentWebcam = () => {
         await p.setCameraEnabled(true);
         await p.setMicrophoneEnabled(false);
         await p.setScreenShareEnabled(false);
+
+        p.tracks.forEach((publication) => {
+          if (publication.track.kind === "video" && localVideoRef.current) {
+            publication.track.attach(localVideoRef.current);
+          }
+        });
       } catch (error) {
         console.error(error);
       }
@@ -316,10 +323,19 @@ const StudentWebcam = () => {
         <Box
           borderRadius={"10px"}
           overflow={"hidden"}
+          display="flex"
           // borderWidth={"4px"}
           // borderColor={"#1A202C"}
+          justifyContent="center"
+          alignItems="center"
         >
           {/* <Webcam audio={false} ref={webcamRef} /> */}
+          <video
+            style={{ width: "50%", borderRadius: "10px", overflow: "hidden" }}
+            ref={localVideoRef}
+            autoPlay={true}
+            muted={true}
+          />
         </Box>
         <canvas
           ref={canvasRef}
