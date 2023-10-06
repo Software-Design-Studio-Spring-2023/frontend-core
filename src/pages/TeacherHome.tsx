@@ -83,6 +83,9 @@ const TeacherHome = () => {
           videoCaptureDefaults: {
             facingMode: "user",
           },
+          publishDefaults: {
+            videoEncoding: VideoPresets.h2160.encoding,
+          },
         });
         setRoom(room);
         room.prepareConnection(
