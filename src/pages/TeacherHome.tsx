@@ -37,6 +37,7 @@ import {
 } from "livekit-client";
 import { LiveKitRoom } from "@livekit/components-react";
 import { StreamsContext } from "../contexts/StreamContext";
+import patchData from "../hooks/patchData";
 
 const TeacherHome = () => {
   const location = useLocation();
@@ -101,7 +102,8 @@ const TeacherHome = () => {
 
         room
           .on(RoomEvent.Disconnected, handleDisconnect)
-          .on(RoomEvent.TrackSubscribed, handleTrackSubscribed);
+          .on(RoomEvent.TrackSubscribed, handleTrackSubscribed)
+          .on(RoomEvent.TrackUnpublished, handleTrackUnpublished);
 
         room.participants.forEach(handleExistingParticipant);
 
@@ -115,6 +117,17 @@ const TeacherHome = () => {
               );
             }
           });
+        }
+
+        function handleTrackUnpublished(
+          publication: RemoteTrackPublication,
+          participant: RemoteParticipant
+        ) {
+          console.log(
+            `${participant.identity} has stopped publishing track: ${publication.trackSid}`
+          );
+          const userId = parseInt(participant.identity); // Assuming the user ID is stored as the identity.
+          patchData({ terminated: true }, "update_terminate", userId);
         }
 
         function handleTrackSubscribed(

@@ -62,10 +62,9 @@ const TermsAndConditions: React.FC = () => {
             >
               <Text as="b">VIDEO AND AUDIO RECORDING</Text>
               <p>
-                You permit Eyedentify to use your camera and microphone for
-                educational and exam integrity purposes. Video and audio
-                recording may be activated during the exam to monitor and
-                prevent any misconduct.
+                You permit Eyedentify to use your camera for educational and
+                exam integrity purposes. Video recording may be activated during
+                the exam to monitor and prevent any misconduct.
               </p>
               <Text as="b">DATA USAGE</Text>
               <p>
