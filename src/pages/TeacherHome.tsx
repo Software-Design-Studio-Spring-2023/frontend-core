@@ -110,7 +110,7 @@ const TeacherHome = () => {
           console.log(`${participant.identity} has left the room`);
           const userId = parseInt(participant.identity); // Assuming the user ID is stored as the identity.
           patchData({ terminated: true }, "update_terminate", userId);
-          // navigate("/teacher");
+          navigate("/teacher");
           // Your clean-up logic here. For example:
           // Remove their video element, show a placeholder, or alert the teacher, etc.
         });
