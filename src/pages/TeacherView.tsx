@@ -74,9 +74,15 @@ const TeacherView = ({ user }: Props) => {
 
   useEffect(() => {
     if (!stream) {
+      console.log("Navigating to /teacher due to lack of stream.");
+    }
+  }, [stream, navigate]);
+
+  useEffect(() => {
+    if (user?.terminated) {
       navigate("/teacher");
     }
-  }, [navigate]);
+  }, [user?.terminated, navigate]);
 
   const [warning, setWarning] = useState(warnings);
 
