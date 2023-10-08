@@ -32,6 +32,7 @@ import {
   VideoPresets,
 } from "livekit-client";
 import StudentConnect from "../components/StudentConnect";
+import patchData from "../hooks/patchData";
 
 let name = "";
 
@@ -96,10 +97,15 @@ const StudentWebcam = () => {
           "wss://eyedentify-90kai7lw.livekit.cloud",
           token
         );
+
+        room.on(RoomEvent.Connected, () => {
+          console.log("connected to room", room.name);
+          patchData({ terminated: false }, "update_terminate", currentUser.id);
+        });
+
         room.on(RoomEvent.Disconnected, handleDisconnect);
 
         await room.connect("wss://eyedentify-90kai7lw.livekit.cloud", token);
-        console.log("connected to room", room.name);
 
         // publish local camera and mic tracks
         const p = room.localParticipant;
@@ -375,4 +381,5 @@ export default StudentWebcam;
 
 function handleDisconnect() {
   console.log("disconnected from room");
+  patchData({ terminated: true }, "update_terminate", currentUser.id);
 }
