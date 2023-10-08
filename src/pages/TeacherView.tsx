@@ -72,11 +72,11 @@ const TeacherView = ({ user }: Props) => {
     }
   }, [user]);
 
-  if (user !== undefined && user.terminated === true) {
-    useEffect(() => {
+  useEffect(() => {
+    if (user?.terminated) {
       navigate("/teacher");
-    }, []);
-  }
+    }
+  }, [user, navigate]);
 
   const [warning, setWarning] = useState(warnings);
 
