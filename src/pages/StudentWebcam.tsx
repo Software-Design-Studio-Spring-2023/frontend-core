@@ -46,7 +46,7 @@ const StudentWebcam = () => {
   const [startCapture, setStartCapture] = useState(false);
   const [room, setRoom] = useState<Room | null>(null);
   const localVideoRef = useRef(null);
-  const [recording, setRecording] = useState<boolean>(false);
+  const [ready, isReady] = useState<boolean>(false);
   const [lkParticipant, setLkParticipant] = useState<any>(null);
   const [isConnected, setIsConnected] = useState(false);
 
@@ -195,7 +195,7 @@ const StudentWebcam = () => {
     //   recorder.onstop = handleDownload;
 
     //   recorder.start();
-    setRecording(true);
+    isReady(true);
     // }
   };
 
@@ -240,7 +240,7 @@ const StudentWebcam = () => {
 
     patchData({ terminated: true }, "update_terminate", currentUser.id);
     navigate("/");
-    setRecording(false);
+    isReady(false);
   };
 
   function handleDisconnect() {
@@ -262,7 +262,7 @@ const StudentWebcam = () => {
   return (
     <>
       <Box
-        hidden={recording ? false : true}
+        hidden={ready ? false : true}
         position="absolute"
         top="0"
         left="50%"
@@ -279,7 +279,7 @@ const StudentWebcam = () => {
         <Heading padding={"10px"}>{currentUser.name}</Heading>
         <Spacer />
         <Box paddingRight={"30px"}>
-          <div hidden={recording ? false : true}>
+          <div hidden={ready ? false : true}>
             <EndExam handleTerminate={handleStopCapture} />
           </div>
         </Box>
@@ -320,7 +320,7 @@ const StudentWebcam = () => {
           style={{ display: "none" }}
         ></canvas>{" "}
         {/* Hide the canvas element */}
-        <div hidden={recording ? true : false}>
+        <div hidden={ready ? true : false}>
           <p>This is where the checklist will be</p>
         </div>
         {/* {showAlert && (
@@ -336,7 +336,7 @@ const StudentWebcam = () => {
           colorScheme="teal"
           variant="solid"
           padding={"10px"}
-          hidden={recording ? true : false}
+          hidden={ready ? true : false}
           onClick={handleStartCapture}
         >
           {"Ready"}
