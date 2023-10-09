@@ -48,7 +48,7 @@ const StudentWebcam = () => {
   const [startCapture, setStartCapture] = useState(false);
   const [room, setRoom] = useState<Room | null>(null);
   const localVideoRef = useRef(null);
-
+  const [recording, setRecording] = useState<boolean>(false);
   const [lkParticipant, setLkParticipant] = useState<any>(null);
   const [isConnected, setIsConnected] = useState(false);
 
@@ -101,6 +101,10 @@ const StudentWebcam = () => {
         room.on(RoomEvent.Connected, () => {
           console.log("connected to room", room.name);
           patchData({ terminated: false }, "update_terminate", currentUser.id);
+          if (recording) {
+            // Conditionally publish tracks if recording
+            publishTracks(room.localParticipant);
+          }
         });
 
         room.on(RoomEvent.Disconnected, handleDisconnect);
@@ -108,25 +112,37 @@ const StudentWebcam = () => {
         await room.connect("wss://eyedentify-90kai7lw.livekit.cloud", token);
 
         // publish local camera and mic tracks
-        const p = room.localParticipant;
+        // const p = room.localParticipant;
         // turn on the local user's camera and mic, this may trigger a browser prompt
         // to ensure permissions are granted
-        await p.setCameraEnabled(true);
-        await p.setMicrophoneEnabled(false);
-        await p.setScreenShareEnabled(false);
+        // await p.setCameraEnabled(true);
+        // await p.setMicrophoneEnabled(false);
+        // await p.setScreenShareEnabled(false);
 
-        p.tracks.forEach((publication) => {
-          if (publication.track.kind === "video" && localVideoRef.current) {
-            publication.track.attach(localVideoRef.current);
-          }
-        });
+        // p.tracks.forEach((publication) => {
+        //   if (publication.track.kind === "video" && localVideoRef.current) {
+        //     publication.track.attach(localVideoRef.current);
+        //   }
+        // });
       } catch (error) {
         console.error(error);
       }
     };
 
     connectToRoom();
-  }, [token]);
+  }, [token, recording]);
+
+  const publishTracks = async (participant: LocalParticipant) => {
+    await participant.setCameraEnabled(true);
+    await participant.setMicrophoneEnabled(false);
+    await participant.setScreenShareEnabled(false);
+
+    participant.tracks.forEach((publication) => {
+      if (publication.track.kind === "video" && localVideoRef.current) {
+        publication.track.attach(localVideoRef.current);
+      }
+    });
+  };
 
   // useEffect(() => {
   //   const timer = setTimeout(() => {
@@ -149,7 +165,6 @@ const StudentWebcam = () => {
   const [frameCaptureInterval, setFrameCaptureInterval] = useState<
     number | null
   >(null);
-  const [recording, setRecording] = useState<boolean>(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
   );
@@ -181,66 +196,26 @@ const StudentWebcam = () => {
   //   }
   // };
 
-  useEffect(() => {
-    const publishTrackToRoom = async () => {
-      if (isConnected && webcamRef.current && room) {
-        const stream = webcamRef.current.stream;
-        console.log("Stream:", stream);
-
-        if (stream) {
-          const track = stream.getVideoTracks()[0];
-          console.log("Track:", track);
-
-          if (track) {
-            try {
-              // Adding a timeout here
-              setTimeout(async () => {
-                try {
-                  await room.localParticipant.publishTrack(track);
-                  console.log("Track published successfully.");
-                } catch (error) {
-                  console.error("Error publishing video track:", error);
-                }
-              }, 2000); // 2000 milliseconds = 2 seconds delay
-            } catch (error) {
-              console.error("Error with timeout function:", error);
-            }
-          } else {
-            console.error("No video track found in the stream.");
-          }
-        } else {
-          console.error("Webcam stream is undefined");
-        }
-      } else {
-        console.error("Webcam not loaded or room not connected.");
-      }
-    };
-
-    if (isConnected) {
-      publishTrackToRoom();
-    }
-  }, [isConnected, room, webcamRef]);
-
   const handleStartCapture = () => {
-    if (webcamRef.current && webcamRef.current.stream) {
-      const stream = webcamRef.current.stream;
-      const recorder = new MediaRecorder(stream, {
-        mimeType: "video/webm",
-      });
-      setMediaRecorder(recorder);
+    // if (webcamRef.current && webcamRef.current.stream) {
+    //   const stream = webcamRef.current.stream;
+    //   const recorder = new MediaRecorder(stream, {
+    //     mimeType: "video/webm",
+    //   });
+    //   setMediaRecorder(recorder);
 
-      (recorder.ondataavailable = (e: BlobEvent) => {
-        if (e.data.size > 0) {
-          capturedChunksRef.current.push(e.data);
-        }
-      }),
-        [capturedChunksRef];
+    //   (recorder.ondataavailable = (e: BlobEvent) => {
+    //     if (e.data.size > 0) {
+    //       capturedChunksRef.current.push(e.data);
+    //     }
+    //   }),
+    //     [capturedChunksRef];
 
-      recorder.onstop = handleDownload;
+    //   recorder.onstop = handleDownload;
 
-      recorder.start();
-      setRecording(true);
-    }
+    //   recorder.start();
+    setRecording(true);
+    // }
   };
 
   const downloadVideo = () => {
@@ -381,5 +356,4 @@ export default StudentWebcam;
 
 function handleDisconnect() {
   console.log("disconnected from room");
-  patchData({ terminated: true }, "update_terminate", currentUser.id);
 }
