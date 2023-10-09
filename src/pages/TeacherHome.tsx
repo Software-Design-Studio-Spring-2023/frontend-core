@@ -183,10 +183,6 @@ const TeacherHome = () => {
     setItemClicked(false);
   }, []);
 
-  const areTracksPublished = (stream) => {
-    return stream && Object.keys(stream.getTracks()).length > 0;
-  };
-
   //
   return (
     <StreamsContext.Provider value={streams}>
@@ -309,12 +305,7 @@ const TeacherHome = () => {
                         name={user.name}
                         warnings={user.warnings}
                         id={user.id}
-                        loading={
-                          streams[user.id] &&
-                          areTracksPublished(streams[user.id])
-                            ? false
-                            : true
-                        }
+                        loading={streams[user.id] ? false : true}
                       />
                     )
                   ) : (
@@ -322,11 +313,7 @@ const TeacherHome = () => {
                       name={user.name}
                       warnings={user.warnings}
                       id={user.id}
-                      loading={
-                        streams[user.id] && areTracksPublished(streams[user.id])
-                          ? false
-                          : true
-                      }
+                      loading={streams[user.id] ? false : true}
                     />
                   )}
                 </GridItem>
