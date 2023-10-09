@@ -301,6 +301,7 @@ const StudentWebcam = () => {
       {/* {currentUser.warnings === 1 && <WarningOne/>}
       {currentUser.warnings === 2 && <WarningTwo/>} */}
       <VStack padding={"20px"} minHeight="91vh">
+        {!recording && <Webcam audio={false} ref={webcamRef} />}
         <Box
           borderRadius={"10px"}
           overflow={"hidden"}
@@ -311,7 +312,6 @@ const StudentWebcam = () => {
           alignItems="center"
         >
           {/* <Webcam audio={false} ref={webcamRef} /> */}
-          {!recording && <Webcam audio={false} ref={webcamRef} />}
           <video
             style={{ width: "50%", borderRadius: "10px", overflow: "hidden" }}
             ref={localVideoRef}
