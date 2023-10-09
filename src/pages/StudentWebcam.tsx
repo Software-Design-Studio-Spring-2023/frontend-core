@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import Webcam from "react-webcam";
+
 import { currentUser } from "./LoginForm";
 import EndExam from "../components/alerts/EndExam";
 import {
@@ -39,8 +39,6 @@ let name = "";
 // let room: Room | null = null;
 
 let warnings: number;
-
-let userId = currentUser.id;
 
 const StudentWebcam = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -101,35 +99,19 @@ const StudentWebcam = () => {
         room.on(RoomEvent.Connected, () => {
           console.log("connected to room", room.name);
           patchData({ terminated: false }, "update_terminate", currentUser.id);
-
-          // Conditionally publish tracks if recording
           publishTracks(room.localParticipant);
         });
 
         room.on(RoomEvent.Disconnected, handleDisconnect);
 
         await room.connect("wss://eyedentify-90kai7lw.livekit.cloud", token);
-
-        // publish local camera and mic tracks
-        // const p = room.localParticipant;
-        // turn on the local user's camera and mic, this may trigger a browser prompt
-        // to ensure permissions are granted
-        // await p.setCameraEnabled(true);
-        // await p.setMicrophoneEnabled(false);
-        // await p.setScreenShareEnabled(false);
-
-        // p.tracks.forEach((publication) => {
-        //   if (publication.track.kind === "video" && localVideoRef.current) {
-        //     publication.track.attach(localVideoRef.current);
-        //   }
-        // });
       } catch (error) {
         console.error(error);
       }
     };
 
     connectToRoom();
-  }, [token, recording]);
+  }, [token]);
 
   const publishTracks = async (participant: LocalParticipant) => {
     await participant.setCameraEnabled(true);
@@ -159,7 +141,7 @@ const StudentWebcam = () => {
     name = currentUser.name;
     warnings = currentUser.warnings;
   }
-  const webcamRef = useRef<(Webcam & HTMLVideoElement) | null>(null);
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [frameCaptureInterval, setFrameCaptureInterval] = useState<
     number | null
@@ -239,29 +221,59 @@ const StudentWebcam = () => {
   };
 
   const handleStopCapture = () => {
-    if (mediaRecorder && webcamRef.current?.stream) {
-      mediaRecorder.stop();
-      setRecording(false);
-      // captureFrame();
-      //this is to permanently shut the camera off once exam is confirmed done
-      const stream = webcamRef.current?.stream;
-      const tracks = stream.getTracks();
-      if (lkParticipant) {
-        tracks.forEach((track) => {
-          lkParticipant.unpublishTrack(track);
-          track.stop();
-        });
-      } else {
-        tracks.forEach((track) => track.stop());
-      }
+    // if (mediaRecorder && webcamRef.current?.stream) {
+    //   mediaRecorder.stop();
+    //   setRecording(false);
+    //   // captureFrame();
+    //   //this is to permanently shut the camera off once exam is confirmed done
+    //   const stream = webcamRef.current?.stream;
+    //   const tracks = stream.getTracks();
+    //   if (lkParticipant) {
+    //     tracks.forEach((track) => {
+    //       lkParticipant.unpublishTrack(track);
+    //       track.stop();
+    //     });
+    //   } else {
+    //     tracks.forEach((track) => track.stop());
+    //   }
 
-      if (frameCaptureInterval) {
-        window.clearInterval(frameCaptureInterval);
-        setFrameCaptureInterval(null);
-      }
+    //   if (frameCaptureInterval) {
+    //     window.clearInterval(frameCaptureInterval);
+    //     setFrameCaptureInterval(null);
+    //   }
+    // }
+    if (room && room.localParticipant) {
+      const participant = room.localParticipant;
+      participant.tracks.forEach((publication: LocalTrackPublication) => {
+        // Check if the publication is a video track
+        if (publication.track.kind === "video") {
+          // Stop and unpublish the video track
+          publication.track.stop();
+          participant.unpublishTrack(publication.track);
+        }
+      });
     }
+
+    patchData({ terminated: true }, "update_terminate", currentUser.id);
     navigate("/");
+    setRecording(false);
   };
+
+  function handleDisconnect() {
+    console.log("disconnected from room");
+    if (room && room.localParticipant) {
+      const participant = room.localParticipant;
+      participant.tracks.forEach((publication: LocalTrackPublication) => {
+        // Check if the publication is a video track
+        if (publication.track.kind === "video") {
+          // Stop and unpublish the video track
+          publication.track.stop();
+          participant.unpublishTrack(publication.track);
+        }
+      });
+    }
+    patchData({ terminated: true }, "update_terminate", currentUser.id);
+  }
 
   return (
     <>
@@ -343,7 +355,7 @@ const StudentWebcam = () => {
           hidden={recording ? true : false}
           onClick={handleStartCapture}
         >
-          {"Start Exam"}
+          {"Ready"}
         </Button>
         <CopyrightVersion bottomVal={-2} />
       </VStack>
@@ -352,8 +364,3 @@ const StudentWebcam = () => {
 };
 
 export default StudentWebcam;
-
-function handleDisconnect() {
-  console.log("disconnected from room");
-  patchData({ terminated: false }, "update_terminate", currentUser.id);
-}
