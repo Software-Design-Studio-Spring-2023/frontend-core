@@ -75,61 +75,58 @@ const StudentWebcam = () => {
     fetchToken();
   }, [currentUser.id]);
 
-  useEffect(() => {
-    const connectToRoom = async () => {
-      try {
-        const room = new Room({
-          // automatically manage subscribed video quality
-          adaptiveStream: true,
+  const connectToRoom = async () => {
+    try {
+      // if (!token) {
+      //   console.error("Token is not available");
+      //   return; // or handle appropriately based on your use case
+      // }
+      const room = new Room({
+        // automatically manage subscribed video quality
+        adaptiveStream: true,
 
-          // optimize publishing bandwidth and CPU for published tracks
-          dynacast: true,
+        // optimize publishing bandwidth and CPU for published tracks
+        dynacast: true,
 
-          disconnectOnPageLeave: false,
+        disconnectOnPageLeave: false,
 
-          // default capture settings
-          videoCaptureDefaults: {
-            facingMode: "user",
-          },
-        });
-        setRoom(room);
-        room.prepareConnection(
-          "wss://eyedentify-90kai7lw.livekit.cloud",
-          token
-        );
+        // default capture settings
+        videoCaptureDefaults: {
+          facingMode: "user",
+        },
+      });
+      setRoom(room);
+      room.prepareConnection("wss://eyedentify-90kai7lw.livekit.cloud", token);
 
-        room.on(RoomEvent.Connected, () => {
-          console.log("connected to room", room.name);
-          patchData({ terminated: false }, "update_terminate", currentUser.id);
+      room.on(RoomEvent.Connected, () => {
+        console.log("connected to room", room.name);
+        patchData({ terminated: false }, "update_terminate", currentUser.id);
 
-          // Conditionally publish tracks if recording
-          publishTracks(room.localParticipant);
-        });
+        // Conditionally publish tracks if recording
+        publishTracks(room.localParticipant);
+      });
 
-        room.on(RoomEvent.Disconnected, handleDisconnect);
+      room.on(RoomEvent.Disconnected, handleDisconnect);
 
-        await room.connect("wss://eyedentify-90kai7lw.livekit.cloud", token);
+      await room.connect("wss://eyedentify-90kai7lw.livekit.cloud", token);
 
-        // publish local camera and mic tracks
-        // const p = room.localParticipant;
-        // turn on the local user's camera and mic, this may trigger a browser prompt
-        // to ensure permissions are granted
-        // await p.setCameraEnabled(true);
-        // await p.setMicrophoneEnabled(false);
-        // await p.setScreenShareEnabled(false);
+      // publish local camera and mic tracks
+      // const p = room.localParticipant;
+      // turn on the local user's camera and mic, this may trigger a browser prompt
+      // to ensure permissions are granted
+      // await p.setCameraEnabled(true);
+      // await p.setMicrophoneEnabled(false);
+      // await p.setScreenShareEnabled(false);
 
-        // p.tracks.forEach((publication) => {
-        //   if (publication.track.kind === "video" && localVideoRef.current) {
-        //     publication.track.attach(localVideoRef.current);
-        //   }
-        // });
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    connectToRoom();
-  }, [token, recording]);
+      // p.tracks.forEach((publication) => {
+      //   if (publication.track.kind === "video" && localVideoRef.current) {
+      //     publication.track.attach(localVideoRef.current);
+      //   }
+      // });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const publishTracks = async (participant: LocalParticipant) => {
     await participant.setCameraEnabled(true);
@@ -214,6 +211,7 @@ const StudentWebcam = () => {
 
     //   recorder.start();
     setRecording(true);
+    connectToRoom();
     // }
   };
 
@@ -301,6 +299,20 @@ const StudentWebcam = () => {
       {currentUser.warnings === 2 && <WarningTwo/>} */}
       <VStack padding={"20px"} minHeight="91vh">
         <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%" // Ensure it takes the full width of its container
+        >
+          {!recording && (
+            <Webcam
+              audio={false}
+              ref={webcamRef}
+              style={{ borderRadius: "10px", overflow: "hidden" }}
+            />
+          )}
+        </Box>
+        <Box
           borderRadius={"10px"}
           overflow={"hidden"}
           display="flex"
@@ -309,7 +321,6 @@ const StudentWebcam = () => {
           justifyContent="center"
           alignItems="center"
         >
-          {/* <Webcam audio={false} ref={webcamRef} /> */}
           <video
             style={{ width: "50%", borderRadius: "10px", overflow: "hidden" }}
             ref={localVideoRef}
@@ -355,5 +366,5 @@ export default StudentWebcam;
 
 function handleDisconnect() {
   console.log("disconnected from room");
-  patchData({ terminated: false }, "update_terminate", currentUser.id);
+  patchData({ terminated: true }, "update_terminate", currentUser.id);
 }
