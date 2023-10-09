@@ -355,5 +355,5 @@ export default StudentWebcam;
 
 function handleDisconnect() {
   console.log("disconnected from room");
-  patchData({ terminated: false }, "update_terminate", currentUser.id);
+  patchData({ terminated: true }, "update_terminate", currentUser.id);
 }
