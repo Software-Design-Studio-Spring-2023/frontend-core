@@ -112,18 +112,18 @@ const StudentWebcam = () => {
         await room.connect("wss://eyedentify-90kai7lw.livekit.cloud", token);
 
         // publish local camera and mic tracks
-        // const p = room.localParticipant;
+        const p = room.localParticipant;
         // turn on the local user's camera and mic, this may trigger a browser prompt
         // to ensure permissions are granted
-        // await p.setCameraEnabled(true);
-        // await p.setMicrophoneEnabled(false);
-        // await p.setScreenShareEnabled(false);
+        await p.setCameraEnabled(true);
+        await p.setMicrophoneEnabled(false);
+        await p.setScreenShareEnabled(false);
 
-        // p.tracks.forEach((publication) => {
-        //   if (publication.track.kind === "video" && localVideoRef.current) {
-        //     publication.track.attach(localVideoRef.current);
-        //   }
-        // });
+        p.tracks.forEach((publication) => {
+          if (publication.track.kind === "video" && localVideoRef.current) {
+            publication.track.attach(localVideoRef.current);
+          }
+        });
       } catch (error) {
         console.error(error);
       }
