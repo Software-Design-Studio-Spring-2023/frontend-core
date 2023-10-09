@@ -48,7 +48,6 @@ const StudentWebcam = () => {
   const [startCapture, setStartCapture] = useState(false);
   const [room, setRoom] = useState<Room | null>(null);
   const localVideoRef = useRef(null);
-  const [examStarted, setExamStarted] = useState(false);
   const [recording, setRecording] = useState<boolean>(false);
   const [lkParticipant, setLkParticipant] = useState<any>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -102,12 +101,27 @@ const StudentWebcam = () => {
         room.on(RoomEvent.Connected, () => {
           console.log("connected to room", room.name);
           patchData({ terminated: false }, "update_terminate", currentUser.id);
+
+          // Conditionally publish tracks if recording
           publishTracks(room.localParticipant);
         });
 
         room.on(RoomEvent.Disconnected, handleDisconnect);
 
         await room.connect("wss://eyedentify-90kai7lw.livekit.cloud", token);
+
+        // publish local camera and mic tracks
+        // const p = room.localParticipant;
+        // turn on the local user's camera and mic, this may trigger a browser prompt
+        // to ensure permissions are granted
+        // await p.setCameraEnabled(true);
+        // await p.setMicrophoneEnabled(false);
+        // await p.setScreenShareEnabled(false);
+
+        // p.tracks.forEach((publication) => {
+        //   if (publication.track.kind === "video" && localVideoRef.current) {
+        //     publication.track.attach(localVideoRef.current);
+        //   }
         // });
       } catch (error) {
         console.error(error);
@@ -115,7 +129,7 @@ const StudentWebcam = () => {
     };
 
     connectToRoom();
-  }, [token, recording, examStarted]);
+  }, [token, recording]);
 
   const publishTracks = async (participant: LocalParticipant) => {
     await participant.setCameraEnabled(true);
@@ -126,16 +140,7 @@ const StudentWebcam = () => {
       if (publication.track.kind === "video" && localVideoRef.current) {
         publication.track.attach(localVideoRef.current);
       }
-      publication.track.isMuted = !examStarted;
     });
-  };
-
-  const handleStartExam = () => {
-    setExamStarted(true);
-  };
-
-  const handleStopExam = () => {
-    setExamStarted(false);
   };
 
   // useEffect(() => {
@@ -255,7 +260,6 @@ const StudentWebcam = () => {
         setFrameCaptureInterval(null);
       }
     }
-    handleStopExam();
     navigate("/");
   };
 
@@ -305,6 +309,7 @@ const StudentWebcam = () => {
           justifyContent="center"
           alignItems="center"
         >
+          {/* <Webcam audio={false} ref={webcamRef} /> */}
           <video
             style={{ width: "50%", borderRadius: "10px", overflow: "hidden" }}
             ref={localVideoRef}
@@ -335,8 +340,8 @@ const StudentWebcam = () => {
           colorScheme="teal"
           variant="solid"
           padding={"10px"}
-          hidden={recording || examStarted}
-          onClick={handleStartExam}
+          hidden={recording ? true : false}
+          onClick={handleStartCapture}
         >
           {"Start Exam"}
         </Button>
