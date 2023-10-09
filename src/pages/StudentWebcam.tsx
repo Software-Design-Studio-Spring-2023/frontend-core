@@ -221,22 +221,6 @@ const StudentWebcam = () => {
   };
 
   const handleStopCapture = () => {
-    // if (mediaRecorder && webcamRef.current?.stream) {
-    //   mediaRecorder.stop();
-    //   setRecording(false);
-    //   // captureFrame();
-    //   //this is to permanently shut the camera off once exam is confirmed done
-    //   const stream = webcamRef.current?.stream;
-    //   const tracks = stream.getTracks();
-    //   if (lkParticipant) {
-    //     tracks.forEach((track) => {
-    //       lkParticipant.unpublishTrack(track);
-    //       track.stop();
-    //     });
-    //   } else {
-    //     tracks.forEach((track) => track.stop());
-    //   }
-
     //   if (frameCaptureInterval) {
     //     window.clearInterval(frameCaptureInterval);
     //     setFrameCaptureInterval(null);
@@ -272,7 +256,7 @@ const StudentWebcam = () => {
         }
       });
     }
-    patchData({ terminated: true }, "update_terminate", currentUser.id);
+    // patchData({ terminated: true }, "update_terminate", currentUser.id);
   }
 
   return (
