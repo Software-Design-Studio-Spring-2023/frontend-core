@@ -310,6 +310,7 @@ const StudentWebcam = () => {
           alignItems="center"
         >
           {/* <Webcam audio={false} ref={webcamRef} /> */}
+          {!recording && <Webcam audio={false} ref={webcamRef} />}
           <video
             style={{ width: "50%", borderRadius: "10px", overflow: "hidden" }}
             ref={localVideoRef}
