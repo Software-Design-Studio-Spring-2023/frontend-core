@@ -10,6 +10,7 @@ import {
   Skeleton,
   HStack,
   Box,
+  Spinner,
 } from "@chakra-ui/react";
 import Webcam from "react-webcam";
 import setBorder from "../hooks/setBorder";
@@ -23,9 +24,17 @@ interface Props {
   id: number;
   ready: boolean;
   loading: boolean;
+  disconnected: boolean;
 }
 
-const StudentCard = ({ name, warnings, id, loading, ready }: Props) => {
+const StudentCard = ({
+  name,
+  warnings,
+  id,
+  loading,
+  ready,
+  disconnected,
+}: Props) => {
   const videoRef = useRef(null);
   const streams = useContext(StreamsContext);
   const stream = streams[id];
@@ -54,26 +63,32 @@ const StudentCard = ({ name, warnings, id, loading, ready }: Props) => {
     </Card>
   ) : (
     <Card
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
       overflow={"hidden"}
       borderColor={setBorder(warnings)}
       borderWidth={"1px"}
       borderRadius={"10px"}
     >
-      <CardBody>
-        <div
-          ref={videoRef}
-          style={{
-            borderRadius: "10px",
-            overflow: "hidden",
-            width: "100%",
-            height: "auto",
-          }}
-        ></div>
+      <CardBody
+        style={{
+          display: "flex",
+          flexDirection: "column", // ensure children are stacked vertically
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {disconnected ? (
+          <Spinner thickness="4px" size={"xl"} color="teal" />
+        ) : (
+          <div
+            ref={videoRef}
+            style={{
+              borderRadius: "10px",
+              overflow: "hidden",
+              width: "100%",
+              height: "auto",
+            }}
+          ></div>
+        )}
         <VStack>
           <Heading marginTop={"8px"}>
             <HStack>

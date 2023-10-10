@@ -9,6 +9,7 @@ import {
   VStack,
   HStack,
   Spacer,
+  Spinner,
 } from "@chakra-ui/react";
 import Webcam from "react-webcam";
 import setBorder from "../hooks/setBorder";
@@ -22,9 +23,17 @@ interface Props {
   id: number;
   ready: boolean;
   loading: boolean;
+  disconnected: boolean;
 }
 
-const StudentMiniCard = ({ name, id, warnings, loading, ready }: Props) => {
+const StudentMiniCard = ({
+  name,
+  id,
+  warnings,
+  loading,
+  ready,
+  disconnected,
+}: Props) => {
   const videoRef = useRef(null);
   const streams = useContext(StreamsContext);
   const stream = streams[id];
@@ -69,15 +78,27 @@ const StudentMiniCard = ({ name, id, warnings, loading, ready }: Props) => {
         borderRadius={"lg"}
       >
         <VStack spacing={0.5} align="start">
-          <div
-            ref={videoRef}
-            style={{
-              borderRadius: "2px",
-              overflow: "hidden",
-              width: "100%",
-              height: "auto",
-            }}
-          ></div>
+          {disconnected ? (
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              height="80px" // Adjust the height to the desired spinner container size
+              width="100%" // Optional: Adjust the width as needed
+            >
+              <Spinner thickness="3px" size={"md"} color="teal" />
+            </Box>
+          ) : (
+            <div
+              ref={videoRef}
+              style={{
+                borderRadius: "2px",
+                overflow: "hidden",
+                width: "100%",
+                height: "auto",
+              }}
+            ></div>
+          )}
           <Heading paddingLeft={"2px"} fontSize="1xl">
             <HStack>
               <div>{name}</div>

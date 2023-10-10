@@ -84,7 +84,7 @@ const IssueWarning = ({ handleWarning, user }: Props) => {
                   <Radio value="Another person present">
                     Another person present
                   </Radio>
-                  <Radio value="Phone detected">Phone detected</Radio>
+                  <Radio value="Phone detection">Phone detection</Radio>
                   <Radio value="other">Other:</Radio>
                   {selectedReason === "other" && (
                     <Input
