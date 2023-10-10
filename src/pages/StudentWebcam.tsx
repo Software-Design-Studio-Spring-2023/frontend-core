@@ -31,20 +31,24 @@ import {
   RoomEvent,
   VideoPresets,
 } from "livekit-client";
-import StudentConnect from "../components/StudentConnect";
 import patchData from "../hooks/patchData";
+import useUsers from "../hooks/useUsers";
 
 let name = "";
 
 // let room: Room | null = null;
 
-let warnings: number;
-
 const StudentWebcam = () => {
+  let [warnings, setWarnings] = useState<number>(0);
+  let [terminated, setTerminated] = useState<boolean>(false);
+  let [warningOne, setWarningOne] = useState<string>("");
+  let [warningTwo, setWarningTwo] = useState<string>("");
+
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showAlert, setShowAlert] = useState(true);
   const [startCapture, setStartCapture] = useState(false);
   const [room, setRoom] = useState<Room | null>(null);
+  const { data, loading, error } = useUsers();
   const localVideoRef = useRef(null);
   const [ready, isReady] = useState<boolean>(false);
   const [lkParticipant, setLkParticipant] = useState<any>(null);
@@ -125,21 +129,27 @@ const StudentWebcam = () => {
     });
   };
 
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     setShowAlert(false);
-  //     setStartCapture(true);
-  //   }, 3000); // Set timeout to 10 seconds
-
-  //   return () => clearTimeout(timer); // Clear the timer if the component is unmounted before 10 seconds
-  // }, []);
-
   preventLoad(true, true);
   preventAccess("staff");
 
+  useEffect(() => {
+    if (data && currentUser) {
+      const foundUser = data.find((user) => user.id === currentUser.id);
+      if (foundUser) {
+        setWarnings(foundUser.warnings);
+        setWarningOne(foundUser.warningOne);
+        setWarningTwo(foundUser.warningTwo);
+        setTerminated(foundUser.terminated);
+        currentUser.warnings = foundUser.warnings;
+        currentUser.warningOne = foundUser.warningOne;
+        currentUser.warningTwo = foundUser.warningTwo;
+        currentUser.terminated = foundUser.terminated;
+      }
+    }
+  }, [data, currentUser]);
+
   if (currentUser !== undefined) {
     name = currentUser.name;
-    warnings = currentUser.warnings;
   }
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -195,6 +205,7 @@ const StudentWebcam = () => {
     //   recorder.onstop = handleDownload;
 
     //   recorder.start();
+    patchData({ ready: true }, "update_ready", currentUser.id);
     isReady(true);
     // }
   };
@@ -239,6 +250,10 @@ const StudentWebcam = () => {
     }
 
     patchData({ terminated: true }, "update_terminate", currentUser.id);
+    patchData({ warningOne: "" }, "update_warning_one", currentUser.id);
+    patchData({ warningTwo: "" }, "update_warning_two", currentUser.id);
+    patchData({ ready: false }, "update_ready", currentUser.id);
+
     navigate("/");
     isReady(false);
   };
@@ -256,8 +271,9 @@ const StudentWebcam = () => {
         }
       });
     }
-    // patchData({ terminated: true }, "update_terminate", currentUser.id);
   }
+
+  currentUser.terminated === true && handleStopCapture(); //make an alert
 
   return (
     <>
@@ -268,9 +284,7 @@ const StudentWebcam = () => {
         left="50%"
         transform="translateX(-50%)"
       >
-        <Heading
-          padding={"10px"}
-        >{`Warnings: ${currentUser.warnings}`}</Heading>
+        <Heading padding={"10px"}>{`Warnings: ${warnings}`}</Heading>
       </Box>
       <HStack>
         <Box paddingLeft={"10px"}>
@@ -285,27 +299,17 @@ const StudentWebcam = () => {
         </Box>
       </HStack>
       <LoginSuccess />
-
       {/* Warning Alerts */}
-      <Box position="absolute" top="10" width="100%" zIndex="1000">
-        {warnings === 1 && <WarningOne />}
-      </Box>
-      <Box position="absolute" top="10" width="100%" zIndex="1000">
-        {warnings === 2 && <WarningTwo />}
-      </Box>
-      {/* {currentUser.warnings === 1 && <WarningOne/>}
-      {currentUser.warnings === 2 && <WarningTwo/>} */}
+      {warnings === 1 && <WarningOne user={currentUser} />}
+      {warnings === 2 && <WarningTwo user={currentUser} />}
       <VStack padding={"20px"} minHeight="91vh">
         <Box
           borderRadius={"10px"}
           overflow={"hidden"}
           display="flex"
-          // borderWidth={"4px"}
-          // borderColor={"#1A202C"}
           justifyContent="center"
           alignItems="center"
         >
-          {/* <Webcam audio={false} ref={webcamRef} /> */}
           <video
             style={{ width: "50%", borderRadius: "10px", overflow: "hidden" }}
             ref={localVideoRef}
@@ -323,15 +327,6 @@ const StudentWebcam = () => {
         <div hidden={ready ? true : false}>
           <p>This is where the checklist will be</p>
         </div>
-        {/* {showAlert && (
-          <Alert padding={"30px"} size={"medium"} status="warning">
-            <AlertIcon />
-            <AlertTitle>You have just received a warning!</AlertTitle>
-            <AlertDescription>
-              Suspicious activity has been detected on your video feed.
-            </AlertDescription>
-          </Alert>
-        )} */}
         <Button
           colorScheme="teal"
           variant="solid"

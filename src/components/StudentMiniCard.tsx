@@ -1,20 +1,30 @@
 //This is what will be rendered in the grid when viewing a student, and represents a student and their stream.
 //We will need to replace the Webcam and make the card loading as a student is connecting.
 
-import { Heading, Text, Box, Skeleton, VStack } from "@chakra-ui/react";
+import {
+  Heading,
+  Text,
+  Box,
+  Skeleton,
+  VStack,
+  HStack,
+  Spacer,
+} from "@chakra-ui/react";
 import Webcam from "react-webcam";
 import setBorder from "../hooks/setBorder";
 import { useRef, useEffect, useContext } from "react";
 import { StreamsContext } from "../contexts/StreamContext";
+import { TiTick, TiTimes } from "react-icons/ti";
 
 interface Props {
   name: string;
   warnings: number;
   id: number;
+  ready: boolean;
   loading: boolean;
 }
 
-const StudentMiniCard = ({ name, id, warnings, loading }: Props) => {
+const StudentMiniCard = ({ name, id, warnings, loading, ready }: Props) => {
   const videoRef = useRef(null);
   const streams = useContext(StreamsContext);
   const stream = streams[id];
@@ -69,7 +79,13 @@ const StudentMiniCard = ({ name, id, warnings, loading }: Props) => {
             }}
           ></div>
           <Heading paddingLeft={"2px"} fontSize="1xl">
-            {name}
+            <HStack>
+              <div>{name}</div>
+              <Spacer />
+              <Box marginTop={ready ? "0" : "0.5"} marginLeft={"-3"}>
+                {ready ? <TiTick /> : <TiTimes />}
+              </Box>
+            </HStack>
           </Heading>
           <Text paddingLeft={"2px"} paddingBottom={"2px"} fontSize={"x-small"}>
             Warnings: {warnings}

@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { useRef } from "react";
 import { User } from "../../hooks/useUsers";
+import patchData from "../../hooks/patchData";
 
 interface Props {
   handleTerminate: () => void;
@@ -50,7 +51,7 @@ const TerminateExam = ({ handleTerminate, user }: Props) => {
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              Are you sure you want to terminate this {user.name}'s exam?
+              Are you sure you want to terminate {user.name}'s exam?
             </AlertDialogBody>
 
             <AlertDialogFooter>

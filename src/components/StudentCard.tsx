@@ -8,21 +8,24 @@ import {
   VStack,
   Text,
   Skeleton,
+  HStack,
+  Box,
 } from "@chakra-ui/react";
 import Webcam from "react-webcam";
 import setBorder from "../hooks/setBorder";
 import { useRef, useEffect, useContext } from "react";
 import { StreamsContext } from "../contexts/StreamContext";
+import { TiTick, TiTimes } from "react-icons/ti";
 
 interface Props {
   name: string;
   warnings: number;
   id: number;
-
+  ready: boolean;
   loading: boolean;
 }
 
-const StudentCard = ({ name, warnings, id, loading }: Props) => {
+const StudentCard = ({ name, warnings, id, loading, ready }: Props) => {
   const videoRef = useRef(null);
   const streams = useContext(StreamsContext);
   const stream = streams[id];
@@ -72,7 +75,14 @@ const StudentCard = ({ name, warnings, id, loading }: Props) => {
           }}
         ></div>
         <VStack>
-          <Heading marginTop={"8px"}>{name}</Heading>
+          <Heading marginTop={"8px"}>
+            <HStack>
+              <div>{name}</div>
+              <Box marginTop={ready ? "0" : "1.5"}>
+                {ready ? <TiTick /> : <TiTimes />}
+              </Box>
+            </HStack>
+          </Heading>
           <Text>Warnings: {warnings}</Text>
         </VStack>
       </CardBody>

@@ -13,6 +13,9 @@ export interface User {
     encodeIP: number;
     warnings: number;
     terminated: boolean;
+    ready: boolean;
+    warningOne: string;
+    warningTwo: string;
 }  
   
 const useUsers = () => (useData<User>("/all_users"))
