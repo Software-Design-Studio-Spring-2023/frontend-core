@@ -9,7 +9,7 @@ interface FetchResponse<T>{
   results: T[];
 }
 
-  const useData = <T>(endpoint: string, requestConfig?: AxiosRequestConfig, deps?: any[], pollInterval: number = 500) => {
+  const useData = <T>(endpoint: string, requestConfig?: AxiosRequestConfig, deps?: any[], pollInterval: number = 1000) => {
     const [data, setData] = useState<T[]>([]);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);

@@ -74,14 +74,8 @@ const TeacherView = ({ user }: Props) => {
 
   const [warning, setWarning] = useState(warnings);
 
-  let safe = true;
-
   if (user !== undefined) {
     warnings = user.warnings;
-  }
-
-  if (warning === 2) {
-    safe = false;
   }
 
   return (
@@ -107,7 +101,7 @@ const TeacherView = ({ user }: Props) => {
             overflow: "hidden",
           }}
         />
-        <div hidden={warning === 2 ? true : false}>
+        <div hidden={user.warnings === 2 ? true : false}>
           <IssueWarning
             user={user}
             handleWarning={() => {
@@ -119,7 +113,7 @@ const TeacherView = ({ user }: Props) => {
             }}
           />
         </div>
-        <div hidden={safe}>
+        <div hidden={user.warnings === 2 ? false : true}>
           <TerminateExam
             user={user}
             handleTerminate={() =>
