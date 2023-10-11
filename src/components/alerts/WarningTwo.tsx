@@ -8,8 +8,13 @@ import {
 } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { useState } from "react";
+import { User } from "../../hooks/useUsers";
 
-const WarningTwo = () => {
+interface Props {
+  user: User;
+}
+
+const WarningTwo = ({ user }: Props) => {
   const [showAlert, setShowAlert] = useState(true);
   const [progress, setProgress] = useState(0);
 
@@ -40,7 +45,7 @@ const WarningTwo = () => {
       {showAlert && (
         <Box
           width={"50%"}
-          height={"300px"} // Fixing the height so that the space is always reserved
+          // height={"300px"} // Fixing the height so that the space is always reserved
           position="relative"
           margin="auto"
           display="block"
@@ -58,9 +63,12 @@ const WarningTwo = () => {
             <AlertIcon />
             <AlertTitle mr={2}>Final Warning</AlertTitle>
             <AlertDescription flex="1">
-              Unusual activity and/or suspicious behaviour has been detected.
+              You have been warned for:
               <br />
-              This is your last chance to complete your exam and avoid exam termination.
+              {user.warningTwo}
+              <br />
+              This is your last chance to complete your exam and avoid exam
+              termination.
             </AlertDescription>
           </Alert>
           <Progress

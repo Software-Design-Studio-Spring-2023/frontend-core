@@ -1,20 +1,39 @@
 //This is what will be rendered in the grid when viewing a student, and represents a student and their stream.
 //We will need to replace the Webcam and make the card loading as a student is connecting.
 
-import { Heading, Text, Box, Skeleton, VStack } from "@chakra-ui/react";
+import {
+  Heading,
+  Text,
+  Box,
+  Skeleton,
+  VStack,
+  HStack,
+  Spacer,
+  Spinner,
+} from "@chakra-ui/react";
 import Webcam from "react-webcam";
 import setBorder from "../hooks/setBorder";
 import { useRef, useEffect, useContext } from "react";
 import { StreamsContext } from "../contexts/StreamContext";
+import { TiTick, TiTimes } from "react-icons/ti";
 
 interface Props {
   name: string;
   warnings: number;
   id: number;
+  ready: boolean;
   loading: boolean;
+  disconnected: boolean;
 }
 
-const StudentMiniCard = ({ name, id, warnings, loading }: Props) => {
+const StudentMiniCard = ({
+  name,
+  id,
+  warnings,
+  loading,
+  ready,
+  disconnected,
+}: Props) => {
   const videoRef = useRef(null);
   const streams = useContext(StreamsContext);
   const stream = streams[id];
@@ -59,17 +78,35 @@ const StudentMiniCard = ({ name, id, warnings, loading }: Props) => {
         borderRadius={"lg"}
       >
         <VStack spacing={0.5} align="start">
-          <div
-            ref={videoRef}
-            style={{
-              borderRadius: "2px",
-              overflow: "hidden",
-              width: "100%",
-              height: "auto",
-            }}
-          ></div>
+          {disconnected ? (
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              height="80px" // Adjust the height to the desired spinner container size
+              width="100%" // Optional: Adjust the width as needed
+            >
+              <Spinner thickness="3px" size={"md"} color="teal" />
+            </Box>
+          ) : (
+            <div
+              ref={videoRef}
+              style={{
+                borderRadius: "2px",
+                overflow: "hidden",
+                width: "100%",
+                height: "auto",
+              }}
+            ></div>
+          )}
           <Heading paddingLeft={"2px"} fontSize="1xl">
-            {name}
+            <HStack>
+              <div>{name}</div>
+              <Spacer />
+              <Box marginTop={ready ? "0" : "0.5"} marginLeft={"-3"}>
+                {ready ? <TiTick /> : <TiTimes />}
+              </Box>
+            </HStack>
           </Heading>
           <Text paddingLeft={"2px"} paddingBottom={"2px"} fontSize={"x-small"}>
             Warnings: {warnings}

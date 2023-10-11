@@ -8,21 +8,33 @@ import {
   VStack,
   Text,
   Skeleton,
+  HStack,
+  Box,
+  Spinner,
 } from "@chakra-ui/react";
 import Webcam from "react-webcam";
 import setBorder from "../hooks/setBorder";
 import { useRef, useEffect, useContext } from "react";
 import { StreamsContext } from "../contexts/StreamContext";
+import { TiTick, TiTimes } from "react-icons/ti";
 
 interface Props {
   name: string;
   warnings: number;
   id: number;
-
+  ready: boolean;
   loading: boolean;
+  disconnected: boolean;
 }
 
-const StudentCard = ({ name, warnings, id, loading }: Props) => {
+const StudentCard = ({
+  name,
+  warnings,
+  id,
+  loading,
+  ready,
+  disconnected,
+}: Props) => {
   const videoRef = useRef(null);
   const streams = useContext(StreamsContext);
   const stream = streams[id];
@@ -51,28 +63,41 @@ const StudentCard = ({ name, warnings, id, loading }: Props) => {
     </Card>
   ) : (
     <Card
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
       overflow={"hidden"}
       borderColor={setBorder(warnings)}
       borderWidth={"1px"}
       borderRadius={"10px"}
     >
-      <CardBody>
-        <div
-          ref={videoRef}
-          style={{
-            borderRadius: "10px",
-            overflow: "hidden",
-            width: "100%",
-            height: "auto",
-          }}
-        ></div>
+      <CardBody
+        style={{
+          display: "flex",
+          flexDirection: "column", // ensure children are stacked vertically
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {disconnected ? (
+          <Spinner thickness="4px" size={"xl"} color="teal" />
+        ) : (
+          <div
+            ref={videoRef}
+            style={{
+              borderRadius: "10px",
+              overflow: "hidden",
+              width: "100%",
+              height: "auto",
+            }}
+          ></div>
+        )}
         <VStack>
-          <Heading marginTop={"8px"}>{name}</Heading>
+          <Heading marginTop={"8px"}>
+            <HStack>
+              <div>{name}</div>
+              <Box marginTop={ready ? "0" : "1.5"}>
+                {ready ? <TiTick /> : <TiTimes />}
+              </Box>
+            </HStack>
+          </Heading>
           <Text>Warnings: {warnings}</Text>
         </VStack>
       </CardBody>

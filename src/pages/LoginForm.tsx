@@ -35,6 +35,9 @@ export var currentUser: User | undefined = {
   imageURL: "",
   encodeIP: 0,
   terminated: false,
+  ready: false,
+  warningOne: "",
+  warningTwo: "",
 }; //this is the logged in current user exported for the current sessiion, app-wide
 
 const LoginForm = () => {

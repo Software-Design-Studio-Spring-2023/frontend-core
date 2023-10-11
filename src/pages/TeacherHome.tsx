@@ -108,11 +108,13 @@ const TeacherHome = () => {
 
         room.on(RoomEvent.ParticipantDisconnected, (participant) => {
           console.log(`${participant.identity} has left the room`);
-          const userId = parseInt(participant.identity); // Assuming the user ID is stored as the identity.
-          patchData({ terminated: true }, "update_terminate", userId);
+          const userId = parseInt(participant.identity);
           navigate("/teacher");
-          // Your clean-up logic here. For example:
-          // Remove their video element, show a placeholder, or alert the teacher, etc.
+
+          setStreams((prevStreams) => ({
+            ...prevStreams,
+            [userId]: "DISCONNECTED",
+          }));
         });
 
         function handleExistingParticipant(participant: RemoteParticipant) {
@@ -133,17 +135,8 @@ const TeacherHome = () => {
           participant: RemoteParticipant
         ) {
           if (track.kind === Track.Kind.Video) {
-            // Get the user ID from the participant identity (assuming it's stored there)
             const userId = parseInt(participant.identity);
-
-            // Create the video or audio element
             const element = track.attach();
-            console.log(
-              "Element Type:",
-              typeof element,
-              element instanceof MediaStream
-            );
-            // Update the streams state variable with the new element
             setStreams((prevStreams) => ({
               ...prevStreams,
               [userId]: element,
@@ -277,25 +270,30 @@ const TeacherHome = () => {
               return (
                 <GridItem
                   _hover={
-                    streams[user.id]
-                      ? {
-                          transform: "scale(1.03)", // Increase the scale when hovered
-                          transition: "transform 0.1s", // Smooth transition
-                        }
-                      : {}
+                    // streams[user.id] && streams[user.id] !== "DISCONNECTED"
+                    //   ?
+                    {
+                      transform: "scale(1.03)", // Increase the scale when hovered
+                      transition: "transform 0.1s", // Smooth transition
+                    }
                   }
                   borderRadius={"10px"}
-                  cursor={streams[user.id] ? "pointer" : "auto"}
-                  key={user.id}
-                  onClick={
-                    streams[user.id]
-                      ? () => {
-                          setItemClicked(true);
-                          setUserClicked(user.name);
-                          navigate(`/teacher/${user.id}`); //opens teacher view for student on click
-                        }
-                      : null
+                  cursor={
+                    streams[user.id] && streams[user.id] !== "DISCONNECTED"
+                      ? "pointer"
+                      : "auto"
                   }
+                  key={user.id}
+                  onClick={() => {
+                    if (
+                      streams[user.id] &&
+                      streams[user.id] !== "DISCONNECTED"
+                    ) {
+                      setItemClicked(true);
+                      setUserClicked(user.name);
+                      navigate(`/teacher/${user.id}`); //opens teacher view for student on click
+                    }
+                  }}
                 >
                   {itemClicked ? (
                     userClicked === user.name ? (
@@ -303,17 +301,21 @@ const TeacherHome = () => {
                     ) : (
                       <StudentMiniCard
                         name={user.name}
+                        ready={user.ready}
                         warnings={user.warnings}
                         id={user.id}
                         loading={streams[user.id] ? false : true}
+                        disconnected={streams[user.id] === "DISCONNECTED"}
                       />
                     )
                   ) : (
                     <StudentCard
                       name={user.name}
+                      ready={user.ready}
                       warnings={user.warnings}
                       id={user.id}
                       loading={streams[user.id] ? false : true}
+                      disconnected={streams[user.id] === "DISCONNECTED"}
                     />
                   )}
                 </GridItem>
