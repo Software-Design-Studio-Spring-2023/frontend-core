@@ -92,6 +92,22 @@ const TermsAndConditions: React.FC = () => {
                 absolute security, and you should also take necessary
                 precautions.
               </p>
+              <Text as="b">EXAM AND CRITERIA CHECK</Text>
+              <p>
+                Eyedentify will conduct a criteria check before the exam 
+                to ensure the integrity of the examination process.
+                This check may include verifying your identity, system 
+                requirements, and network stability. 
+              </p>
+              <p>
+                <b>Please be aware that the time taken for the criteria 
+                  check will be included in your overall exam time if the 
+                  exam has started by the examiner. We recommend that you 
+                  arrive at least 10 minutes before the scheduled start of 
+                  the exam to ensure these checks are completed efficiently 
+                  and to avoid any disruption to your exam experience. 
+                </b>
+              </p>
               <Text as="b">COOKIES AND TRACKING</Text>
               <p>
                 We may use cookies and other tracking technologies to improve
