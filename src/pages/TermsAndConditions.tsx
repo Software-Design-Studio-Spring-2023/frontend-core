@@ -12,6 +12,7 @@ import preventAccess from "../hooks/preventAccess";
 const TermsAndConditions: React.FC = () => {
   const navigate = useNavigate();
   const [accepted, setAccepted] = useState(false);
+  const [isAtBottom, setBottom] = useState(false);
 
   preventAccess("staff");
 
@@ -22,6 +23,10 @@ const TermsAndConditions: React.FC = () => {
     // Navigate to the "/student" page
     navigate("/student");
   };
+
+  const handleScroll = (e) =>  {
+    setBottom((e.target.scrollHeight - e.target.scrollTop - e.target.clientHeight) < 1);
+  }
 
   return (
     <>
@@ -46,12 +51,12 @@ const TermsAndConditions: React.FC = () => {
             Privacy Terms and Conditions. By starting the exam, you agree to the
             following:
           </p>
-
           <Box
             maxWidth="50vw"
             maxHeight="50vh"
             overflow="auto"
             scrollBehavior="smooth"
+            onScroll={ (e) => { handleScroll(e) }}
           >
             <VStack
               justifyContent="left"
@@ -94,18 +99,18 @@ const TermsAndConditions: React.FC = () => {
               </p>
               <Text as="b">EXAM AND CRITERIA CHECK</Text>
               <p>
-                Eyedentify will conduct a criteria check before the exam 
+                Eyedentify will conduct a criteria check before the exam
                 to ensure the integrity of the examination process.
-                This check may include verifying your identity, system 
-                requirements, and network stability. 
+                This check may include verifying your identity, system
+                requirements, and network stability.
               </p>
               <p>
-                <b>Please be aware that the time taken for the criteria 
-                  check will be included in your overall exam time if the 
-                  exam has started by the examiner. We recommend that you 
-                  arrive at least 10 minutes before the scheduled start of 
-                  the exam to ensure these checks are completed efficiently 
-                  and to avoid any disruption to your exam experience. 
+                <b>Please be aware that the time taken for the criteria
+                  check will be included in your overall exam time if the
+                  exam has started by the examiner. We recommend that you
+                  arrive at least 10 minutes before the scheduled start of
+                  the exam to ensure these checks are completed efficiently
+                  and to avoid any disruption to your exam experience.
                 </b>
               </p>
               <Text as="b">COOKIES AND TRACKING</Text>
@@ -137,7 +142,13 @@ const TermsAndConditions: React.FC = () => {
             By clicking "I Accept," you acknowledge that you have read and agree
             to these Privacy Terms and Conditions.
           </p>
-          <Button colorScheme="teal" variant="solid" onClick={handleAccept}>
+          <Button 
+            colorScheme="teal" 
+            variant="solid" 
+            onClick={handleAccept} 
+            isDisabled = { !isAtBottom }
+            backgroundColor={isAtBottom ? "teal.500" : "teal.100"} 
+          >
             I Accept
           </Button>
           <AcceptTC
