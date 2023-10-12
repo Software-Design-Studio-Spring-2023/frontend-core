@@ -322,7 +322,7 @@ const TeacherHome = () => {
               );
             })}
         </Grid>
-        <CopyrightVersion bottomVal={-8} />
+        <CopyrightVersion bottomVal={0} />
       </>
     </StreamsContext.Provider>
   );
