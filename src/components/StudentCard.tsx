@@ -35,14 +35,13 @@ const StudentCard = ({
   ready,
   disconnected,
 }: Props) => {
-  const videoRef = useRef(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const streams = useContext(StreamsContext);
   const stream = streams[id];
 
   useEffect(() => {
     if (stream && videoRef.current) {
-      videoRef.current.innerHTML = ""; // clear the inner HTML to ensure no other elements
-      videoRef.current.appendChild(stream);
+      videoRef.current.srcObject = stream;
     }
   }, [stream]);
 
@@ -79,15 +78,18 @@ const StudentCard = ({
         {disconnected ? (
           <Spinner thickness="4px" size={"xl"} color="teal" />
         ) : (
-          <div
+          <video
             ref={videoRef}
+            playsInline
+            autoPlay
+            muted
             style={{
               borderRadius: "10px",
               overflow: "hidden",
               width: "100%",
               height: "auto",
             }}
-          ></div>
+          ></video>
         )}
         <VStack>
           <Heading marginTop={"8px"}>

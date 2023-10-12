@@ -34,14 +34,13 @@ const StudentMiniCard = ({
   ready,
   disconnected,
 }: Props) => {
-  const videoRef = useRef(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const streams = useContext(StreamsContext);
   const stream = streams[id];
 
   useEffect(() => {
     if (stream && videoRef.current) {
-      videoRef.current.innerHTML = ""; // clear the inner HTML to ensure no other elements
-      videoRef.current.appendChild(stream);
+      videoRef.current.srcObject = stream;
     }
   }, [stream]);
 
@@ -89,15 +88,18 @@ const StudentMiniCard = ({
               <Spinner thickness="3px" size={"md"} color="teal" />
             </Box>
           ) : (
-            <div
+            <video
               ref={videoRef}
+              playsInline
+              autoPlay
+              muted
               style={{
                 borderRadius: "2px",
                 overflow: "hidden",
                 width: "100%",
                 height: "auto",
               }}
-            ></div>
+            ></video>
           )}
           <Heading paddingLeft={"2px"} fontSize="1xl">
             <HStack>
