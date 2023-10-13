@@ -38,6 +38,7 @@ import {
 import { LiveKitRoom } from "@livekit/components-react";
 import { StreamsContext } from "../contexts/StreamContext";
 import patchData from "../hooks/patchData";
+import CheatDetectionAlert from "../components/alerts/CheatDetectionAlert";
 
 const TeacherHome = () => {
   const location = useLocation();
@@ -232,6 +233,10 @@ const TeacherHome = () => {
               /Android|iPhone/i.test(navigator.userAgent) ? "14px" : "30px"
             }
           >
+            <CheatDetectionAlert 
+            // Add specific user here
+            handleCheatDetectedWarning={() => navigate("/")} 
+            />
             <LogOut handleLogout={() => navigate("/")} />
           </Box>
         </HStack>
