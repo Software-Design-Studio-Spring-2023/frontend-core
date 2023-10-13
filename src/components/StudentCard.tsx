@@ -52,42 +52,29 @@ const StudentCard = ({
     }
   }, [stream]);
 
-  useEffect(() => {
-    tf.ready()
-      .then(() => {
-        console.log("TensorFlow.js is ready!");
-        console.log("Using backend: ", tf.getBackend()); // Should log: "webgl" if WebGL is used
-        // Here you can initiate anything that needs TensorFlow.js to be ready,
-        // perhaps starting video processing, fetching models, etc.
-      })
-      .catch((err) => {
-        console.error("Error initializing TensorFlow.js!", err);
-      });
-  }, []);
-
   const applyBokehEffect = useCallback(async () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    if (!video) return;
+    if (!video || !canvas) return;
 
-    try {
-      const segmenter = await bodySegmentation.createSegmenter(
-        bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation,
-        { runtime: "tfjs" }
-      );
+    const segmenter = await bodySegmentation.createSegmenter(
+      bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation,
+      {
+        runtime: "mediapipe",
+        solutionPath:
+          "https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation",
+        modelType: "general",
+      }
+    );
 
-      // Ensure video is still available and loaded
+    const foregroundThreshold = 0.5;
+    const backgroundBlurAmount = 20;
+    const edgeBlurAmount = 5;
+    const flipHorizontal = false;
+
+    const drawEffect = async () => {
       if (!video || video.readyState !== 4) return;
 
-      const segmentation = await segmenter.segmentPeople(video);
-      console.log(segmentation);
-
-      const foregroundThreshold = 1;
-      const backgroundBlurAmount = 20;
-      const edgeBlurAmount = 5;
-      const flipHorizontal = false;
-
-      // const canvas = document.createElement("canvas");
       if (video.videoWidth > 0 && video.videoHeight > 0) {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
@@ -97,14 +84,7 @@ const StudentCard = ({
         console.error("Video dimensions not available");
       }
 
-      console.log(
-        canvas.height,
-        canvas.width,
-        video.videoWidth,
-        video.videoHeight,
-        video.width,
-        video.height
-      );
+      const segmentation = await segmenter.segmentPeople(video);
 
       if (!segmentation) {
         console.error("Segmentation failed!");
@@ -131,31 +111,32 @@ const StudentCard = ({
         edgeBlurAmount,
         flipHorizontal
       );
-    } catch (error) {
-      console.error("Error applying bokeh effect:", error);
-    }
+
+      requestAnimationFrame(drawEffect);
+    };
+
+    drawEffect();
   }, [videoRef, canvasRef]);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    const handleMetadataLoaded = () => {
+    const handleVideoPlay = () => {
       if (video.videoWidth === 0 || video.videoHeight === 0) {
         console.error("Video dimensions are zero!");
         return;
       }
-      // Now you should be able to access video.videoWidth and video.videoHeight.
       applyBokehEffect();
     };
 
-    video.addEventListener("loadedmetadata", handleMetadataLoaded);
+    video.addEventListener("play", handleVideoPlay);
 
     return () => {
       // Cleanup event listener on component unmount.
-      video.removeEventListener("loadedmetadata", handleMetadataLoaded);
+      video.removeEventListener("play", handleVideoPlay);
     };
-  }, [videoRef, canvasRef, applyBokehEffect]);
+  }, [videoRef, applyBokehEffect]);
 
   return loading ? (
     <Card
@@ -190,19 +171,7 @@ const StudentCard = ({
         {disconnected ? (
           <Spinner thickness="4px" size={"xl"} color="teal" />
         ) : (
-          <div>
-            <video
-              ref={videoRef}
-              playsInline
-              autoPlay
-              muted
-              style={{
-                borderRadius: "10px",
-                overflow: "hidden",
-                width: "100%",
-                height: "auto",
-              }}
-            ></video>
+          <div style={{ position: "relative" }}>
             <canvas
               ref={canvasRef}
               style={{
@@ -212,6 +181,20 @@ const StudentCard = ({
                 height: "auto",
               }}
             ></canvas>
+            <video
+              ref={videoRef}
+              playsInline
+              autoPlay
+              muted
+              style={{
+                borderRadius: "10px",
+                position: "absolute",
+                overflow: "hidden",
+                width: "100%",
+                height: "auto",
+                visibility: "hidden",
+              }}
+            ></video>
           </div>
         )}
         <VStack>
