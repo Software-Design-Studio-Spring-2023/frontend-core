@@ -23,6 +23,7 @@ import "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
 import * as tf from "@tensorflow/tfjs";
 import "@mediapipe/selfie_segmentation";
+import { useSegmenter } from "../contexts/SegmenterContext";
 
 interface Props {
   name: string;
@@ -43,6 +44,8 @@ const StudentCard = ({
 }: Props) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const segmenter = useSegmenter();
+  console.log(segmenter);
   const streams = useContext(StreamsContext);
   const stream = streams[id];
 
@@ -56,16 +59,6 @@ const StudentCard = ({
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
-
-    const segmenter = await bodySegmentation.createSegmenter(
-      bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation,
-      {
-        runtime: "mediapipe",
-        solutionPath:
-          "https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation",
-        modelType: "general",
-      }
-    );
 
     const foregroundThreshold = 0.5;
     const backgroundBlurAmount = 20;
