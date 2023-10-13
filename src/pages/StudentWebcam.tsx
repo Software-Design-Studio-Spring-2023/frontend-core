@@ -30,6 +30,7 @@ import {
   Room,
   RoomEvent,
   VideoPresets,
+  createLocalVideoTrack,
 } from "livekit-client";
 import patchData from "../hooks/patchData";
 import useUsers from "../hooks/useUsers";
@@ -212,15 +213,27 @@ const StudentWebcam = () => {
   }, [localVideoRef, applyBokehEffect]);
 
   const publishTracks = async (participant: LocalParticipant) => {
-    await participant.setCameraEnabled(true);
+    await participant.setCameraEnabled(false);
     await participant.setMicrophoneEnabled(false);
     await participant.setScreenShareEnabled(false);
 
-    participant.tracks.forEach((publication) => {
-      if (publication.track.kind === "video" && localVideoRef.current) {
-        publication.track.attach(localVideoRef.current);
-      }
-    });
+    try {
+      const videoTrack = await createLocalVideoTrack();
+      await participant.publishTrack(videoTrack); // Ensure this completes before moving on
+
+      const canvasStream = canvasRef.current.captureStream(30);
+      const canvasVideoTrack = canvasStream.getVideoTracks()[0];
+
+      await videoTrack.replaceTrack(canvasVideoTrack); // Ensure track is replaced only after being published
+
+      // participant.tracks.forEach((publication) => {
+      //   if (publication.track.kind === "video" && localVideoRef.current) {
+      //     publication.track.attach(localVideoRef.current);
+      //   }
+      // });
+    } catch (error) {
+      console.error("Error in publishing or replacing tracks:", error);
+    }
   };
 
   preventLoad(true, true);
