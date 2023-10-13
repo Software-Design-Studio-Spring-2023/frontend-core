@@ -40,6 +40,7 @@ import "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
 import * as tf from "@tensorflow/tfjs";
 import "@mediapipe/selfie_segmentation";
+import Webcam from "react-webcam";
 
 let name = "";
 
@@ -50,7 +51,7 @@ const StudentWebcam = () => {
   let [terminated, setTerminated] = useState<boolean>(false);
   let [warningOne, setWarningOne] = useState<string>("");
   let [warningTwo, setWarningTwo] = useState<string>("");
-
+  const webcamRef = useRef(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showAlert, setShowAlert] = useState(true);
   const [startCapture, setStartCapture] = useState(false);
@@ -127,7 +128,7 @@ const StudentWebcam = () => {
   }, [token]);
 
   const applyBokehEffect = useCallback(async () => {
-    const video = localVideoRef.current;
+    const video = webcamRef.current?.video;
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
 
@@ -190,10 +191,10 @@ const StudentWebcam = () => {
     };
 
     drawEffect();
-  }, [localVideoRef, canvasRef]);
+  }, [webcamRef, canvasRef]);
 
   useEffect(() => {
-    const video = localVideoRef.current;
+    const video = webcamRef.current?.video;
     if (!video) return;
 
     const handleVideoPlay = () => {
@@ -210,7 +211,7 @@ const StudentWebcam = () => {
       // Cleanup event listener on component unmount.
       video.removeEventListener("play", handleVideoPlay);
     };
-  }, [localVideoRef, applyBokehEffect]);
+  }, [webcamRef, applyBokehEffect]);
 
   const publishTracks = async (participant: LocalParticipant) => {
     await participant.setCameraEnabled(false);
@@ -422,20 +423,18 @@ const StudentWebcam = () => {
               style={{
                 borderRadius: "10px",
                 overflow: "hidden",
-                width: "50%",
+                width: "100%",
                 height: "auto",
               }}
             ></canvas>
-            <video
-              style={{
-                width: "50%",
-                // borderRadius: "10px",
-                // overflow: "hidden",
-                visibility: "hidden",
+            <Webcam
+              audio={false}
+              style={{ visibility: "hidden" }}
+              ref={webcamRef}
+              screenshotFormat="image/jpeg"
+              videoConstraints={{
+                facingMode: "user",
               }}
-              ref={localVideoRef}
-              autoPlay={true}
-              muted={true}
             />
           </div>
         </Box>
