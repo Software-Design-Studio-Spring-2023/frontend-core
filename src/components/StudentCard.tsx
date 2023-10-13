@@ -67,6 +67,7 @@ const StudentCard = ({
 
   const applyBokehEffect = useCallback(async () => {
     const video = videoRef.current;
+    const canvas = canvasRef.current;
     if (!video) return;
 
     try {
@@ -86,21 +87,24 @@ const StudentCard = ({
       const edgeBlurAmount = 5;
       const flipHorizontal = false;
 
-      const canvas = document.createElement("canvas");
-      canvas.width = video.videoWidth; // Set canvas dimensions
-      canvas.height = video.videoHeight;
+      // const canvas = document.createElement("canvas");
+      if (video.videoWidth > 0 && video.videoHeight > 0) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        video.width = video.videoWidth;
+        video.height = video.videoHeight;
+      } else {
+        console.error("Video dimensions not available");
+      }
+
       console.log(
         canvas.height,
         canvas.width,
         video.videoWidth,
-        video.videoHeight
+        video.videoHeight,
+        video.width,
+        video.height
       );
-
-      // Ensure to clear previous canvas children if any
-      if (canvasRef.current) {
-        // canvasRef.current.innerHTML = "";
-        canvasRef.current.appendChild(canvas);
-      }
 
       if (!segmentation) {
         console.error("Segmentation failed!");
@@ -118,18 +122,15 @@ const StudentCard = ({
         return;
       }
 
-      // await bodySegmentation.drawBokehEffect(
-      //   canvas,
-      //   video,
-      //   segmentation,
-      //   foregroundThreshold,
-      //   backgroundBlurAmount,
-      //   edgeBlurAmount,
-      //   flipHorizontal
-      // );
-
-      ctx.fillStyle = "blue";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      await bodySegmentation.drawBokehEffect(
+        canvas,
+        video,
+        segmentation,
+        foregroundThreshold,
+        backgroundBlurAmount,
+        edgeBlurAmount,
+        flipHorizontal
+      );
     } catch (error) {
       console.error("Error applying bokeh effect:", error);
     }
@@ -189,39 +190,26 @@ const StudentCard = ({
         {disconnected ? (
           <Spinner thickness="4px" size={"xl"} color="teal" />
         ) : (
-          <div
-            style={{
-              position: "relative", // <-- ensure this container is also relative
-              width: "100%",
-              height: "200px", // <-- or your desired height
-              overflow: "hidden",
-              borderRadius: "10px",
-            }}
-          >
+          <div>
             <video
               ref={videoRef}
               playsInline
               autoPlay
               muted
               style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
+                borderRadius: "10px",
+                overflow: "hidden",
                 width: "100%",
-                height: "100%",
-                objectFit: "cover", // <-- ensure aspect ratio is maintained
+                height: "auto",
               }}
             ></video>
             <canvas
               ref={canvasRef}
               style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
+                borderRadius: "10px",
+                overflow: "hidden",
                 width: "100%",
-                height: "100%",
-                zIndex: 1, // Ensure it’s on top if overlaying
-                opacity: 0.5, // Temporarily to see if it overlays correctly
+                height: "auto",
               }}
             ></canvas>
           </div>
