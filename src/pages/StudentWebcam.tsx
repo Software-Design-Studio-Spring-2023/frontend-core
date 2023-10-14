@@ -423,14 +423,17 @@ const StudentWebcam = () => {
               style={{
                 borderRadius: "10px",
                 overflow: "hidden",
-                width: "100%",
+                width: "50%",
                 height: "auto",
                 position: "relative",
                 zIndex: 2, // Ensure the canvas is in front
+                marginLeft: "25%",
               }}
             ></canvas>
             <Webcam
               audio={false}
+              height={720}
+              width={1280}
               style={{
                 position: "absolute",
                 top: 0,
@@ -441,6 +444,8 @@ const StudentWebcam = () => {
               ref={webcamRef}
               screenshotFormat="image/jpeg"
               videoConstraints={{
+                width: 1280,
+                height: 720,
                 facingMode: "user",
               }}
             />
