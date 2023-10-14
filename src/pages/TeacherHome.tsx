@@ -232,11 +232,7 @@ const TeacherHome = () => {
             marginRight={
               /Android|iPhone/i.test(navigator.userAgent) ? "14px" : "30px"
             }
-          >
-            <CheatDetectionAlert 
-            // Add specific user here
-            handleCheatDetectedWarning={() => navigate("/")} 
-            />
+          >zv
             <LogOut handleLogout={() => navigate("/")} />
           </Box>
         </HStack>

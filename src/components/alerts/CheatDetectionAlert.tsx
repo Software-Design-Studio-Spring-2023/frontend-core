@@ -15,27 +15,20 @@ import { useNavigate } from 'react-router-dom'
 
 interface Props {
     handleCheatDetectedWarning: () => void;
-    // user: User;
+    user: User;
 }
 
-const CheatDetectionAlert = ({handleCheatDetectedWarning}:Props) => {
+const CheatDetectionAlert = ({ handleCheatDetectedWarning, user }: Props) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const cancelRef = useRef(null);
     const navigate = useNavigate();
     const jumptostream =()=> {
-       // navigate(`/teacher/${user.id}`)
+        handleCheatDetectedWarning();
+        navigate(`/teacher/${user.id}`)
     }
+    
     return (
         <>
-
-            <Button
-                colorScheme="teal"
-                variant="solid"
-                onClick={onOpen}
-                size={/Android|iPhone/i.test(navigator.userAgent) ? "sm" : "md"}
-            >
-                Misconduct
-            </Button>
             <AlertDialog
                 motionPreset="scale"
                 size={/Android|iPhone/i.test(navigator.userAgent) ? "xs" : "lg"}
@@ -57,7 +50,11 @@ const CheatDetectionAlert = ({handleCheatDetectedWarning}:Props) => {
                         <Button ref={cancelRef} onClick={onClose}>
                             No
                         </Button>
-                        <Button colorScheme="red" onClick={jumptostream} ml={3}>
+                        <Button 
+                        colorScheme="red" 
+                        onClick={jumptostream} //opens teacher view for student on click
+                        ml={3}
+                        >
                             Yes
                         </Button>
                         </AlertDialogFooter>
