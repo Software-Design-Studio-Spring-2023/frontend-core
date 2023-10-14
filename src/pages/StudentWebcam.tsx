@@ -425,11 +425,19 @@ const StudentWebcam = () => {
                 overflow: "hidden",
                 width: "100%",
                 height: "auto",
+                position: "relative",
+                zIndex: 2, // Ensure the canvas is in front
               }}
             ></canvas>
             <Webcam
               audio={false}
-              style={{ visibility: "hidden" }}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                visibility: "hidden",
+                zIndex: 0, // Place the webcam behind the canvas
+              }}
               ref={webcamRef}
               screenshotFormat="image/jpeg"
               videoConstraints={{
@@ -438,13 +446,6 @@ const StudentWebcam = () => {
             />
           </div>
         </Box>
-        {/* <canvas
-          ref={canvasRef}
-          width={640}
-          height={480}
-          style={{ display: "none" }}
-        ></canvas>{" "} */}
-        {/* Hide the canvas element */}
         <div hidden={ready ? true : false}>
           <p>This is where the checklist will be</p>
         </div>
