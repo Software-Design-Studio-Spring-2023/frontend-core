@@ -1,20 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-
 import { currentUser } from "./LoginForm";
 import EndExam from "../components/alerts/EndExam";
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
-  Box,
-  Button,
-  HStack,
-  Heading,
-  Spacer,
-  VStack,
-} from "@chakra-ui/react";
-import { LiveKitRoom } from "@livekit/components-react";
+import { Box, Button, HStack, Heading, Spacer, VStack } from "@chakra-ui/react";
 import { HiEye } from "react-icons/hi";
 import LoginSuccess from "../components/alerts/LoginSuccess";
 import WarningOne from "../components/alerts/WarningOne";
@@ -24,21 +11,17 @@ import preventLoad from "../hooks/preventLoad";
 import preventAccess from "../hooks/preventAccess";
 import { useNavigate } from "react-router-dom";
 import {
-  DefaultReconnectPolicy,
   LocalParticipant,
   LocalTrackPublication,
   Room,
   RoomEvent,
-  VideoPresets,
   createLocalVideoTrack,
 } from "livekit-client";
 import patchData from "../hooks/patchData";
 import useUsers from "../hooks/useUsers";
 import * as bodySegmentation from "@tensorflow-models/body-segmentation";
 import "@tensorflow/tfjs-core";
-// Register WebGL backend.
 import "@tensorflow/tfjs-backend-webgl";
-import * as tf from "@tensorflow/tfjs";
 import "@mediapipe/selfie_segmentation";
 import Webcam from "react-webcam";
 
