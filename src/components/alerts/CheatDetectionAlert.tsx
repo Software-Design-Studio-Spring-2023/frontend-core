@@ -82,7 +82,10 @@ const CheatDetectionAlert = ({ handleCheatDetectedWarning, user }: Props) => {
                 </Button>
                 <Button
                   colorScheme="red"
-                  onClick={handleCheatDetectedWarning} //opens teacher view for student on click
+                  onClick={() => {
+                    handleCheatDetectedWarning();
+                    handleNoClick();
+                  }} //opens teacher view for student on click
                   ml={3}
                 >
                   Yes
