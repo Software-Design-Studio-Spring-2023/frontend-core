@@ -166,7 +166,12 @@ const StudentWebcam = () => {
 
     if (detections.length > 1 || detections.length === 0) {
       // more than one person detected
-      patchData({ isSuspicious: true }, "update_isSuspicious", currentUser.id); //patch data only if exam has started
+      currentUser.ready === true &&
+        patchData(
+          { isSuspicious: true },
+          "update_isSuspicious",
+          currentUser.id
+        ); //patch data only if exam has started
       setPeopleVerified(true);
     } else {
       setPeopleVerified(false);
@@ -191,12 +196,13 @@ const StudentWebcam = () => {
         } else {
           console.log(`No match found for ${currentUser.name}`);
           setFaceVerified(false);
-          //patch data only if exam has started
-          patchData(
-            { isSuspicious: true },
-            "update_isSuspicious",
-            currentUser.id
-          );
+          //patch data only if examinee is ready
+          currentUser.ready === true &&
+            patchData(
+              { isSuspicious: true },
+              "update_isSuspicious",
+              currentUser.id
+            );
         }
       }
     }
@@ -406,6 +412,7 @@ const StudentWebcam = () => {
 
     //   recorder.start();
     patchData({ ready: true }, "update_ready", currentUser.id);
+    currentUser.ready === true;
     isReady(true);
     // }
   };

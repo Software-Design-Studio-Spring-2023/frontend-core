@@ -12,7 +12,6 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import { User } from "../../hooks/useUsers";
-import { useNavigate } from "react-router-dom";
 import patchData from "../../hooks/patchData";
 
 interface Props {
@@ -35,9 +34,7 @@ const CheatDetectionAlert = ({ handleCheatDetectedWarning, user }: Props) => {
   };
 
   useEffect(() => {
-    const sound = new Audio("/sounds/warning.mp3"); // Path to your sound file
-    sound.play(); // Play the sound
-
+    onOpen();
     const interval = 10; // update every 10ms
     const totalDuration = 5000; // 5 seconds in total
 
@@ -76,11 +73,11 @@ const CheatDetectionAlert = ({ handleCheatDetectedWarning, user }: Props) => {
               </AlertDialogHeader>
               <AlertDialogBody>
                 {`Misconduct suspected from student: ${user.name}`}
-
-                {"\nView students camera?"}
+                <br />
+                {"View students camera?"}
               </AlertDialogBody>
               <AlertDialogFooter>
-                <Button ref={cancelRef} onClick={onClose}>
+                <Button ref={cancelRef} onClick={handleNoClick}>
                   No
                 </Button>
                 <Button
