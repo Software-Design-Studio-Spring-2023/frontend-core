@@ -150,14 +150,6 @@ const TeacherHome = () => {
     connectToRoom();
   }, [token !== null]);
 
-  // Cleanup event listeners on component unmount
-  // return () => {
-  //   if (room) {
-  //     room.off('participantConnected', handleParticipantConnected);
-  //     room.off('participantDisconnected', handleParticipantDisconnected);
-  //   }
-  // };
-
   useEffect(() => {
     if (isConnected) {
       // Now, attempt to retrieve the room instance
