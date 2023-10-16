@@ -23,7 +23,7 @@ import CopyrightVersion from "../components/CopyrightVersion";
 import preventLoad from "../hooks/preventLoad";
 import preventAccess from "../hooks/preventAccess";
 import setBorder from "../hooks/setBorder";
-import CountDownApp from "../hooks/CountDownApp";
+import CountDownApp from "../components/CountDownApp";
 import {
   DefaultReconnectPolicy,
   Participant,
