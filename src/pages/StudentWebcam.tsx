@@ -8,6 +8,8 @@ import WarningOne from "../components/alerts/WarningOne";
 import WarningTwo from "../components/alerts/WarningTwo";
 import CopyrightVersion from "../components/CopyrightVersion";
 import preventLoad from "../hooks/preventLoad";
+import * as faceapi from "face-api.js";
+
 import preventAccess from "../hooks/preventAccess";
 import { useNavigate } from "react-router-dom";
 import {
@@ -110,6 +112,37 @@ const StudentWebcam = () => {
     connectToRoom();
   }, [token]);
 
+  useEffect(() => {
+    async function loadModels() {
+      await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
+      await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
+    }
+    loadModels();
+  }, []);
+
+  const checkFacesInFrame = async () => {
+    const video = webcamRef.current?.video;
+    if (!video) return;
+
+    const detections = await faceapi.detectAllFaces(
+      video,
+      new faceapi.TinyFaceDetectorOptions()
+    );
+
+    if (detections.length > 1) {
+      // console.log("More than one person detected");
+      // Handle the case when more than one face is detected
+      patchData({ isSuspicious: true }, "update_isSuspicious", currentUser.id);
+    } else {
+      // console.log("One person detected or none at all");
+    }
+  };
+
+  useEffect(() => {
+    const intervalId = setInterval(checkFacesInFrame, 1000); // Check every 5 seconds
+    return () => clearInterval(intervalId); // Clear interval when component unmounts
+  }, []);
+
   const applyBokehEffect = useCallback(async () => {
     const video = webcamRef.current?.video;
     const canvas = canvasRef.current;
@@ -143,8 +176,9 @@ const StudentWebcam = () => {
       }
 
       const segmentation = await segmenter.segmentPeople(video);
-      console.log(segmentation);
-      console.log(segmentation.length);
+
+      // console.log(segmentation);
+      // console.log(segmentation.length);
       // if there is more than one person in the frame, set isSuspicious to true
       if (segmentation.length !== 1 && currentUser.isSuspicious === false) {
         patchData(
