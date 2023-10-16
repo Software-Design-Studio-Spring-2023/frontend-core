@@ -172,6 +172,11 @@ const StudentWebcam = () => {
       setPeopleVerified(false);
     }
 
+    if (detections.length === 0) {
+      //no people means no face :)
+      setFaceVerified(false);
+    }
+
     //facial recognition
     for (let detection of detections) {
       if (referenceDescriptor) {
