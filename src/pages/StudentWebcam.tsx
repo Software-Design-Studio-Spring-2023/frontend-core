@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useRef, useState } from "react";
 import { currentUser } from "./LoginForm";
 import EndExam from "../components/alerts/EndExam";
@@ -28,6 +27,7 @@ import Webcam from "react-webcam";
 
 let name = "";
 
+// let room: Room | null = null;
 
 const StudentWebcam = () => {
   let [warnings, setWarnings] = useState<number>(0);
@@ -42,17 +42,20 @@ const StudentWebcam = () => {
   const { data, loading, error } = useUsers();
   const localVideoRef = useRef(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
   const [ready, isReady] = useState<boolean>(false);
   const [lkParticipant, setLkParticipant] = useState<any>(null);
   const [isConnected, setIsConnected] = useState(false);
+
   const navigate = useNavigate();
+
   const [token, setToken] = useState(null);
 
   useEffect(() => {
     const fetchToken = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/api/get_student_token/${currentUser.id}`
+          `https://eyedentify-69d961d5a478.herokuapp.com/api/get_student_token/${currentUser.id}`
         );
         if (!response.ok) {
           throw new Error("Network response was not ok " + response.statusText);
@@ -81,7 +84,7 @@ const StudentWebcam = () => {
 
           // default capture settings
           videoCaptureDefaults: {
-            resolution: VideoPresets.h720.resolution,
+            facingMode: "user",
           },
         });
         setRoom(room);
@@ -89,28 +92,18 @@ const StudentWebcam = () => {
           "wss://eyedentify-90kai7lw.livekit.cloud",
           token
         );
+
+        room.on(RoomEvent.Connected, () => {
+          console.log("connected to room", room.name);
+          patchData({ terminated: false }, "update_terminate", currentUser.id);
+          publishTracks(room.localParticipant);
+        });
+
         room.on(RoomEvent.Disconnected, handleDisconnect);
 
         await room.connect("wss://eyedentify-90kai7lw.livekit.cloud", token);
-        console.log("connected to room", room.name);
-
-        // publish local camera and mic tracks
-        const p = room.localParticipant;
-        // turn on the local user's camera and mic, this may trigger a browser prompt
-        // to ensure permissions are granted
-        await p.setCameraEnabled(true);
-        await p.setMicrophoneEnabled(false);
-        await p.setScreenShareEnabled(false);
-
-        const videoTrack = p.videoTracks.values().next().value.track;
-
-        if (videoTrack) {
-          await videoTrack.restartTrack({
-            facingMode: "user",
-          });
-        }
       } catch (error) {
-        console.error("Error connecting to room:", room);
+        console.error(error);
       }
     };
 
@@ -226,19 +219,33 @@ const StudentWebcam = () => {
       console.error("Error in publishing or replacing tracks:", error);
     }
   };
-    
+
   preventLoad(true, true);
   preventAccess("staff");
 
+  useEffect(() => {
+    if (data && currentUser) {
+      const foundUser = data.find((user) => user.id === currentUser.id);
+      if (foundUser) {
+        setWarnings(foundUser.warnings);
+        setWarningOne(foundUser.warningOne);
+        setWarningTwo(foundUser.warningTwo);
+        setTerminated(foundUser.terminated);
+        currentUser.warnings = foundUser.warnings;
+        currentUser.warningOne = foundUser.warningOne;
+        currentUser.warningTwo = foundUser.warningTwo;
+        currentUser.terminated = foundUser.terminated;
+      }
+    }
+  }, [data, currentUser]);
+
   if (currentUser !== undefined) {
     name = currentUser.name;
-    warnings = currentUser.warnings;
   }
-  
+
   const [frameCaptureInterval, setFrameCaptureInterval] = useState<
     number | null
   >(null);
-  const [recording, setRecording] = useState<boolean>(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
   );
@@ -270,66 +277,27 @@ const StudentWebcam = () => {
   //   }
   // };
 
-  useEffect(() => {
-    const publishTrackToRoom = async () => {
-      if (isConnected && webcamRef.current && room) {
-        const stream = webcamRef.current.stream;
-        console.log("Stream:", stream);
-
-        if (stream) {
-          const track = stream.getVideoTracks()[0];
-          console.log("Track:", track);
-
-          if (track) {
-            try {
-              // Adding a timeout here
-              setTimeout(async () => {
-                try {
-                  await room.localParticipant.publishTrack(track);
-                  console.log("Track published successfully.");
-                } catch (error) {
-                  console.error("Error publishing video track:", error);
-                }
-              }, 2000); // 2000 milliseconds = 2 seconds delay
-            } catch (error) {
-              console.error("Error with timeout function:", error);
-            }
-          } else {
-            console.error("No video track found in the stream.");
-          }
-        } else {
-          console.error("Webcam stream is undefined");
-        }
-      } else {
-        console.error("Webcam not loaded or room not connected.");
-      }
-    };
-
-    if (isConnected) {
-      publishTrackToRoom();
-    }
-  }, [isConnected, room, webcamRef]);
-
   const handleStartCapture = () => {
-    if (webcamRef.current && webcamRef.current.stream) {
-      const stream = webcamRef.current.stream;
-      const recorder = new MediaRecorder(stream, {
-        mimeType: "video/webm",
-      });
-      setMediaRecorder(recorder);
+    // if (webcamRef.current && webcamRef.current.stream) {
+    //   const stream = webcamRef.current.stream;
+    //   const recorder = new MediaRecorder(stream, {
+    //     mimeType: "video/webm",
+    //   });
+    //   setMediaRecorder(recorder);
 
-      (recorder.ondataavailable = (e: BlobEvent) => {
-        if (e.data.size > 0) {
-          capturedChunksRef.current.push(e.data);
-        }
-      }),
-        [capturedChunksRef];
+    //   (recorder.ondataavailable = (e: BlobEvent) => {
+    //     if (e.data.size > 0) {
+    //       capturedChunksRef.current.push(e.data);
+    //     }
+    //   }),
+    //     [capturedChunksRef];
 
-      recorder.onstop = handleDownload;
+    //   recorder.onstop = handleDownload;
 
-      recorder.start();
-      setRecording(true);
-    }
+    //   recorder.start();
+    patchData({ ready: true }, "update_ready", currentUser.id);
+    isReady(true);
+    // }
   };
 
   const downloadVideo = () => {
@@ -354,42 +322,59 @@ const StudentWebcam = () => {
   };
 
   const handleStopCapture = () => {
-    if (mediaRecorder && webcamRef.current?.stream) {
-      mediaRecorder.stop();
-      setRecording(false);
-      // captureFrame();
-      //this is to permanently shut the camera off once exam is confirmed done
-      const stream = webcamRef.current?.stream;
-      const tracks = stream.getTracks();
-      if (lkParticipant) {
-        tracks.forEach((track) => {
-          lkParticipant.unpublishTrack(track);
-          track.stop();
-        });
-      } else {
-        tracks.forEach((track) => track.stop());
-      }
-
-      if (frameCaptureInterval) {
-        window.clearInterval(frameCaptureInterval);
-        setFrameCaptureInterval(null);
-      }
+    //   if (frameCaptureInterval) {
+    //     window.clearInterval(frameCaptureInterval);
+    //     setFrameCaptureInterval(null);
+    //   }
+    // }
+    if (room && room.localParticipant) {
+      const participant = room.localParticipant;
+      participant.tracks.forEach((publication: LocalTrackPublication) => {
+        // Check if the publication is a video track
+        if (publication.track.kind === "video") {
+          // Stop and unpublish the video track
+          publication.track.stop();
+          participant.unpublishTrack(publication.track);
+        }
+      });
     }
+
+    patchData({ terminated: true }, "update_terminate", currentUser.id);
+    patchData({ warningOne: "" }, "update_warning_one", currentUser.id);
+    patchData({ warningTwo: "" }, "update_warning_two", currentUser.id);
+    patchData({ ready: false }, "update_ready", currentUser.id);
+
     navigate("/");
+    isReady(false);
   };
+
+  function handleDisconnect() {
+    console.log("disconnected from room");
+    if (room && room.localParticipant) {
+      const participant = room.localParticipant;
+      participant.tracks.forEach((publication: LocalTrackPublication) => {
+        // Check if the publication is a video track
+        if (publication.track.kind === "video") {
+          // Stop and unpublish the video track
+          publication.track.stop();
+          participant.unpublishTrack(publication.track);
+        }
+      });
+    }
+  }
+
+  currentUser.terminated === true && handleStopCapture(); //make an alert
 
   return (
     <>
       <Box
-        hidden={recording ? false : true}
+        hidden={ready ? false : true}
         position="absolute"
         top="0"
         left="50%"
         transform="translateX(-50%)"
       >
-        <Heading
-          padding={"10px"}
-        >{`Warnings: ${currentUser.warnings}`}</Heading>
+        <Heading padding={"10px"}>{`Warnings: ${warnings}`}</Heading>
       </Box>
       <HStack>
         <Box paddingLeft={"10px"}>
@@ -398,30 +383,23 @@ const StudentWebcam = () => {
         <Heading padding={"10px"}>{currentUser.name}</Heading>
         <Spacer />
         <Box paddingRight={"30px"}>
-          <div hidden={recording ? false : true}>
+          <div hidden={ready ? false : true}>
             <EndExam handleTerminate={handleStopCapture} />
           </div>
         </Box>
       </HStack>
       <LoginSuccess />
-
       {/* Warning Alerts */}
-      <Box position="absolute" top="10" width="100%" zIndex="1000">
-        {warnings === 1 && <WarningOne user={undefined} />}
-      </Box>
-      <Box position="absolute" top="10" width="100%" zIndex="1000">
-        {warnings === 2 && <WarningTwo user={undefined} />}
-      </Box>
-      {/* {currentUser.warnings === 1 && <WarningOne/>}
-      {currentUser.warnings === 2 && <WarningTwo/>} */}
+      {warnings === 1 && <WarningOne user={currentUser} />}
+      {warnings === 2 && <WarningTwo user={currentUser} />}
       <VStack padding={"20px"} minHeight="91vh">
         <Box
           borderRadius={"10px"}
           overflow={"hidden"}
-          // borderWidth={"4px"}
-          // borderColor={"#1A202C"}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
         >
-
           <div style={{ position: "relative" }}>
             <canvas
               ref={canvasRef}
@@ -459,32 +437,19 @@ const StudentWebcam = () => {
         <div hidden={ready ? true : false}>
           <p>This is where the checklist will be</p>
         </div>
-        {/* {showAlert && (
-          <Alert padding={"30px"} size={"medium"} status="warning">
-            <AlertIcon />
-            <AlertTitle>You have just received a warning!</AlertTitle>
-            <AlertDescription>
-              Suspicious activity has been detected on your video feed.
-            </AlertDescription>
-          </Alert>
-        )} */}
         <Button
           colorScheme="teal"
           variant="solid"
           padding={"10px"}
-          hidden={recording ? true : false}
+          hidden={ready ? true : false}
           onClick={handleStartCapture}
         >
-          {"Start Exam"}
+          {"Ready"}
         </Button>
-        <CopyrightVersion bottomVal={0} />
+        <CopyrightVersion bottomVal={-2} />
       </VStack>
     </>
   );
 };
 
 export default StudentWebcam;
-
-function handleDisconnect() {
-  console.log("disconnected from room");
-}
