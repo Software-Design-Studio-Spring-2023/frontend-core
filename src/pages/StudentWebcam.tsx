@@ -37,11 +37,13 @@ const StudentWebcam = () => {
   let [warningOne, setWarningOne] = useState<string>("");
   let [warningTwo, setWarningTwo] = useState<string>("");
   const webcamRef = useRef(null);
+  const [modelsLoaded, setModelsLoaded] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showAlert, setShowAlert] = useState(true);
   const [startCapture, setStartCapture] = useState(false);
   const [room, setRoom] = useState<Room | null>(null);
   const { data, loading, error } = useUsers();
+  const [referenceDescriptor, setReferenceDescriptor] = useState(null);
   const localVideoRef = useRef(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -115,33 +117,87 @@ const StudentWebcam = () => {
   useEffect(() => {
     async function loadModels() {
       await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
+      await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
       await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
+      await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
+      setModelsLoaded(true);
     }
     loadModels();
   }, []);
+
+  useEffect(() => {
+    const computeReferenceDescriptor = async (imgElement) => {
+      const detections = await faceapi
+        .detectSingleFace(imgElement)
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+      if (detections) {
+        setReferenceDescriptor(detections.descriptor);
+      }
+    };
+    const loadReferenceImageFromURL = (url) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous"; // Required for CORS if the image is on a different domain
+      img.src = url;
+      img.onload = () => {
+        computeReferenceDescriptor(img);
+      };
+    };
+
+    // Call this function with the URL of your reference image
+    loadReferenceImageFromURL("/images/marko.jpg");
+  }, [modelsLoaded]);
+
+  // loadReferenceImageFromURL(currentUser.imageURL);
+
+  // Assuming you have a referenceImage element somewhere
 
   const checkFacesInFrame = async () => {
     const video = webcamRef.current?.video;
     if (!video) return;
 
-    const detections = await faceapi.detectAllFaces(
-      video,
-      new faceapi.TinyFaceDetectorOptions()
-    );
+    const detections = await faceapi
+      .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+      .withFaceLandmarks()
+      .withFaceDescriptors();
 
-    if (detections.length > 1) {
-      // console.log("More than one person detected");
-      // Handle the case when more than one face is detected
+    detections.length > 1 &&
+      // more than one person detected
       patchData({ isSuspicious: true }, "update_isSuspicious", currentUser.id);
-    } else {
-      // console.log("One person detected or none at all");
+
+    //facial recognition
+    for (let detection of detections) {
+      if (referenceDescriptor) {
+        const distance = faceapi.euclideanDistance(
+          referenceDescriptor,
+          detection.descriptor
+        );
+        if (distance < 0.6) {
+          // Threshold, can adjust
+          console.log(`Match found for ${currentUser.name}`);
+          // patchData(
+          //   { isSuspicious: false },
+          //   "update_isSuspicious",
+          //   currentUser.id
+          // );
+        } else {
+          console.log(`No match found for ${currentUser.name}`);
+          patchData(
+            { isSuspicious: true },
+            "update_isSuspicious",
+            currentUser.id
+          );
+        }
+      }
     }
   };
 
   useEffect(() => {
-    const intervalId = setInterval(checkFacesInFrame, 1000); // Check every 5 seconds
-    return () => clearInterval(intervalId); // Clear interval when component unmounts
-  }, []);
+    if (!modelsLoaded || !referenceDescriptor) return;
+
+    const intervalId = setInterval(checkFacesInFrame, 1000); // Check every second
+    return () => clearInterval(intervalId);
+  }, [modelsLoaded, referenceDescriptor]);
 
   const applyBokehEffect = useCallback(async () => {
     const video = webcamRef.current?.video;
@@ -180,13 +236,13 @@ const StudentWebcam = () => {
       // console.log(segmentation);
       // console.log(segmentation.length);
       // if there is more than one person in the frame, set isSuspicious to true
-      if (segmentation.length !== 1 && currentUser.isSuspicious === false) {
-        patchData(
-          { isSuspicious: true },
-          "update_isSuspicious",
-          currentUser.id
-        );
-      }
+      // if (segmentation.length !== 1 && currentUser.isSuspicious === false) {
+      //   patchData(
+      //     { isSuspicious: true },
+      //     "update_isSuspicious",
+      //     currentUser.id
+      //   );
+      // }
 
       if (!segmentation) {
         console.error("Segmentation failed!");

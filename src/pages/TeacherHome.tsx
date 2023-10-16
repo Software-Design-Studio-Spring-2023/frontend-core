@@ -171,18 +171,19 @@ const TeacherHome = () => {
   useEffect(() => {
     const checkForSuspiciousUsers = () => {
       if (data.find((user) => user.isSuspicious)) {
-        const foundUser = data.find((user) => user.isSuspicious);
+        const foundUser = data.find((user) => user.isSuspicious === true);
         setSuspiciousUser(foundUser);
+        // alert("suspicious user found");
 
-        setTimeout(() => {
-          //set back to null if nothing happens
-          patchData(
-            { isSuspicious: false },
-            "update_isSuspicious",
-            suspiciousUser.id
-          );
-          setSuspiciousUser(null);
-        }, 5000);
+        // setTimeout(() => {
+        //   //set back to null if nothing happens
+        //   patchData(
+        //     { isSuspicious: false },
+        //     "update_isSuspicious",
+        //     suspiciousUser.id
+        //   );
+        //   setSuspiciousUser(null);
+        // }, 5000);
       }
     };
 
@@ -259,7 +260,7 @@ const TeacherHome = () => {
           <hr hidden={itemClicked ? false : true} />
         </Box>
         {/Android|iPhone/i.test(navigator.userAgent) ? <></> : <LoginSuccess />}
-        {suspiciousUser && (
+        {suspiciousUser !== null && (
           <CheatDetectionAlert
             handleCheatDetectedWarning={cheatHandler}
             user={suspiciousUser}
