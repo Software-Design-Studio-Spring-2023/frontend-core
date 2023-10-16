@@ -166,7 +166,7 @@ const StudentWebcam = () => {
 
     if (detections.length > 1 || detections.length === 0) {
       // more than one person detected
-      patchData({ isSuspicious: true }, "update_isSuspicious", currentUser.id);
+      patchData({ isSuspicious: true }, "update_isSuspicious", currentUser.id); //patch data only if exam has started
       setPeopleVerified(true);
     } else {
       setPeopleVerified(false);
@@ -187,15 +187,11 @@ const StudentWebcam = () => {
         if (distance < 0.6) {
           // Threshold, can adjust
           console.log(`Match found for ${currentUser.name}`);
-          // patchData(
-          //   { isSuspicious: false },
-          //   "update_isSuspicious",
-          //   currentUser.id
           setFaceVerified(true);
-          // );
         } else {
           console.log(`No match found for ${currentUser.name}`);
           setFaceVerified(false);
+          //patch data only if exam has started
           patchData(
             { isSuspicious: true },
             "update_isSuspicious",
