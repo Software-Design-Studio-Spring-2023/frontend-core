@@ -232,7 +232,7 @@ const TeacherHome = () => {
             marginRight={
               /Android|iPhone/i.test(navigator.userAgent) ? "14px" : "30px"
             }
-          >zv
+          >
             <LogOut handleLogout={() => navigate("/")} />
           </Box>
         </HStack>
