@@ -129,7 +129,6 @@ const TeacherHome = () => {
             }
           });
         }
-
         function handleTrackSubscribed(
           track: RemoteTrack,
           publication: RemoteTrackPublication,
@@ -137,10 +136,15 @@ const TeacherHome = () => {
         ) {
           if (track.kind === Track.Kind.Video) {
             const userId = parseInt(participant.identity);
-            const element = track.attach();
+
+            // Create a new MediaStream
+            const stream = new MediaStream();
+            // Add the track to the new stream
+            stream.addTrack(track.mediaStreamTrack);
+
             setStreams((prevStreams) => ({
               ...prevStreams,
-              [userId]: element,
+              [userId]: stream,
             }));
           }
         }

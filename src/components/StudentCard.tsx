@@ -14,7 +14,7 @@ import {
 } from "@chakra-ui/react";
 import Webcam from "react-webcam";
 import setBorder from "../hooks/setBorder";
-import { useRef, useEffect, useContext } from "react";
+import { useRef, useEffect, useContext, useCallback } from "react";
 import { StreamsContext } from "../contexts/StreamContext";
 import { TiTick, TiTimes } from "react-icons/ti";
 
@@ -35,14 +35,14 @@ const StudentCard = ({
   ready,
   disconnected,
 }: Props) => {
-  const videoRef = useRef(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const streams = useContext(StreamsContext);
   const stream = streams[id];
 
   useEffect(() => {
     if (stream && videoRef.current) {
-      videoRef.current.innerHTML = ""; // clear the inner HTML to ensure no other elements
-      videoRef.current.appendChild(stream);
+      videoRef.current.srcObject = stream;
     }
   }, [stream]);
 
@@ -79,15 +79,21 @@ const StudentCard = ({
         {disconnected ? (
           <Spinner thickness="4px" size={"xl"} color="teal" />
         ) : (
-          <div
-            ref={videoRef}
-            style={{
-              borderRadius: "10px",
-              overflow: "hidden",
-              width: "100%",
-              height: "auto",
-            }}
-          ></div>
+          <div style={{ position: "relative" }}>
+            <video
+              ref={videoRef}
+              playsInline
+              autoPlay
+              muted
+              style={{
+                borderRadius: "10px",
+
+                overflow: "hidden",
+                width: "100%",
+                height: "auto",
+              }}
+            ></video>
+          </div>
         )}
         <VStack>
           <Heading marginTop={"8px"}>

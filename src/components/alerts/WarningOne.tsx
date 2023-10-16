@@ -19,8 +19,11 @@ const WarningOne = ({ user }: Props) => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
+    const sound = new Audio("/sounds/warning.mp3"); // Path to your sound file
+    sound.play(); // Play the sound
+
     const interval = 10; // update every 10ms
-    const totalDuration = 5000; // 5 seconds in total
+    const totalDuration = 3000; // 5 seconds in total
 
     // Initialize the progress state to totalDuration
     setProgress(totalDuration);

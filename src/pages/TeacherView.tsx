@@ -23,13 +23,11 @@ let warnings: number;
 const TeacherView = ({ user }: Props) => {
   const streams = useContext(StreamsContext);
   const stream = streams[user.id];
-  const videoRef = useRef(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     if (stream && videoRef.current) {
-      videoRef.current.innerHTML = ""; // clear the inner HTML to ensure no other elements
-
-      videoRef.current.appendChild(stream);
+      videoRef.current.srcObject = stream;
     }
   }, [stream]);
 
@@ -89,8 +87,11 @@ const TeacherView = ({ user }: Props) => {
         <Heading padding={"10px"}>{`Warnings: ${user.warnings}`}</Heading>
       </Box>
       <VStack justifyContent="center" alignItems="center" spacing={2.5}>
-        <div
+        <video
           ref={videoRef}
+          playsInline
+          autoPlay
+          muted
           style={{
             marginTop: /Android|iPhone/i.test(navigator.userAgent) ? 48 : 0,
             display: "flex",
