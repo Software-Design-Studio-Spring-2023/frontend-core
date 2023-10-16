@@ -173,6 +173,16 @@ const TeacherHome = () => {
       if (data.find((user) => user.isSuspicious)) {
         const foundUser = data.find((user) => user.isSuspicious);
         setSuspiciousUser(foundUser);
+
+        setTimeout(() => {
+          //set back to null if nothing happens
+          patchData(
+            { isSuspicious: false },
+            "update_isSuspicious",
+            suspiciousUser.id
+          );
+          setSuspiciousUser(null);
+        }, 5000);
       }
     };
 

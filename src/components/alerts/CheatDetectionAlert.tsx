@@ -26,6 +26,14 @@ const CheatDetectionAlert = ({ handleCheatDetectedWarning, user }: Props) => {
   const [showAlert, setShowAlert] = useState(true);
   const [progress, setProgress] = useState(0);
 
+  const handleNoClick = () => {
+    // Execute your additional logic here
+    console.log("No button was clicked");
+    patchData({ isSuspicious: false }, "update_isSuspicious", user.id);
+    // Close the alert dialog
+    onClose();
+  };
+
   useEffect(() => {
     const sound = new Audio("/sounds/warning.mp3"); // Path to your sound file
     sound.play(); // Play the sound
