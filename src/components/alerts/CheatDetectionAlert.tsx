@@ -42,7 +42,7 @@ const CheatDetectionAlert = ({ handleCheatDetectedWarning, user }: Props) => {
                         Misconduct Suspected!
                     </AlertDialogHeader>
                         <AlertDialogBody>
-                            {`Miscoduct Suspected from student: ${user.id}`}
+                            {`Miscoduct Suspected from student: ${user.name}`}
 
                             {"\nView students camera?"}
                         </AlertDialogBody>
