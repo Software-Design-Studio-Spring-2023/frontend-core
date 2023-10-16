@@ -181,6 +181,11 @@ const TeacherHome = () => {
     setItemClicked(false);
   }, []);
 
+  const cheatHandler = (user) => {
+    navigate(`/teacher/${user.id}`);
+    patchData({ isSuspicious: false }, "update_isSuspicious", user.id);
+  };
+
   //
   return (
     <StreamsContext.Provider value={streams}>
@@ -236,6 +241,7 @@ const TeacherHome = () => {
           <hr hidden={itemClicked ? false : true} />
         </Box>
         {/Android|iPhone/i.test(navigator.userAgent) ? <></> : <LoginSuccess />}
+        <CheatDetectionAlert handleCheatDetectedWarning={} user={} />
         {/* The grid */}
         <Grid
           paddingTop={itemClicked ? "10px" : "0px"}
