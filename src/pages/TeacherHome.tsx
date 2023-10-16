@@ -9,7 +9,6 @@ import {
   Heading,
   Spacer,
 } from "@chakra-ui/react";
-import Webcam from "react-webcam";
 import { currentUser } from "./LoginForm";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -22,20 +21,15 @@ import LoginSuccess from "../components/alerts/LoginSuccess";
 import CopyrightVersion from "../components/CopyrightVersion";
 import preventLoad from "../hooks/preventLoad";
 import preventAccess from "../hooks/preventAccess";
-import setBorder from "../hooks/setBorder";
 import CountDownApp from "../hooks/CountDownApp";
 import {
-  DefaultReconnectPolicy,
-  Participant,
   RemoteParticipant,
   RemoteTrack,
   RemoteTrackPublication,
   Room,
   RoomEvent,
   Track,
-  VideoPresets,
 } from "livekit-client";
-import { LiveKitRoom } from "@livekit/components-react";
 import { StreamsContext } from "../contexts/StreamContext";
 import patchData from "../hooks/patchData";
 import CheatDetectionAlert from "../components/alerts/CheatDetectionAlert";
@@ -43,10 +37,11 @@ import CheatDetectionAlert from "../components/alerts/CheatDetectionAlert";
 const TeacherHome = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [suspiciousUser, setSuspiciousUser] = useState(null);
+
   const [itemClicked, setItemClicked] = useState(false);
   const [userClicked, setUserClicked] = useState("");
   const { data, loading, error } = useUsers();
-  const [participants, setParticipants] = useState({});
   const [isConnected, setIsConnected] = useState(false);
   const [room, setRoom] = useState<Room | null>(null);
   const [streams, setStreams] = useState({});
@@ -181,9 +176,30 @@ const TeacherHome = () => {
     setItemClicked(false);
   }, []);
 
-  const cheatHandler = (user) => {
-    navigate(`/teacher/${user.id}`);
-    patchData({ isSuspicious: false }, "update_isSuspicious", user.id);
+  useEffect(() => {
+    const checkForSuspiciousUsers = () => {
+      if (data.find((user) => user.isSuspicious)) {
+        const foundUser = data.find((user) => user.isSuspicious);
+        setSuspiciousUser(foundUser);
+      }
+    };
+
+    // Set up the interval to check for suspicious users every second
+    const intervalId = setInterval(() => {
+      checkForSuspiciousUsers();
+    }, 1000);
+
+    // Clear the interval when the component is unmounted
+    return () => clearInterval(intervalId);
+  }, [data]);
+
+  const cheatHandler = () => {
+    navigate(`/teacher/${suspiciousUser.id}`);
+    patchData(
+      { isSuspicious: false },
+      "update_isSuspicious",
+      suspiciousUser.id
+    );
   };
 
   //
@@ -241,7 +257,12 @@ const TeacherHome = () => {
           <hr hidden={itemClicked ? false : true} />
         </Box>
         {/Android|iPhone/i.test(navigator.userAgent) ? <></> : <LoginSuccess />}
-        <CheatDetectionAlert handleCheatDetectedWarning={} user={} />
+        {suspiciousUser && (
+          <CheatDetectionAlert
+            handleCheatDetectedWarning={cheatHandler}
+            user={suspiciousUser}
+          />
+        )}
         {/* The grid */}
         <Grid
           paddingTop={itemClicked ? "10px" : "0px"}

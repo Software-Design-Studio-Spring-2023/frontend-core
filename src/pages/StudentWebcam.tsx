@@ -143,7 +143,8 @@ const StudentWebcam = () => {
       }
 
       const segmentation = await segmenter.segmentPeople(video);
-
+      console.log(segmentation);
+      console.log(segmentation.length);
       // if there is more than one person in the frame, set isSuspicious to true
       if (segmentation.length !== 1 && currentUser.isSuspicious === false) {
         patchData(
