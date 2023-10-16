@@ -37,6 +37,9 @@ const StudentWebcam = () => {
   let [warningOne, setWarningOne] = useState<string>("");
   let [warningTwo, setWarningTwo] = useState<string>("");
   const webcamRef = useRef(null);
+  const [faceVerified, setFaceVerified] = useState(false);
+  const [peopleVerified, setPeopleVerified] = useState(false);
+
   const [modelsLoaded, setModelsLoaded] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showAlert, setShowAlert] = useState(true);
@@ -161,9 +164,13 @@ const StudentWebcam = () => {
       .withFaceLandmarks()
       .withFaceDescriptors();
 
-    detections.length > 1 &&
+    if (detections.length > 1 || detections.length === 0) {
       // more than one person detected
       patchData({ isSuspicious: true }, "update_isSuspicious", currentUser.id);
+      setPeopleVerified(true);
+    } else {
+      setPeopleVerified(false);
+    }
 
     //facial recognition
     for (let detection of detections) {
@@ -179,9 +186,11 @@ const StudentWebcam = () => {
           //   { isSuspicious: false },
           //   "update_isSuspicious",
           //   currentUser.id
+          setFaceVerified(true);
           // );
         } else {
           console.log(`No match found for ${currentUser.name}`);
+          setFaceVerified(false);
           patchData(
             { isSuspicious: true },
             "update_isSuspicious",
@@ -488,10 +497,8 @@ const StudentWebcam = () => {
           </div>
         </Box>
       </HStack>
-      <LoginSuccess />
+
       {/* Warning Alerts */}
-      {warnings === 1 && <WarningOne user={currentUser} />}
-      {warnings === 2 && <WarningTwo user={currentUser} />}
       <VStack padding={"20px"} minHeight="91vh">
         <Box
           borderRadius={"10px"}
@@ -534,18 +541,25 @@ const StudentWebcam = () => {
             />
           </div>
         </Box>
-        <div hidden={ready ? true : false}>
-          <p>This is where the checklist will be</p>
-        </div>
+        <HStack hidden={ready ? true : false}>
+          <Box>{`Face Verified: ${faceVerified ? "✅" : "❌"}`}</Box>
+          <Box>{`One Person: ${peopleVerified ? "❌" : "✅"}`}</Box>
+        </HStack>
         <Button
           colorScheme="teal"
           variant="solid"
           padding={"10px"}
           hidden={ready ? true : false}
+          isDisabled={faceVerified === false || peopleVerified === true}
           onClick={handleStartCapture}
         >
           {"Ready"}
         </Button>
+        <Box width={"50%"} bottom={20}>
+          <LoginSuccess />
+          {warnings === 1 && <WarningOne user={currentUser} />}
+          {warnings === 2 && <WarningTwo user={currentUser} />}
+        </Box>
         <CopyrightVersion bottomVal={-2} />
       </VStack>
     </>
