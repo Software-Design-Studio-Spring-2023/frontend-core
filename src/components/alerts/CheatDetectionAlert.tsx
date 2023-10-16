@@ -85,7 +85,7 @@ const CheatDetectionAlert = ({ handleCheatDetectedWarning, user }: Props) => {
                   onClick={() => {
                     handleCheatDetectedWarning();
                     handleNoClick();
-                  }} //opens teacher view for student on click
+                  }} //opens teacher view for student on click and patches false after action handled
                   ml={3}
                 >
                   Yes
