@@ -38,6 +38,7 @@ import {
 import { LiveKitRoom } from "@livekit/components-react";
 import { StreamsContext } from "../contexts/StreamContext";
 import patchData from "../hooks/patchData";
+import CheatDetectionAlert from "../components/alerts/CheatDetectionAlert";
 
 const TeacherHome = () => {
   const location = useLocation();
@@ -326,7 +327,7 @@ const TeacherHome = () => {
               );
             })}
         </Grid>
-        <CopyrightVersion bottomVal={-8} />
+        <CopyrightVersion bottomVal={0} />
       </>
     </StreamsContext.Provider>
   );
