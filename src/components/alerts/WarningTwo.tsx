@@ -21,9 +21,6 @@ const WarningTwo = ({ user }: Props) => {
   useEffect(() => {
     const sound = new Audio("/sounds/warning.mp3"); // Path to your sound file
     sound.play(); // Play the sound
-  }, []);
-
-  useEffect(() => {
     const totalDuration = 3000; // 3 seconds in total
     const startTime = Date.now();
 
