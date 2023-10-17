@@ -30,8 +30,8 @@ const CopyrightVersion = ({ bottomVal }: Props) => {
           alignItems="center"
           paddingTop={2.5}
           paddingBottom={2.5}
-          >
-          Version X.X Alpha
+        >
+          Version 1.0
         </Text>
       </Box>
     </>
