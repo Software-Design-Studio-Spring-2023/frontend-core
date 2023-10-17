@@ -1,7 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { currentUser } from "./LoginForm";
 import EndExam from "../components/alerts/EndExam";
-import { Box, Button, HStack, Heading, Spacer, VStack } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  HStack,
+  Heading,
+  Spacer,
+  Spinner,
+  VStack,
+} from "@chakra-ui/react";
 import { HiEye } from "react-icons/hi";
 import LoginSuccess from "../components/alerts/LoginSuccess";
 import WarningOne from "../components/alerts/WarningOne";
@@ -49,7 +57,7 @@ const StudentWebcam = () => {
   const [referenceDescriptor, setReferenceDescriptor] = useState(null);
   const localVideoRef = useRef(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
+  const [componentLoading, setComponentLoading] = useState(true);
   const [ready, isReady] = useState<boolean>(false);
   const [lkParticipant, setLkParticipant] = useState<any>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -57,6 +65,13 @@ const StudentWebcam = () => {
   const navigate = useNavigate();
 
   const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    // You can use a delay, or wait for some operation to complete.
+    setTimeout(() => {
+      setComponentLoading(false);
+    }, 1500); // This will wait for 2 seconds before marking the component as "mounted". Adjust as necessary.
+  }, []);
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -505,8 +520,19 @@ const StudentWebcam = () => {
         </Box>
       </HStack>
 
-      {/* Warning Alerts */}
       <VStack padding={"20px"} minHeight="91vh">
+        {componentLoading ? (
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            height="50vh"
+          >
+            <Spinner thickness="4px" size={"xl"} color="teal" />
+          </Box>
+        ) : (
+          <></>
+        )}{" "}
         <Box
           borderRadius={"10px"}
           overflow={"hidden"}
@@ -548,21 +574,25 @@ const StudentWebcam = () => {
             />
           </div>
         </Box>
-        <HStack hidden={ready ? true : false}>
-          <Box>{`Face Verified: ${faceVerified ? "✅" : "❌"}`}</Box>
-          <Box>{`One Person: ${peopleVerified ? "❌" : "✅"}`}</Box>
-        </HStack>
-        <Button
-          colorScheme="teal"
-          variant="solid"
-          padding={"10px"}
-          hidden={ready ? true : false}
-          isDisabled={faceVerified === false || peopleVerified === true}
-          onClick={handleStartCapture}
-        >
-          {"Ready"}
-        </Button>
-        <Box width={"50%"} bottom={20}>
+        <Box hidden={componentLoading ? true : false}>
+          <HStack hidden={ready ? true : false}>
+            <Box>{`Face Verified: ${faceVerified ? "✅" : "❌"}`}</Box>
+            <Box>{`One Person: ${peopleVerified ? "❌" : "✅"}`}</Box>
+          </HStack>
+        </Box>
+        <Box hidden={componentLoading ? true : false}>
+          <Button
+            colorScheme="teal"
+            variant="solid"
+            padding={"10px"}
+            hidden={ready ? true : false}
+            isDisabled={faceVerified === false || peopleVerified === true}
+            onClick={handleStartCapture}
+          >
+            {"Ready"}
+          </Button>
+        </Box>
+        <Box width={"75%"}>
           <LoginSuccess />
           {warnings === 1 && <WarningOne user={currentUser} />}
           {warnings === 2 && <WarningTwo user={currentUser} />}

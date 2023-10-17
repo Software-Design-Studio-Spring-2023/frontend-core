@@ -21,26 +21,27 @@ const WarningTwo = ({ user }: Props) => {
   useEffect(() => {
     const sound = new Audio("/sounds/warning.mp3"); // Path to your sound file
     sound.play(); // Play the sound
+  }, []);
 
-    const interval = 10; // update every 10ms
+  useEffect(() => {
     const totalDuration = 3000; // 3 seconds in total
+    const startTime = Date.now();
 
-    // Initialize the progress state to totalDuration
-    setProgress(totalDuration);
+    function updateProgress() {
+      const elapsed = Date.now() - startTime;
 
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        const nextValue = prev - interval;
-        if (nextValue <= 0) {
-          clearInterval(timer);
-          setShowAlert(false);
-          return 0;
-        }
-        return nextValue;
-      });
-    }, interval);
+      if (elapsed >= totalDuration) {
+        setProgress(0);
+        setShowAlert(false);
+      } else {
+        setProgress(totalDuration - elapsed);
+        requestAnimationFrame(updateProgress);
+      }
+    }
 
-    return () => clearInterval(timer);
+    requestAnimationFrame(updateProgress);
+
+    return () => {}; // No cleanup required for RAF in this instance.
   }, []);
 
   return (

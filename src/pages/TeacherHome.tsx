@@ -8,6 +8,7 @@ import {
   HStack,
   Heading,
   Spacer,
+  Spinner,
 } from "@chakra-ui/react";
 import { currentUser } from "./LoginForm";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
@@ -38,7 +39,7 @@ const TeacherHome = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [suspiciousUser, setSuspiciousUser] = useState(null);
-
+  const [componentLoading, setComponentLoading] = useState(true);
   const [itemClicked, setItemClicked] = useState(false);
   const [userClicked, setUserClicked] = useState("");
   const { data, loading, error } = useUsers();
@@ -50,6 +51,13 @@ const TeacherHome = () => {
   preventAccess("student");
 
   const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    // You can use a delay, or wait for some operation to complete.
+    setTimeout(() => {
+      setComponentLoading(false);
+    }, 1500); // This will wait for 2 seconds before marking the component as "mounted". Adjust as necessary.
+  }, []);
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -268,74 +276,96 @@ const TeacherHome = () => {
           />
         )}
         {/* The grid */}
-        <Grid
-          paddingTop={itemClicked ? "10px" : "0px"}
-          paddingLeft={"10px"}
-          paddingRight={"10px"}
-          templateColumns={
-            itemClicked
-              ? //this is for the small grids
-                {
-                  //this is responsive grid scaling for different sized devices
-                  lg: "repeat(10, 1fr)",
-                  md: "repeat(5, 1fr)",
-                  sm: "repeat(4, 1fr)",
+        {componentLoading ? (
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            height="50vh"
+          >
+            <Spinner thickness="4px" size={"xl"} color="teal" />
+          </Box>
+        ) : (
+          <Grid
+            paddingTop={itemClicked ? "10px" : "0px"}
+            paddingLeft={"10px"}
+            paddingRight={"10px"}
+            templateColumns={
+              itemClicked
+                ? //this is for the small grids
+                  {
+                    //this is responsive grid scaling for different sized devices
+                    lg: "repeat(10, 1fr)",
+                    md: "repeat(5, 1fr)",
+                    sm: "repeat(4, 1fr)",
+                  }
+                : {
+                    //this is responsive grid scaling for different sized devices
+                    lg: "repeat(5, 1fr)",
+                    md: "repeat(3, 1fr)",
+                    sm: "repeat(2, 1fr)",
+                  }
+            }
+            gap={4}
+            style={
+              itemClicked
+                ? { width: "calc(100% - 10px)", margin: "0 auto" }
+                : {}
+            }
+          >
+            {data
+              .sort((a, b) => (streams[b.id] ? 1 : streams[a.id] ? -1 : 0))
+              .map((user) => {
+                if (user.userType !== "student" || user.terminated === true) {
+                  return null;
                 }
-              : {
-                  //this is responsive grid scaling for different sized devices
-                  lg: "repeat(5, 1fr)",
-                  md: "repeat(3, 1fr)",
-                  sm: "repeat(2, 1fr)",
-                }
-          }
-          gap={4}
-          style={
-            itemClicked ? { width: "calc(100% - 10px)", margin: "0 auto" } : {}
-          }
-        >
-          {data
-            .sort((a, b) => (streams[b.id] ? 1 : streams[a.id] ? -1 : 0))
-            .map((user) => {
-              if (user.userType !== "student" || user.terminated === true) {
-                return null;
-              }
 
-              if (itemClicked && userClicked === user.name) {
-                return null; // This will not render the GridItem at all for the clicked user
-              }
-              return (
-                <GridItem
-                  _hover={
-                    // streams[user.id] && streams[user.id] !== "DISCONNECTED"
-                    //   ?
-                    {
-                      transform: "scale(1.03)", // Increase the scale when hovered
-                      transition: "transform 0.1s", // Smooth transition
+                if (itemClicked && userClicked === user.name) {
+                  return null; // This will not render the GridItem at all for the clicked user
+                }
+                return (
+                  <GridItem
+                    _hover={
+                      // streams[user.id] && streams[user.id] !== "DISCONNECTED"
+                      //   ?
+                      {
+                        transform: "scale(1.03)", // Increase the scale when hovered
+                        transition: "transform 0.1s", // Smooth transition
+                      }
                     }
-                  }
-                  borderRadius={"10px"}
-                  cursor={
-                    streams[user.id] && streams[user.id] !== "DISCONNECTED"
-                      ? "pointer"
-                      : "auto"
-                  }
-                  key={user.id}
-                  onClick={() => {
-                    if (
-                      streams[user.id] &&
-                      streams[user.id] !== "DISCONNECTED"
-                    ) {
-                      setItemClicked(true);
-                      setUserClicked(user.name);
-                      navigate(`/teacher/${user.id}`); //opens teacher view for student on click
+                    borderRadius={"10px"}
+                    cursor={
+                      streams[user.id] && streams[user.id] !== "DISCONNECTED"
+                        ? "pointer"
+                        : "auto"
                     }
-                  }}
-                >
-                  {itemClicked ? (
-                    userClicked === user.name ? (
-                      <></>
+                    key={user.id}
+                    onClick={() => {
+                      if (
+                        streams[user.id] &&
+                        streams[user.id] !== "DISCONNECTED"
+                      ) {
+                        setItemClicked(true);
+                        setUserClicked(user.name);
+                        navigate(`/teacher/${user.id}`); //opens teacher view for student on click
+                      }
+                    }}
+                  >
+                    {itemClicked ? (
+                      userClicked === user.name ? (
+                        <></>
+                      ) : (
+                        <StudentMiniCard
+                          name={user.name}
+                          ready={user.ready}
+                          warnings={user.warnings}
+                          id={user.id}
+                          loading={streams[user.id] ? false : true}
+                          disconnected={streams[user.id] === "DISCONNECTED"}
+                        />
+                      )
                     ) : (
-                      <StudentMiniCard
+                      <StudentCard
                         name={user.name}
                         ready={user.ready}
                         warnings={user.warnings}
@@ -343,21 +373,12 @@ const TeacherHome = () => {
                         loading={streams[user.id] ? false : true}
                         disconnected={streams[user.id] === "DISCONNECTED"}
                       />
-                    )
-                  ) : (
-                    <StudentCard
-                      name={user.name}
-                      ready={user.ready}
-                      warnings={user.warnings}
-                      id={user.id}
-                      loading={streams[user.id] ? false : true}
-                      disconnected={streams[user.id] === "DISCONNECTED"}
-                    />
-                  )}
-                </GridItem>
-              );
-            })}
-        </Grid>
+                    )}
+                  </GridItem>
+                );
+              })}
+          </Grid>
+        )}
         <CopyrightVersion bottomVal={0} />
       </>
     </StreamsContext.Provider>
