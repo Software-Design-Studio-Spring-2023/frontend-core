@@ -197,6 +197,7 @@ const TeacherHome = () => {
   }, [data]);
 
   const cheatHandler = () => {
+    setItemClicked(true);
     navigate(`/teacher/${suspiciousUser.id}`);
     patchData(
       { isSuspicious: false },

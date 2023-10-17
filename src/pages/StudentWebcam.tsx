@@ -148,10 +148,9 @@ const StudentWebcam = () => {
     };
 
     // Call this function with the URL of your reference image
-    loadReferenceImageFromURL("/images/marko.jpg");
+    // loadReferenceImageFromURL("/images/marko.jpg");
+    loadReferenceImageFromURL(currentUser.imageURL);
   }, [modelsLoaded]);
-
-  // loadReferenceImageFromURL(currentUser.imageURL);
 
   // Assuming you have a referenceImage element somewhere
 
