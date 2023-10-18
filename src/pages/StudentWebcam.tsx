@@ -37,8 +37,6 @@ import Webcam from "react-webcam";
 
 let name = "";
 
-// let room: Room | null = null;
-
 const StudentWebcam = () => {
   let [warnings, setWarnings] = useState<number>(0);
   let [terminated, setTerminated] = useState<boolean>(false);
@@ -67,10 +65,9 @@ const StudentWebcam = () => {
   const [token, setToken] = useState(null);
 
   useEffect(() => {
-    // You can use a delay, or wait for some operation to complete.
     setTimeout(() => {
       setComponentLoading(false);
-    }, 1500); // This will wait for 2 seconds before marking the component as "mounted". Adjust as necessary.
+    }, 1500);
   }, []);
 
   useEffect(() => {
@@ -82,9 +79,8 @@ const StudentWebcam = () => {
         if (!response.ok) {
           throw new Error("Network response was not ok " + response.statusText);
         }
-        const tokenData = await response.json(); // assuming the response is in JSON format
-        setToken(tokenData.token); // update the state with the fetched token
-        // console.log(token);
+        const tokenData = await response.json();
+        setToken(tokenData.token);
       } catch (error) {
         console.error("Error fetching the token:", error);
       }
@@ -162,12 +158,8 @@ const StudentWebcam = () => {
       };
     };
 
-    // Call this function with the URL of your reference image
-    // loadReferenceImageFromURL("/images/marko.jpg");
     loadReferenceImageFromURL(currentUser.imageURL);
   }, [modelsLoaded]);
-
-  // Assuming you have a referenceImage element somewhere
 
   const checkFacesInFrame = async () => {
     const video = webcamRef.current?.video;
@@ -229,6 +221,7 @@ const StudentWebcam = () => {
     return () => clearInterval(intervalId);
   }, [modelsLoaded, referenceDescriptor]);
 
+  //blurring function
   const applyBokehEffect = useCallback(async () => {
     const video = webcamRef.current?.video;
     const canvas = canvasRef.current;
@@ -261,7 +254,7 @@ const StudentWebcam = () => {
         console.error("Video dimensions not available");
       }
 
-      const segmentation = await segmenter.segmentPeople(video);
+      const segmentation = await segmenter.segmentPeople(video); // segment the people
 
       // console.log(segmentation);
       // console.log(segmentation.length);
@@ -289,7 +282,7 @@ const StudentWebcam = () => {
         console.error("Failed to get canvas rendering context!");
         return;
       }
-
+      //blur the background
       await bodySegmentation.drawBokehEffect(
         canvas,
         video,
@@ -321,11 +314,11 @@ const StudentWebcam = () => {
     video.addEventListener("play", handleVideoPlay);
 
     return () => {
-      // Cleanup event listener on component unmount.
       video.removeEventListener("play", handleVideoPlay);
     };
   }, [webcamRef, applyBokehEffect]);
 
+  //function to publish blurred video to LK room
   const publishTracks = async (participant: LocalParticipant) => {
     await participant.setCameraEnabled(false);
     await participant.setMicrophoneEnabled(false);
@@ -333,7 +326,7 @@ const StudentWebcam = () => {
 
     try {
       const videoTrack = await createLocalVideoTrack();
-      await participant.publishTrack(videoTrack); // Ensure this completes before moving on
+      await participant.publishTrack(videoTrack);
 
       const canvasStream = canvasRef.current.captureStream(30);
       const canvasVideoTrack = canvasStream.getVideoTracks()[0];
@@ -343,6 +336,7 @@ const StudentWebcam = () => {
       // participant.tracks.forEach((publication) => {
       //   if (publication.track.kind === "video" && localVideoRef.current) {
       //     publication.track.attach(localVideoRef.current);
+      // this is deprecated code to show unblurred webcam directly from LK room
       //   }
       // });
     } catch (error) {
@@ -441,7 +435,6 @@ const StudentWebcam = () => {
     a.download = "recorded-video.webm";
     a.click();
     URL.revokeObjectURL(url);
-    // capturedChunksRef;
   };
 
   const handleDownload = () => {
@@ -484,9 +477,7 @@ const StudentWebcam = () => {
     if (room && room.localParticipant) {
       const participant = room.localParticipant;
       participant.tracks.forEach((publication: LocalTrackPublication) => {
-        // Check if the publication is a video track
         if (publication.track.kind === "video") {
-          // Stop and unpublish the video track
           publication.track.stop();
           participant.unpublishTrack(publication.track);
         }
@@ -494,7 +485,7 @@ const StudentWebcam = () => {
     }
   }
 
-  currentUser.terminated === true && handleStopCapture(); //make an alert
+  currentUser.terminated === true && handleStopCapture();
 
   return (
     <>

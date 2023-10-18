@@ -32,62 +32,64 @@ const LoginSuccess = () => {
 
     requestAnimationFrame(updateProgress);
 
-    return () => {}; // No cleanup required for RAF in this instance.
+    return () => {};
   }, []);
 
   return (
     <>
-      {showAlert && currentUser.userType === "student" && (
-        <Box
-          width={"50%"}
-          position="relative"
-          margin="auto"
-          display="block"
-          marginBottom={"10px"}
-        >
-          <Alert display={"flex"} width={"100%"} status="success">
-            <AlertIcon />
-            <AlertTitle mr={2}>Login Successful</AlertTitle>
-            <AlertDescription flex="1">
-              Welcome {currentUser.name}! Good Luck On Your Exam!
-            </AlertDescription>
-          </Alert>
-          <Progress
-            size="xs"
-            value={(progress / 3000) * 100} // Adjust the denominator to your total duration
-            position="absolute"
-            width="100%"
-            bottom="0"
-            colorScheme="green"
-          />
-        </Box>
-      )}
+      {showAlert &&
+        currentUser.userType === "student" && ( //student login success alert
+          <Box
+            width={"50%"}
+            position="relative"
+            margin="auto"
+            display="block"
+            marginBottom={"10px"}
+          >
+            <Alert display={"flex"} width={"100%"} status="success">
+              <AlertIcon />
+              <AlertTitle mr={2}>Login Successful</AlertTitle>
+              <AlertDescription flex="1">
+                Welcome {currentUser.name}! Good Luck On Your Exam!
+              </AlertDescription>
+            </Alert>
+            <Progress
+              size="xs"
+              value={(progress / 3000) * 100} // Adjust the denominator to your total duration
+              position="absolute"
+              width="100%"
+              bottom="0"
+              colorScheme="green"
+            />
+          </Box>
+        )}
 
-      {showAlert && currentUser.userType === "staff" && (
-        <Box
-          width={"50%"}
-          position="relative"
-          margin="auto"
-          display="block"
-          marginBottom={"10px"}
-        >
-          <Alert display={"flex"} width={"100%"} status="success">
-            <AlertIcon />
-            <AlertTitle mr={2}>Login Successful</AlertTitle>
-            <AlertDescription flex="1">
-              Welcome {currentUser.name}! Happy Supervising!
-            </AlertDescription>
-          </Alert>
-          <Progress
-            size="xs"
-            value={(progress / 3000) * 100} // Adjust the denominator to your total duration
-            position="absolute"
-            width="100%"
-            bottom="0"
-            colorScheme="green"
-          />
-        </Box>
-      )}
+      {showAlert &&
+        currentUser.userType === "staff" && ( //teacher login success alert
+          <Box
+            width={"50%"}
+            position="relative"
+            margin="auto"
+            display="block"
+            marginBottom={"10px"}
+          >
+            <Alert display={"flex"} width={"100%"} status="success">
+              <AlertIcon />
+              <AlertTitle mr={2}>Login Successful</AlertTitle>
+              <AlertDescription flex="1">
+                Welcome {currentUser.name}! Happy Supervising!
+              </AlertDescription>
+            </Alert>
+            <Progress
+              size="xs"
+              value={(progress / 3000) * 100} // Adjust the denominator to your total duration
+              position="absolute"
+              width="100%"
+              bottom="0"
+              colorScheme="green"
+            />
+          </Box>
+        )}
     </>
   );
 };

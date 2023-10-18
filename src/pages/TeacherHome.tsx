@@ -53,10 +53,9 @@ const TeacherHome = () => {
   const [token, setToken] = useState(null);
 
   useEffect(() => {
-    // You can use a delay, or wait for some operation to complete.
     setTimeout(() => {
       setComponentLoading(false);
-    }, 1500); // This will wait for 2 seconds before marking the component as "mounted". Adjust as necessary.
+    }, 1500);
   }, []);
 
   useEffect(() => {
@@ -68,8 +67,8 @@ const TeacherHome = () => {
         if (!response.ok) {
           throw new Error("Network response was not ok " + response.statusText);
         }
-        const tokenData = await response.json(); // assuming the response is in JSON format
-        setToken(tokenData.token); // update the state with the fetched token
+        const tokenData = await response.json();
+        setToken(tokenData.token);
         // console.log(token);
       } catch (error) {
         console.error("Error fetching the token:", error);
@@ -160,8 +159,6 @@ const TeacherHome = () => {
 
   useEffect(() => {
     if (isConnected) {
-      // Now, attempt to retrieve the room instance
-      // since 'room' is a state variable, it should hold the latest room instance here
       console.log("Current room instance:", room);
     }
   }, [isConnected]);
@@ -181,7 +178,6 @@ const TeacherHome = () => {
       if (data.find((user) => user.isSuspicious)) {
         const foundUser = data.find((user) => user.isSuspicious === true);
         setSuspiciousUser(foundUser);
-        // alert(`${suspiciousUser.name} is suspicious`);
 
         setTimeout(() => {
           //set back to null if nothing happens
@@ -325,14 +321,10 @@ const TeacherHome = () => {
                 }
                 return (
                   <GridItem
-                    _hover={
-                      // streams[user.id] && streams[user.id] !== "DISCONNECTED"
-                      //   ?
-                      {
-                        transform: "scale(1.03)", // Increase the scale when hovered
-                        transition: "transform 0.1s", // Smooth transition
-                      }
-                    }
+                    _hover={{
+                      transform: "scale(1.03)",
+                      transition: "transform 0.1s",
+                    }}
                     borderRadius={"10px"}
                     cursor={
                       streams[user.id] && streams[user.id] !== "DISCONNECTED"

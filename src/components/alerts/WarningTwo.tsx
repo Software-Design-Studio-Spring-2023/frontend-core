@@ -19,9 +19,9 @@ const WarningTwo = ({ user }: Props) => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const sound = new Audio("/sounds/warning.mp3"); // Path to your sound file
-    sound.play(); // Play the sound
-    const totalDuration = 3000; // 3 seconds in total
+    const sound = new Audio("/sounds/warning.mp3");
+    sound.play(); // alert sounds
+    const totalDuration = 3000; // 3 seconds in total for the progress bar
     const startTime = Date.now();
 
     function updateProgress() {
@@ -38,7 +38,7 @@ const WarningTwo = ({ user }: Props) => {
 
     requestAnimationFrame(updateProgress);
 
-    return () => {}; // No cleanup required for RAF in this instance.
+    return () => {};
   }, []);
 
   return (
@@ -46,7 +46,6 @@ const WarningTwo = ({ user }: Props) => {
       {showAlert && (
         <Box
           width={"50%"}
-          // height={"300px"} // Fixing the height so that the space is always reserved
           position="relative"
           margin="auto"
           display="block"
@@ -74,7 +73,7 @@ const WarningTwo = ({ user }: Props) => {
           </Alert>
           <Progress
             size="xs"
-            value={(progress / 3000) * 100} // Adjust the denominator to your total duration
+            value={(progress / 3000) * 100}
             position="relative"
             width="100%"
             bottom="0"
