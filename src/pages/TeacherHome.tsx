@@ -41,6 +41,7 @@ const TeacherHome = () => {
   const [suspiciousUser, setSuspiciousUser] = useState(null);
   const [componentLoading, setComponentLoading] = useState(true);
   const [itemClicked, setItemClicked] = useState(false);
+  const [recentJoinerId, setRecentJoinerId] = useState(null);
   const [userClicked, setUserClicked] = useState("");
   const { data, loading, error } = useUsers();
   const [isConnected, setIsConnected] = useState(false);
@@ -172,6 +173,15 @@ const TeacherHome = () => {
   useEffect(() => {
     setItemClicked(false);
   }, []);
+
+  useEffect(() => {
+    for (let user of data) {
+      if (streams[user.id] && !recentJoinerId) {
+        setRecentJoinerId(user.id);
+        break;
+      }
+    }
+  }, [streams]);
 
   useEffect(() => {
     const checkForSuspiciousUsers = () => {
@@ -310,7 +320,11 @@ const TeacherHome = () => {
             }
           >
             {data
-              .sort((a, b) => (streams[b.id] ? 1 : streams[a.id] ? -1 : 0))
+              .sort((a, b) => {
+                if (a.id === recentJoinerId) return -1;
+                if (b.id === recentJoinerId) return 1;
+                return streams[b.id] ? 1 : streams[a.id] ? -1 : 0;
+              })
               .map((user) => {
                 if (user.userType !== "student" || user.terminated === true) {
                   return null;
