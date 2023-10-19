@@ -42,6 +42,7 @@ const TeacherHome = () => {
   const [componentLoading, setComponentLoading] = useState(true);
   const [itemClicked, setItemClicked] = useState(false);
   const [recentJoinerId, setRecentJoinerId] = useState(null);
+  const [joinerTimestamps, setJoinerTimestamps] = useState({});
   const [userClicked, setUserClicked] = useState("");
   const { data, loading, error } = useUsers();
   const [isConnected, setIsConnected] = useState(false);
@@ -52,6 +53,8 @@ const TeacherHome = () => {
   preventAccess("student");
 
   const [token, setToken] = useState(null);
+
+  const DEBOUNCE_DELAY = 2000; // 2 seconds
 
   useEffect(() => {
     setTimeout(() => {
@@ -175,13 +178,28 @@ const TeacherHome = () => {
   }, []);
 
   useEffect(() => {
+    const now = Date.now();
+    let mostRecentId = recentJoinerId;
+    let mostRecentTime = joinerTimestamps[mostRecentId] || 0;
+
     for (let user of data) {
-      if (streams[user.id] && !recentJoinerId) {
-        setRecentJoinerId(user.id);
-        break;
+      if (streams[user.id] && user.id !== recentJoinerId) {
+        const thisUserTime = joinerTimestamps[user.id] || now;
+        setJoinerTimestamps((prev) => ({ ...prev, [user.id]: thisUserTime }));
+
+        if (thisUserTime > mostRecentTime) {
+          mostRecentTime = thisUserTime;
+          mostRecentId = user.id;
+        }
       }
     }
-  }, [streams]);
+
+    const handle = setTimeout(() => {
+      setRecentJoinerId(mostRecentId);
+    }, DEBOUNCE_DELAY);
+
+    return () => clearTimeout(handle);
+  }, [streams, data, recentJoinerId, joinerTimestamps]);
 
   useEffect(() => {
     const checkForSuspiciousUsers = () => {
