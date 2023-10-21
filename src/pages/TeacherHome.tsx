@@ -22,7 +22,7 @@ import LoginSuccess from "../components/alerts/LoginSuccess";
 import CopyrightVersion from "../components/CopyrightVersion";
 import preventLoad from "../hooks/preventLoad";
 import preventAccess from "../hooks/preventAccess";
-import CountDownApp from "../hooks/CountDownApp";
+import CountDownApp from "../components/CountDownApp";
 import {
   RemoteParticipant,
   RemoteTrack,
