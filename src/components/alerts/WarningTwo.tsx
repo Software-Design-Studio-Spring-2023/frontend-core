@@ -9,6 +9,7 @@ import {
 import { useEffect } from "react";
 import { useState } from "react";
 import { User } from "../../hooks/useUsers";
+import warningCountdown from "../../hooks/warningCountdown";
 
 interface Props {
   user: User;
@@ -18,28 +19,7 @@ const WarningTwo = ({ user }: Props) => {
   const [showAlert, setShowAlert] = useState(true);
   const [progress, setProgress] = useState(0);
 
-  useEffect(() => {
-    const sound = new Audio("/sounds/warning.mp3");
-    sound.play(); // alert sounds
-    const totalDuration = 3000; // 3 seconds in total for the progress bar
-    const startTime = Date.now();
-
-    function updateProgress() {
-      const elapsed = Date.now() - startTime;
-
-      if (elapsed >= totalDuration) {
-        setProgress(0);
-        setShowAlert(false);
-      } else {
-        setProgress(totalDuration - elapsed);
-        requestAnimationFrame(updateProgress);
-      }
-    }
-
-    requestAnimationFrame(updateProgress);
-
-    return () => {};
-  }, []);
+  warningCountdown(setProgress, setShowAlert);
 
   return (
     <>
