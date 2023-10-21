@@ -3,21 +3,22 @@
 import useData from "./useData";
 
 export interface User {
-    id: number;
-    name: string;
-    loggedIn: boolean;
-    userType: string;
-    email: string;
-    password: string;
-    imageURL: string;
-    encodeIP: number;
-    warnings: number;
-    terminated: boolean;
-    ready: boolean;
-    warningOne: string;
-    warningTwo: string;
-}  
-  
-const useUsers = () => (useData<User>("/all_users"))
+  id: number;
+  name: string;
+  loggedIn: boolean;
+  userType: string;
+  email: string;
+  password: string;
+  imageURL: string;
+  encodeIP: number;
+  warnings: number;
+  terminated: boolean;
+  ready: boolean;
+  warningOne: string;
+  warningTwo: string;
+  isSuspicious: boolean;
+}
 
-export default useUsers
+const useUsers = () => useData<User>("/all_users");
+
+export default useUsers;

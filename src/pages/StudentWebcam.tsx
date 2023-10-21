@@ -1,13 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { currentUser } from "./LoginForm";
 import EndExam from "../components/alerts/EndExam";
-import { Box, Button, HStack, Heading, Spacer, VStack } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  HStack,
+  Heading,
+  Spacer,
+  Spinner,
+  VStack,
+} from "@chakra-ui/react";
 import { HiEye } from "react-icons/hi";
 import LoginSuccess from "../components/alerts/LoginSuccess";
 import WarningOne from "../components/alerts/WarningOne";
 import WarningTwo from "../components/alerts/WarningTwo";
 import CopyrightVersion from "../components/CopyrightVersion";
 import preventLoad from "../hooks/preventLoad";
+import * as faceapi from "face-api.js";
+
 import preventAccess from "../hooks/preventAccess";
 import { useNavigate } from "react-router-dom";
 import {
@@ -27,22 +37,25 @@ import Webcam from "react-webcam";
 
 let name = "";
 
-// let room: Room | null = null;
-
 const StudentWebcam = () => {
   let [warnings, setWarnings] = useState<number>(0);
   let [terminated, setTerminated] = useState<boolean>(false);
   let [warningOne, setWarningOne] = useState<string>("");
   let [warningTwo, setWarningTwo] = useState<string>("");
   const webcamRef = useRef(null);
+  const [faceVerified, setFaceVerified] = useState(false);
+  const [peopleVerified, setPeopleVerified] = useState(false);
+
+  const [modelsLoaded, setModelsLoaded] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showAlert, setShowAlert] = useState(true);
   const [startCapture, setStartCapture] = useState(false);
   const [room, setRoom] = useState<Room | null>(null);
   const { data, loading, error } = useUsers();
+  const [referenceDescriptor, setReferenceDescriptor] = useState(null);
   const localVideoRef = useRef(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
+  const [componentLoading, setComponentLoading] = useState(true);
   const [ready, isReady] = useState<boolean>(false);
   const [lkParticipant, setLkParticipant] = useState<any>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -50,6 +63,12 @@ const StudentWebcam = () => {
   const navigate = useNavigate();
 
   const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setComponentLoading(false);
+    }, 1500);
+  }, []);
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -60,9 +79,8 @@ const StudentWebcam = () => {
         if (!response.ok) {
           throw new Error("Network response was not ok " + response.statusText);
         }
-        const tokenData = await response.json(); // assuming the response is in JSON format
-        setToken(tokenData.token); // update the state with the fetched token
-        // console.log(token);
+        const tokenData = await response.json();
+        setToken(tokenData.token);
       } catch (error) {
         console.error("Error fetching the token:", error);
       }
@@ -110,6 +128,100 @@ const StudentWebcam = () => {
     connectToRoom();
   }, [token]);
 
+  useEffect(() => {
+    async function loadModels() {
+      await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
+      await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
+      await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
+      await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
+      setModelsLoaded(true);
+    }
+    loadModels();
+  }, []);
+
+  useEffect(() => {
+    const computeReferenceDescriptor = async (imgElement) => {
+      const detections = await faceapi
+        .detectSingleFace(imgElement)
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+      if (detections) {
+        setReferenceDescriptor(detections.descriptor);
+      }
+    };
+    const loadReferenceImageFromURL = (url) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous"; // Required for CORS if the image is on a different domain
+      img.src = url;
+      img.onload = () => {
+        computeReferenceDescriptor(img);
+      };
+    };
+
+    loadReferenceImageFromURL(currentUser.imageURL);
+  }, [modelsLoaded]);
+
+  const checkFacesInFrame = async () => {
+    const video = webcamRef.current?.video;
+    if (!video) return;
+
+    const detections = await faceapi
+      .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+      .withFaceLandmarks()
+      .withFaceDescriptors();
+
+    if (detections.length > 1 || detections.length === 0) {
+      // more than one person detected
+      currentUser.ready === true &&
+        patchData(
+          { isSuspicious: true },
+          "update_isSuspicious",
+          currentUser.id
+        ); //patch data only if exam has started
+      setPeopleVerified(true);
+    } else {
+      setPeopleVerified(false);
+    }
+
+    if (detections.length === 0) {
+      //no people means no face :)
+      setFaceVerified(false);
+    }
+
+    //facial recognition
+    for (let detection of detections) {
+      if (referenceDescriptor) {
+        const distance = faceapi.euclideanDistance(
+          referenceDescriptor,
+          detection.descriptor
+        );
+        if (distance < 0.6) {
+          // Threshold, can adjust
+          console.log(`Match found for ${currentUser.name}`);
+          setFaceVerified(true);
+        } else {
+          console.log(`No match found for ${currentUser.name}`);
+          setFaceVerified(false);
+          //patch data only if examinee is ready
+          currentUser.ready === true &&
+            patchData(
+              { isSuspicious: true },
+              "update_isSuspicious",
+              currentUser.id
+            );
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!modelsLoaded || !referenceDescriptor) return;
+
+    const intervalId = setInterval(checkFacesInFrame, 1000); // Check every second
+    return () => clearInterval(intervalId);
+  }, [modelsLoaded, referenceDescriptor]);
+
+  //blurring function
   const applyBokehEffect = useCallback(async () => {
     const video = webcamRef.current?.video;
     const canvas = canvasRef.current;
@@ -142,8 +254,7 @@ const StudentWebcam = () => {
         console.error("Video dimensions not available");
       }
 
-      const segmentation = await segmenter.segmentPeople(video);
-
+      const segmentation = await segmenter.segmentPeople(video); // segment the people
       if (!segmentation) {
         console.error("Segmentation failed!");
         return;
@@ -159,7 +270,7 @@ const StudentWebcam = () => {
         console.error("Failed to get canvas rendering context!");
         return;
       }
-
+      //blur the background
       await bodySegmentation.drawBokehEffect(
         canvas,
         video,
@@ -191,11 +302,11 @@ const StudentWebcam = () => {
     video.addEventListener("play", handleVideoPlay);
 
     return () => {
-      // Cleanup event listener on component unmount.
       video.removeEventListener("play", handleVideoPlay);
     };
   }, [webcamRef, applyBokehEffect]);
 
+  //function to publish blurred video to LK room
   const publishTracks = async (participant: LocalParticipant) => {
     await participant.setCameraEnabled(false);
     await participant.setMicrophoneEnabled(false);
@@ -203,18 +314,12 @@ const StudentWebcam = () => {
 
     try {
       const videoTrack = await createLocalVideoTrack();
-      await participant.publishTrack(videoTrack); // Ensure this completes before moving on
+      await participant.publishTrack(videoTrack);
 
       const canvasStream = canvasRef.current.captureStream(30);
       const canvasVideoTrack = canvasStream.getVideoTracks()[0];
 
       await videoTrack.replaceTrack(canvasVideoTrack); // Ensure track is replaced only after being published
-
-      // participant.tracks.forEach((publication) => {
-      //   if (publication.track.kind === "video" && localVideoRef.current) {
-      //     publication.track.attach(localVideoRef.current);
-      //   }
-      // });
     } catch (error) {
       console.error("Error in publishing or replacing tracks:", error);
     }
@@ -296,6 +401,7 @@ const StudentWebcam = () => {
 
     //   recorder.start();
     patchData({ ready: true }, "update_ready", currentUser.id);
+    currentUser.ready === true;
     isReady(true);
     // }
   };
@@ -310,7 +416,6 @@ const StudentWebcam = () => {
     a.download = "recorded-video.webm";
     a.click();
     URL.revokeObjectURL(url);
-    // capturedChunksRef;
   };
 
   const handleDownload = () => {
@@ -353,9 +458,7 @@ const StudentWebcam = () => {
     if (room && room.localParticipant) {
       const participant = room.localParticipant;
       participant.tracks.forEach((publication: LocalTrackPublication) => {
-        // Check if the publication is a video track
         if (publication.track.kind === "video") {
-          // Stop and unpublish the video track
           publication.track.stop();
           participant.unpublishTrack(publication.track);
         }
@@ -363,7 +466,7 @@ const StudentWebcam = () => {
     }
   }
 
-  currentUser.terminated === true && handleStopCapture(); //make an alert
+  currentUser.terminated === true && handleStopCapture();
 
   return (
     <>
@@ -388,11 +491,20 @@ const StudentWebcam = () => {
           </div>
         </Box>
       </HStack>
-      <LoginSuccess />
-      {/* Warning Alerts */}
-      {warnings === 1 && <WarningOne user={currentUser} />}
-      {warnings === 2 && <WarningTwo user={currentUser} />}
+
       <VStack padding={"20px"} minHeight="91vh">
+        {componentLoading ? (
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            height="50vh"
+          >
+            <Spinner thickness="4px" size={"xl"} color="teal" />
+          </Box>
+        ) : (
+          <></>
+        )}{" "}
         <Box
           borderRadius={"10px"}
           overflow={"hidden"}
@@ -434,18 +546,29 @@ const StudentWebcam = () => {
             />
           </div>
         </Box>
-        <div hidden={ready ? true : false}>
-          <p>This is where the checklist will be</p>
-        </div>
-        <Button
-          colorScheme="teal"
-          variant="solid"
-          padding={"10px"}
-          hidden={ready ? true : false}
-          onClick={handleStartCapture}
-        >
-          {"Ready"}
-        </Button>
+        <Box hidden={componentLoading ? true : false}>
+          <HStack hidden={ready ? true : false}>
+            <Box>{`Face Verified: ${faceVerified ? "✅" : "❌"}`}</Box>
+            <Box>{`One Person: ${peopleVerified ? "❌" : "✅"}`}</Box>
+          </HStack>
+        </Box>
+        <Box hidden={componentLoading ? true : false}>
+          <Button
+            colorScheme="teal"
+            variant="solid"
+            padding={"10px"}
+            hidden={ready ? true : false}
+            isDisabled={faceVerified === false || peopleVerified === true}
+            onClick={handleStartCapture}
+          >
+            {"Ready"}
+          </Button>
+        </Box>
+        <Box width={"75%"}>
+          <LoginSuccess />
+          {warnings === 1 && <WarningOne user={currentUser} />}
+          {warnings === 2 && <WarningTwo user={currentUser} />}
+        </Box>
         <CopyrightVersion bottomVal={-2} />
       </VStack>
     </>

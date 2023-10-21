@@ -9,6 +9,7 @@ import {
 import { useEffect } from "react";
 import { useState } from "react";
 import { User } from "../../hooks/useUsers";
+import warningCountdown from "../../hooks/warningCountdown";
 
 interface Props {
   user: User;
@@ -18,37 +19,13 @@ const WarningOne = ({ user }: Props) => {
   const [showAlert, setShowAlert] = useState(true);
   const [progress, setProgress] = useState(0);
 
-  useEffect(() => {
-    const sound = new Audio("/sounds/warning.mp3"); // Path to your sound file
-    sound.play(); // Play the sound
-
-    const interval = 10; // update every 10ms
-    const totalDuration = 3000; // 5 seconds in total
-
-    // Initialize the progress state to totalDuration
-    setProgress(totalDuration);
-
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        const nextValue = prev - interval;
-        if (nextValue <= 0) {
-          clearInterval(timer);
-          setShowAlert(false);
-          return 0;
-        }
-        return nextValue;
-      });
-    }, interval);
-
-    return () => clearInterval(timer);
-  }, []);
+  warningCountdown(setProgress, setShowAlert);
 
   return (
     <>
       {showAlert && (
         <Box
           width={"50%"}
-          // height={"300px"} // Fixing the height so that the space is always reserved
           position="relative"
           margin="auto"
           display="block"
@@ -75,7 +52,7 @@ const WarningOne = ({ user }: Props) => {
           </Alert>
           <Progress
             size="xs"
-            value={(progress / 3000) * 100} // Adjust the denominator to your total duration
+            value={(progress / 3000) * 100} // Adjust the denominator to make alert longer
             position="relative"
             width="100%"
             bottom="0"

@@ -1,4 +1,5 @@
 import { Box, Text } from "@chakra-ui/react";
+import { version } from "../../package.json";
 interface Props {
   bottomVal: number;
 }
@@ -30,8 +31,8 @@ const CopyrightVersion = ({ bottomVal }: Props) => {
           alignItems="center"
           paddingTop={2.5}
           paddingBottom={2.5}
-          >
-          Version X.X Alpha
+        >
+          Version {version}
         </Text>
       </Box>
     </>
