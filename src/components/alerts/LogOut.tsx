@@ -30,7 +30,8 @@ const LogOut = ({ handleLogout }: Props) => {
     <>
       <Button
         colorScheme="teal"
-        variant="solid"
+        variant="outline"
+        borderColor={"teal.500"}
         onClick={onOpen}
         size={/Android|iPhone/i.test(navigator.userAgent) ? "sm" : "md"}
       >
