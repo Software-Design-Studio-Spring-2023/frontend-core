@@ -30,7 +30,6 @@ import {
 import patchData from "../hooks/patchData";
 import useUsers from "../hooks/useUsers";
 import * as bodySegmentation from "@tensorflow-models/body-segmentation";
-import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
 import "@mediapipe/selfie_segmentation";
@@ -124,13 +123,10 @@ const StudentWebcam = () => {
 
   useEffect(() => {
     async function loadModels() {
-      const loadedModel = await cocoSsd.load();
       await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
       await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
       await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
       await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
-      setCocoModel(loadedModel);
-      console.log("Models loaded.");
       setModelsLoaded(true);
     }
     loadModels();
@@ -220,24 +216,6 @@ const StudentWebcam = () => {
     return () => clearInterval(intervalId);
   }, [modelsLoaded, referenceDescriptor]);
 
-  const detectObjects = useCallback(async () => {
-    const video = webcamRef.current?.video;
-    const canvas = canvasRef.current;
-    if (!video || !canvas) return;
-
-    if (model && video) {
-      const predictions = await model.detect(video);
-      console.log("COCO Output: ", { predictions });
-
-      // Filter out predictions that aren't mobile phones
-      const filteredPredictions = predictions.filter(
-        (prediction) => prediction.class === "cell phone"
-      );
-
-      setPredictions(filteredPredictions);
-    }
-  }, [webcamRef, canvasRef, modelsLoaded]);
-
   //blurring function
   const applyBokehEffect = useCallback(async () => {
     const video = webcamRef.current?.video;
@@ -302,7 +280,7 @@ const StudentWebcam = () => {
     };
 
     drawEffect();
-  }, [webcamRef, canvasRef, modelsLoaded]);
+  }, [webcamRef, canvasRef]);
 
   useEffect(() => {
     const video = webcamRef.current?.video;
@@ -371,6 +349,13 @@ const StudentWebcam = () => {
   const capturedChunksRef = useRef<BlobPart[]>([]);
 
   const handleUpload = async () => {
+    console.log("handleUpload started");
+    console.log("capturedChunks length:", capturedChunksRef.current.length);
+    console.log(
+      "MediaRecorder state:",
+      mediaRecorder ? mediaRecorder.state : "No MediaRecorder"
+    );
+
     if (capturedChunksRef.current.length) {
       const blob = new Blob(capturedChunksRef.current, { type: "video/webm" });
 
@@ -381,14 +366,12 @@ const StudentWebcam = () => {
       const { url } = await response.json();
       console.log("Presigned URL:", url);
       // Upload the blob to the presigned URL
-      await fetch(url, {
+      const uploadResponse = await fetch(url, {
         method: "PUT",
-        headers: {
-          "Content-Type": "video/webm",
-        },
         body: blob,
       });
       console.log("Blob size:", blob.size);
+      console.log("Upload response:", await uploadResponse.text());
     }
   };
 
