@@ -368,7 +368,7 @@ const StudentWebcam = () => {
       const blob = new Blob(capturedChunksRef.current, { type: "video/webm" });
 
       // Fetch the presigned URL
-      const response = await fetch("YOUR_API_TO_GET_PRESIGNED_URL");
+      const response = await fetch(`/api/presigned_url/${currentUser.id}`);
       const { presignedUrl } = await response.json();
 
       // Upload the blob to the presigned URL
