@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 import "./progressbar.css";
 
 export const CountDownApp = () => {
-  const initialTotalTimeMS = 100 * 1000;
+  const initialTotalTimeMS = 100 * 10000;
   const timeMS = useCountdown(initialTotalTimeMS, () =>
     console.log("Times up!!")
   );
@@ -22,7 +22,7 @@ export const CountDownApp = () => {
   let displaySeconds = timeTotalSeconds % 60;
 
   if (timeTotalSeconds === 0) {
-    return <Heading>TIMES UP!!!!</Heading>;
+    return <Heading>TIMES UP!</Heading>;
   } else {
     return (
       <Fragment>
@@ -30,13 +30,11 @@ export const CountDownApp = () => {
           {timeTotalHours} : {displayMinutes} : {displaySeconds}
         </Heading>
 
-        <div>
+        <div className="progressbar-container">
           <div className="progressbar">
             <motion.div
               className="bar"
-              animate={{
-                width: "0%",
-              }}
+              animate={{ width: "0%" }}
               transition={{ duration: timeTotalSeconds }}
             />
           </div>

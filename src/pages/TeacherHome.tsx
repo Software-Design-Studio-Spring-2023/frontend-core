@@ -3,6 +3,7 @@
 import {
   Box,
   Button,
+  Flex,
   Grid,
   GridItem,
   HStack,
@@ -22,7 +23,7 @@ import LoginSuccess from "../components/alerts/LoginSuccess";
 import CopyrightVersion from "../components/CopyrightVersion";
 import preventLoad from "../hooks/preventLoad";
 import preventAccess from "../hooks/preventAccess";
-import setBorder from "../hooks/setBorder";
+import setBorder from "../hooks/setBordeclearr";
 import CountDownApp from "../components/CountDownApp";
 import {
   DefaultReconnectPolicy,
@@ -39,6 +40,7 @@ import { LiveKitRoom } from "@livekit/components-react";
 import { StreamsContext } from "../contexts/StreamContext";
 import patchData from "../hooks/patchData";
 import CheatDetectionAlert from "../components/alerts/CheatDetectionAlert";
+import StartExamButton from "../components/StartExamButton";
 
 const TeacherHome = () => {
   const location = useLocation();
@@ -195,6 +197,7 @@ const TeacherHome = () => {
               }
             />
           </Box>
+
           <Heading
             padding={"10px"}
             marginLeft={
@@ -206,22 +209,31 @@ const TeacherHome = () => {
           >
             {itemClicked ? userClicked : "Participants"}
           </Heading>
-          <Spacer />
-          {/* <CountDownApp></CountDownApp> */}
 
-          <Button
-            marginRight={"10px"}
-            hidden={itemClicked ? false : true}
-            fontSize={/Android|iPhone/i.test(navigator.userAgent) ? "xs" : ""}
-            onClick={() => {
-              setItemClicked(false);
-              navigate("/teacher");
-            }}
-            bgColor="gray.600"
-            size={/Android|iPhone/i.test(navigator.userAgent) ? "sm" : "md"}
-          >
-            {/Android|iPhone/i.test(navigator.userAgent) ? "Back " : "Go Back"}
-          </Button>
+          <Spacer />
+          <Heading>Exam Title</Heading>
+          <Spacer />
+          <HStack spacing="30px">
+            <Spacer />
+
+            <Button
+              marginRight={"10px"}
+              hidden={itemClicked ? false : true}
+              fontSize={/Android|iPhone/i.test(navigator.userAgent) ? "xs" : ""}
+              onClick={() => {
+                setItemClicked(false);
+                navigate("/teacher");
+              }}
+              bgColor="gray.600"
+              size={/Android|iPhone/i.test(navigator.userAgent) ? "sm" : "md"}
+            >
+              {/Android|iPhone/i.test(navigator.userAgent)
+                ? "Back "
+                : "Go Back"}
+            </Button>
+          </HStack>
+
+          <StartExamButton />
           <Box
             marginRight={
               /Android|iPhone/i.test(navigator.userAgent) ? "14px" : "30px"
