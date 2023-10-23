@@ -34,6 +34,8 @@ import "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
 import "@mediapipe/selfie_segmentation";
 import Webcam from "react-webcam";
+import WaitingRoom from "../components/alerts/WaitingRoom";
+import TimeDeduction from "../components/alerts/TimeDeduction";
 
 let name = "";
 
@@ -568,6 +570,10 @@ const StudentWebcam = () => {
           <LoginSuccess />
           {warnings === 1 && <WarningOne user={currentUser} />}
           {warnings === 2 && <WarningTwo user={currentUser} />}
+          {/* add warnings for students who are exam ready */}
+          <WaitingRoom />
+          {/* add warnings for students who are late to exam */}
+          <TimeDeduction />
         </Box>
         <CopyrightVersion bottomVal={-2} />
       </VStack>
