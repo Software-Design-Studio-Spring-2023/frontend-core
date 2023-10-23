@@ -367,19 +367,6 @@ const StudentWebcam = () => {
         body: blob,
       });
       console.log("Blob size:", blob.size);
-
-      const downloadLink = document.createElement("a");
-      document.body.appendChild(downloadLink);
-      const blobUrl = URL.createObjectURL(blob);
-      downloadLink.href = blobUrl;
-      downloadLink.download = "captured_video.webm";
-      downloadLink.click();
-
-      // Cleanup by removing the link and releasing the blob URL
-      document.body.removeChild(downloadLink);
-      URL.revokeObjectURL(blobUrl);
-
-      // console.log("Upload response:", await uploadResponse.text());
     }
   };
 
