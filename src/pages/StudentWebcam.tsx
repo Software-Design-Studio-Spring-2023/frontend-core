@@ -30,6 +30,7 @@ import {
 import patchData from "../hooks/patchData";
 import useUsers from "../hooks/useUsers";
 import * as bodySegmentation from "@tensorflow-models/body-segmentation";
+import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
 import "@mediapipe/selfie_segmentation";
@@ -56,6 +57,16 @@ const StudentWebcam = () => {
   const navigate = useNavigate();
 
   const [token, setToken] = useState(null);
+
+  // Load the model.
+  useEffect(() => {
+    const loadModel = async () => {
+      const loadedModel = await cocoSsd.load();
+      setModel(loadedModel);
+      setIsModelLoading(false);
+    };
+    loadModel();
+  }, []);
 
   useEffect(() => {
     setTimeout(() => {
@@ -216,6 +227,24 @@ const StudentWebcam = () => {
     return () => clearInterval(intervalId);
   }, [modelsLoaded, referenceDescriptor]);
 
+  const detectObjects = useCallback(async () => {
+    const video = webcamRef.current?.video;
+    const canvas = canvasRef.current;
+    if (!video || !canvas) return;
+
+    if (model && video) {
+      const predictions = await model.detect(video);
+      console.log("COCO Output: ", { predictions });
+
+      // Filter out predictions that aren't mobile phones
+      const filteredPredictions = predictions.filter(
+        (prediction) => prediction.class === "cell phone"
+      );
+
+      setPredictions(filteredPredictions);
+    }
+  }, [webcamRef, canvasRef, model]);
+
   //blurring function
   const applyBokehEffect = useCallback(async () => {
     const video = webcamRef.current?.video;
@@ -292,6 +321,7 @@ const StudentWebcam = () => {
         return;
       }
       applyBokehEffect();
+      detectObjects();
     };
 
     video.addEventListener("play", handleVideoPlay);
