@@ -392,7 +392,7 @@ const StudentWebcam = () => {
         }
       };
 
-      wasSuspicious && (recorder.onstop = handleUpload);
+      !wasSuspicious && (recorder.onstop = handleUpload);
 
       setMediaRecorder(recorder);
       recorder.start();
