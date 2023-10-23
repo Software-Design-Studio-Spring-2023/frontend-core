@@ -356,54 +356,44 @@ const StudentWebcam = () => {
   );
   const capturedChunksRef = useRef<BlobPart[]>([]);
 
-  // const frames: string[] = [];
+  const handleUpload = async () => {
+    if (capturedChunksRef.current.length) {
+      const blob = new Blob(capturedChunksRef.current, { type: "video/webm" });
 
-  // const captureFrame = () => {
-  //   const video = webcamRef.current?.video;
-  //   const canvas = canvasRef.current;
+      // Fetch the presigned URL
+      const response = await fetch("YOUR_API_TO_GET_PRESIGNED_URL");
+      const { presignedUrl } = await response.json();
 
-  //   if (video && canvas && startCapture) {
-  //     const context = canvas.getContext("2d");
-
-  //     if (context) {
-  //       // Draw the video frame to the canvas.
-  //       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-  //       // You can now save the image data from the canvas or do further processing.
-  //       const imageDataUrl = canvas.toDataURL("image/png");
-  //       frames.push(imageDataUrl);
-  //       console.log(frames);
-  //       // code for downloading the frame, for now its being pushed to an array
-  //       // const downloadLink = document.createElement("a");
-  //       // downloadLink.href = imageDataUrl;
-  //       // downloadLink.download = "captured_frame.png"; // You can change the name here
-  //       // downloadLink.click();
-  //     }
-  //   }
-  // };
+      // Upload the blob to the presigned URL
+      await fetch(presignedUrl, {
+        method: "PUT",
+        body: blob,
+      });
+    }
+  };
 
   const handleStartCapture = () => {
-    // if (webcamRef.current && webcamRef.current.stream) {
-    //   const stream = webcamRef.current.stream;
-    //   const recorder = new MediaRecorder(stream, {
-    //     mimeType: "video/webm",
-    //   });
-    //   setMediaRecorder(recorder);
+    if (canvasRef.current) {
+      const stream = canvasRef.current.captureStream(30); // Assuming 30fps
+      const recorder = new MediaRecorder(stream, {
+        mimeType: "video/webm",
+      });
 
-    //   (recorder.ondataavailable = (e: BlobEvent) => {
-    //     if (e.data.size > 0) {
-    //       capturedChunksRef.current.push(e.data);
-    //     }
-    //   }),
-    //     [capturedChunksRef];
+      recorder.ondataavailable = (e: BlobEvent) => {
+        if (e.data.size > 0) {
+          capturedChunksRef.current.push(e.data);
+        }
+      };
 
-    //   recorder.onstop = handleDownload;
+      recorder.onstop = handleUpload;
 
-    //   recorder.start();
-    patchData({ ready: true }, "update_ready", currentUser.id);
-    currentUser.ready === true;
-    isReady(true);
-    // }
+      setMediaRecorder(recorder);
+      recorder.start();
+
+      patchData({ ready: true }, "update_ready", currentUser.id);
+      currentUser.ready = true;
+      isReady(true);
+    }
   };
 
   const downloadVideo = () => {
@@ -427,11 +417,6 @@ const StudentWebcam = () => {
   };
 
   const handleStopCapture = () => {
-    //   if (frameCaptureInterval) {
-    //     window.clearInterval(frameCaptureInterval);
-    //     setFrameCaptureInterval(null);
-    //   }
-    // }
     if (room && room.localParticipant) {
       const participant = room.localParticipant;
       participant.tracks.forEach((publication: LocalTrackPublication) => {
