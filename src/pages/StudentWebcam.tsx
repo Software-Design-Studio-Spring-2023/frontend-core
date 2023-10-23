@@ -58,16 +58,6 @@ const StudentWebcam = () => {
 
   const [token, setToken] = useState(null);
 
-  // Load the model.
-  useEffect(() => {
-    const loadModel = async () => {
-      const loadedModel = await cocoSsd.load();
-      setModel(loadedModel);
-      setIsModelLoading(false);
-    };
-    loadModel();
-  }, []);
-
   useEffect(() => {
     setTimeout(() => {
       setComponentLoading(false);
@@ -134,10 +124,13 @@ const StudentWebcam = () => {
 
   useEffect(() => {
     async function loadModels() {
+      const loadedModel = await cocoSsd.load();
       await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
       await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
       await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
       await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
+      setCocoModel(loadedModel);
+      console.log("Models loaded.");
       setModelsLoaded(true);
     }
     loadModels();
@@ -243,7 +236,7 @@ const StudentWebcam = () => {
 
       setPredictions(filteredPredictions);
     }
-  }, [webcamRef, canvasRef, model]);
+  }, [webcamRef, canvasRef, modelsLoaded]);
 
   //blurring function
   const applyBokehEffect = useCallback(async () => {
@@ -309,7 +302,7 @@ const StudentWebcam = () => {
     };
 
     drawEffect();
-  }, [webcamRef, canvasRef]);
+  }, [webcamRef, canvasRef, modelsLoaded]);
 
   useEffect(() => {
     const video = webcamRef.current?.video;
@@ -321,7 +314,6 @@ const StudentWebcam = () => {
         return;
       }
       applyBokehEffect();
-      detectObjects();
     };
 
     video.addEventListener("play", handleVideoPlay);
