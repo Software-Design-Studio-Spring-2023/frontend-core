@@ -42,8 +42,11 @@ const StudentWebcam = () => {
   let [terminated, setTerminated] = useState<boolean>(false);
   let [warningOne, setWarningOne] = useState<string>("");
   let [warningTwo, setWarningTwo] = useState<string>("");
+
   const webcamRef = useRef(null);
   const [faceVerified, setFaceVerified] = useState(false);
+  const [wasSuspicious, setWasSuspicious] = useState(false);
+
   const [peopleVerified, setPeopleVerified] = useState(false);
 
   const [modelsLoaded, setModelsLoaded] = useState(false);
@@ -172,12 +175,14 @@ const StudentWebcam = () => {
 
     if (detections.length > 1 || detections.length === 0) {
       // more than one person detected
-      currentUser.ready === true &&
+      if (currentUser.ready === true) {
         patchData(
           { isSuspicious: true },
           "update_isSuspicious",
           currentUser.id
-        ); //patch data only if exam has started
+        );
+        setWasSuspicious(true);
+      } //patch data only if exam has started
       setPeopleVerified(true);
     } else {
       setPeopleVerified(false);
@@ -203,12 +208,14 @@ const StudentWebcam = () => {
           console.log(`No match found for ${currentUser.name}`);
           setFaceVerified(false);
           //patch data only if examinee is ready
-          currentUser.ready === true &&
+          if (currentUser.ready === true) {
             patchData(
               { isSuspicious: true },
               "update_isSuspicious",
               currentUser.id
             );
+            setWasSuspicious(true);
+          }
         }
       }
     }
@@ -385,7 +392,7 @@ const StudentWebcam = () => {
         }
       };
 
-      recorder.onstop = handleUpload;
+      wasSuspicious && (recorder.onstop = handleUpload);
 
       setMediaRecorder(recorder);
       recorder.start();
@@ -417,6 +424,9 @@ const StudentWebcam = () => {
   };
 
   const handleStopCapture = () => {
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+      mediaRecorder.stop();
+    }
     if (room && room.localParticipant) {
       const participant = room.localParticipant;
       participant.tracks.forEach((publication: LocalTrackPublication) => {
