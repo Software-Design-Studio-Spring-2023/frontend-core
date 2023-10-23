@@ -44,7 +44,7 @@ const StudentWebcam = () => {
   let [warningTwo, setWarningTwo] = useState<string>("");
   const webcamRef = useRef(null);
   const [faceVerified, setFaceVerified] = useState(false);
-  const [wasSuspicious, setWasSuspicious] = useState(false);
+
   const [peopleVerified, setPeopleVerified] = useState(false);
   const [modelsLoaded, setModelsLoaded] = useState(false);
   const [room, setRoom] = useState<Room | null>(null);
@@ -171,7 +171,6 @@ const StudentWebcam = () => {
           "update_isSuspicious",
           currentUser.id
         );
-        setWasSuspicious(true);
       } //patch data only if exam has started
       setPeopleVerified(true);
     } else {
@@ -204,7 +203,6 @@ const StudentWebcam = () => {
               "update_isSuspicious",
               currentUser.id
             );
-            setWasSuspicious(true);
           }
         }
       }
@@ -351,18 +349,29 @@ const StudentWebcam = () => {
   const capturedChunksRef = useRef<BlobPart[]>([]);
 
   const handleUpload = async () => {
+    console.log("handleUpload started");
+    console.log("capturedChunks length:", capturedChunksRef.current.length);
+    console.log(
+      "MediaRecorder state:",
+      mediaRecorder ? mediaRecorder.state : "No MediaRecorder"
+    );
+
     if (capturedChunksRef.current.length) {
       const blob = new Blob(capturedChunksRef.current, { type: "video/webm" });
 
       // Fetch the presigned URL
-      const response = await fetch(`/api/presigned_url/${currentUser.id}`);
-      const { presignedUrl } = await response.json();
-
+      const response = await fetch(
+        `https://eyedentify-69d961d5a478.herokuapp.com/api/presigned_url/${currentUser.id}`
+      );
+      const { url } = await response.json();
+      console.log("Presigned URL:", url);
       // Upload the blob to the presigned URL
-      await fetch(presignedUrl, {
+      const uploadResponse = await fetch(url, {
         method: "PUT",
         body: blob,
       });
+      console.log("Blob size:", blob.size);
+      console.log("Upload response:", await uploadResponse.text());
     }
   };
 
@@ -374,12 +383,14 @@ const StudentWebcam = () => {
       });
 
       recorder.ondataavailable = (e: BlobEvent) => {
+        console.log("Data chunk size:", e.data.size);
+
         if (e.data.size > 0) {
           capturedChunksRef.current.push(e.data);
         }
       };
 
-      !wasSuspicious && (recorder.onstop = handleUpload);
+      warnings === 0 && (recorder.onstop = handleUpload);
 
       setMediaRecorder(recorder);
       recorder.start();
