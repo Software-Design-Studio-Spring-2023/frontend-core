@@ -403,26 +403,6 @@ const StudentWebcam = () => {
     }
   };
 
-  const downloadVideo = () => {
-    console.log("Downloading video...");
-
-    const blob = new Blob(capturedChunksRef.current, { type: "video/webm" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "recorded-video.webm";
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const handleDownload = () => {
-    console.log("Checking for chunks:", capturedChunksRef.current.length);
-
-    if (capturedChunksRef.current.length) {
-      downloadVideo();
-    }
-  };
-
   const handleStopCapture = () => {
     if (mediaRecorder && mediaRecorder.state !== "inactive") {
       mediaRecorder.stop();
