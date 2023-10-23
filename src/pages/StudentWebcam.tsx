@@ -42,27 +42,17 @@ const StudentWebcam = () => {
   let [terminated, setTerminated] = useState<boolean>(false);
   let [warningOne, setWarningOne] = useState<string>("");
   let [warningTwo, setWarningTwo] = useState<string>("");
-
   const webcamRef = useRef(null);
   const [faceVerified, setFaceVerified] = useState(false);
   const [wasSuspicious, setWasSuspicious] = useState(false);
-
   const [peopleVerified, setPeopleVerified] = useState(false);
-
   const [modelsLoaded, setModelsLoaded] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [showAlert, setShowAlert] = useState(true);
-  const [startCapture, setStartCapture] = useState(false);
   const [room, setRoom] = useState<Room | null>(null);
   const { data, loading, error } = useUsers();
   const [referenceDescriptor, setReferenceDescriptor] = useState(null);
-  const localVideoRef = useRef(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [componentLoading, setComponentLoading] = useState(true);
   const [ready, isReady] = useState<boolean>(false);
-  const [lkParticipant, setLkParticipant] = useState<any>(null);
-  const [isConnected, setIsConnected] = useState(false);
-
   const navigate = useNavigate();
 
   const [token, setToken] = useState(null);
@@ -355,9 +345,6 @@ const StudentWebcam = () => {
     name = currentUser.name;
   }
 
-  const [frameCaptureInterval, setFrameCaptureInterval] = useState<
-    number | null
-  >(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
   );
