@@ -349,13 +349,6 @@ const StudentWebcam = () => {
   const capturedChunksRef = useRef<BlobPart[]>([]);
 
   const handleUpload = async () => {
-    console.log("handleUpload started");
-    console.log("capturedChunks length:", capturedChunksRef.current.length);
-    console.log(
-      "MediaRecorder state:",
-      mediaRecorder ? mediaRecorder.state : "No MediaRecorder"
-    );
-
     if (capturedChunksRef.current.length) {
       const blob = new Blob(capturedChunksRef.current, { type: "video/webm" });
 
@@ -366,12 +359,14 @@ const StudentWebcam = () => {
       const { url } = await response.json();
       console.log("Presigned URL:", url);
       // Upload the blob to the presigned URL
-      const uploadResponse = await fetch(url, {
+      await fetch(url, {
         method: "PUT",
+        headers: {
+          "Content-Type": "video/webm",
+        },
         body: blob,
       });
       console.log("Blob size:", blob.size);
-      console.log("Upload response:", await uploadResponse.text());
     }
   };
 
