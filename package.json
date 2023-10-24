@@ -4,7 +4,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "homepage": "https://Software-Design-Studio-Spring-2023.github.io/frontend_core/",
+  "homepage": "https://Software-Design-Studio-Spring-2023.github.io/frontend_core",
   "scripts": {
     "dev": "vite",
     "deploy": "gh-pages -d dist",
