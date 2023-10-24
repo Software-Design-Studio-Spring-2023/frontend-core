@@ -47,22 +47,17 @@ const StudentWebcam = () => {
   let [warningTwo, setWarningTwo] = useState<string>("");
   const webcamRef = useRef(null);
   const [faceVerified, setFaceVerified] = useState(false);
-  const [peopleVerified, setPeopleVerified] = useState(false);
 
+  const [peopleVerified, setPeopleVerified] = useState(false);
   const [modelsLoaded, setModelsLoaded] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [showAlert, setShowAlert] = useState(true);
-  const [startCapture, setStartCapture] = useState(false);
   const [room, setRoom] = useState<Room | null>(null);
   const { data, loading, error } = useUsers();
   const [referenceDescriptor, setReferenceDescriptor] = useState(null);
-  const localVideoRef = useRef(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [componentLoading, setComponentLoading] = useState(true);
   const [ready, isReady] = useState<boolean>(false);
   const [lkParticipant, setLkParticipant] = useState<any>(null);
   const [isConnected, setIsConnected] = useState(false);
-
   const [isFaceVerified, setIsFaceVerified] = useState(false);
   const [showCameraTip, setShowCameraTip] = useState(false);
   const [isOnePerson, setIsOnePerson] = useState(true);
@@ -189,12 +184,13 @@ const StudentWebcam = () => {
 
     if (detections.length > 1 || detections.length === 0) {
       // more than one person detected
-      currentUser.ready === true &&
+      if (currentUser.ready === true) {
         patchData(
           { isSuspicious: true },
           "update_isSuspicious",
           currentUser.id
-        ); //patch data only if exam has started
+        );
+      } //patch data only if exam has started
       setPeopleVerified(true);
     } else {
       setPeopleVerified(false);
@@ -220,12 +216,13 @@ const StudentWebcam = () => {
           console.log(`No match found for ${currentUser.name}`);
           setFaceVerified(false);
           //patch data only if examinee is ready
-          currentUser.ready === true &&
+          if (currentUser.ready === true) {
             patchData(
               { isSuspicious: true },
               "update_isSuspicious",
               currentUser.id
             );
+          }
         }
       }
     }
@@ -365,90 +362,68 @@ const StudentWebcam = () => {
     name = currentUser.name;
   }
 
-  const [frameCaptureInterval, setFrameCaptureInterval] = useState<
-    number | null
-  >(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
   );
   const capturedChunksRef = useRef<BlobPart[]>([]);
 
-  // const frames: string[] = [];
-
-  // const captureFrame = () => {
-  //   const video = webcamRef.current?.video;
-  //   const canvas = canvasRef.current;
-
-  //   if (video && canvas && startCapture) {
-  //     const context = canvas.getContext("2d");
-
-  //     if (context) {
-  //       // Draw the video frame to the canvas.
-  //       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-  //       // You can now save the image data from the canvas or do further processing.
-  //       const imageDataUrl = canvas.toDataURL("image/png");
-  //       frames.push(imageDataUrl);
-  //       console.log(frames);
-  //       // code for downloading the frame, for now its being pushed to an array
-  //       // const downloadLink = document.createElement("a");
-  //       // downloadLink.href = imageDataUrl;
-  //       // downloadLink.download = "captured_frame.png"; // You can change the name here
-  //       // downloadLink.click();
-  //     }
-  //   }
-  // };
-
-  const handleStartCapture = () => {
-    // if (webcamRef.current && webcamRef.current.stream) {
-    //   const stream = webcamRef.current.stream;
-    //   const recorder = new MediaRecorder(stream, {
-    //     mimeType: "video/webm",
-    //   });
-    //   setMediaRecorder(recorder);
-
-    //   (recorder.ondataavailable = (e: BlobEvent) => {
-    //     if (e.data.size > 0) {
-    //       capturedChunksRef.current.push(e.data);
-    //     }
-    //   }),
-    //     [capturedChunksRef];
-
-    //   recorder.onstop = handleDownload;
-
-    //   recorder.start();
-    patchData({ ready: true }, "update_ready", currentUser.id);
-    currentUser.ready === true;
-    isReady(true);
-    // }
-  };
-
-  const downloadVideo = () => {
-    console.log("Downloading video...");
-
-    const blob = new Blob(capturedChunksRef.current, { type: "video/webm" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "recorded-video.webm";
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const handleDownload = () => {
-    console.log("Checking for chunks:", capturedChunksRef.current.length);
+  const handleUpload = async () => {
+    console.log("handleUpload started");
+    console.log("capturedChunks length:", capturedChunksRef.current.length);
+    console.log(
+      "MediaRecorder state:",
+      mediaRecorder ? mediaRecorder.state : "No MediaRecorder"
+    );
 
     if (capturedChunksRef.current.length) {
-      downloadVideo();
+      const blob = new Blob(capturedChunksRef.current, { type: "video/webm" });
+
+      // Fetch the presigned URL
+      const response = await fetch(
+        `https://eyedentify-69d961d5a478.herokuapp.com/api/presigned_url/${currentUser.id}`
+      );
+      const { url } = await response.json();
+      console.log("Presigned URL:", url);
+      // Upload the blob to the presigned URL
+      const uploadResponse = await fetch(url, {
+        method: "PUT",
+        body: blob,
+      });
+      console.log("Blob size:", blob.size);
+      console.log("Upload response:", await uploadResponse.text());
+    }
+  };
+
+  const handleStartCapture = () => {
+    if (canvasRef.current) {
+      const stream = canvasRef.current.captureStream(30); // Assuming 30fps
+      const recorder = new MediaRecorder(stream, {
+        mimeType: "video/webm",
+      });
+
+      recorder.ondataavailable = (e: BlobEvent) => {
+        console.log("Data chunk size:", e.data.size);
+
+        if (e.data.size > 0) {
+          capturedChunksRef.current.push(e.data);
+        }
+      };
+
+      warnings === 0 && (recorder.onstop = handleUpload);
+
+      setMediaRecorder(recorder);
+      recorder.start();
+
+      patchData({ ready: true }, "update_ready", currentUser.id);
+      currentUser.ready = true;
+      isReady(true);
     }
   };
 
   const handleStopCapture = () => {
-    //   if (frameCaptureInterval) {
-    //     window.clearInterval(frameCaptureInterval);
-    //     setFrameCaptureInterval(null);
-    //   }
-    // }
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+      mediaRecorder.stop();
+    }
     if (room && room.localParticipant) {
       const participant = room.localParticipant;
       participant.tracks.forEach((publication: LocalTrackPublication) => {
