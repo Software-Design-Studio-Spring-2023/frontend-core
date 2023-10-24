@@ -9,25 +9,37 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { useRef } from "react";
+import { currentUser } from "../../pages/LoginForm";
+import patchData from "../../hooks/patchData";
 
 interface Props {
   handleLogout: () => void;
 }
 
-const EndExam = ({ handleLogout }: Props) => {
+const LogOut = ({ handleLogout }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef(null);
 
   const handleConfirmLogout = () => {
     handleLogout();
     onClose();
+    patchData({ loggedIn: false }, "update_login", currentUser.id);
   };
 
   return (
     <>
-      <Button colorScheme='teal' variant='solid' onClick={onOpen}>Log Out</Button>
+      <Button
+        colorScheme="teal"
+        variant="outline"
+        borderColor={"teal.500"}
+        onClick={onOpen}
+        size={/Android|iPhone/i.test(navigator.userAgent) ? "sm" : "md"}
+      >
+        Log Out
+      </Button>
       <AlertDialog
         motionPreset="scale"
+        size={/Android|iPhone/i.test(navigator.userAgent) ? "xs" : "lg"}
         isOpen={isOpen}
         leastDestructiveRef={cancelRef}
         onClose={onClose}
@@ -55,4 +67,4 @@ const EndExam = ({ handleLogout }: Props) => {
   );
 };
 
-export default EndExam;
+export default LogOut;

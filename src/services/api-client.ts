@@ -1,5 +1,5 @@
 import axios from "axios";
 
 export default axios.create({
-    baseURL:"http://localhost:8080/api"
+    baseURL:"https://eyedentify-69d961d5a478.herokuapp.com/api"
 })
