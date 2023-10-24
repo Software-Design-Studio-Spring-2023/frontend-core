@@ -15,6 +15,9 @@ import LoginSuccess from "../components/alerts/LoginSuccess";
 import WarningOne from "../components/alerts/WarningOne";
 import WarningTwo from "../components/alerts/WarningTwo";
 import CopyrightVersion from "../components/CopyrightVersion";
+import WaitingRoom from "../components/alerts/WaitingRoom";
+import TimeDeduction from "../components/alerts/TimeDeduction";
+import CameraTip from "../components/alerts/CameraTip";
 import preventLoad from "../hooks/preventLoad";
 import * as faceapi from "face-api.js";
 
@@ -34,8 +37,6 @@ import "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
 import "@mediapipe/selfie_segmentation";
 import Webcam from "react-webcam";
-import WaitingRoom from "../components/alerts/WaitingRoom";
-import TimeDeduction from "../components/alerts/TimeDeduction";
 
 let name = "";
 
@@ -62,6 +63,10 @@ const StudentWebcam = () => {
   const [lkParticipant, setLkParticipant] = useState<any>(null);
   const [isConnected, setIsConnected] = useState(false);
 
+  const [isFaceVerified, setIsFaceVerified] = useState(false);
+  const [showCameraTip, setShowCameraTip] = useState(false);
+  const [isOnePerson, setIsOnePerson] = useState(true);
+
   const navigate = useNavigate();
 
   const [token, setToken] = useState(null);
@@ -72,6 +77,16 @@ const StudentWebcam = () => {
     }, 1500);
   }, []);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!isFaceVerified || !isOnePerson) {
+        setShowCameraTip(true);
+      }
+    }, 10000); // 10 seconds
+  
+    return () => clearTimeout(timer);
+  }, [isFaceVerified, isOnePerson]);
+  
   useEffect(() => {
     const fetchToken = async () => {
       try {
@@ -570,9 +585,13 @@ const StudentWebcam = () => {
           <LoginSuccess />
           {warnings === 1 && <WarningOne user={currentUser} />}
           {warnings === 2 && <WarningTwo user={currentUser} />}
+          {/* add warning related to lighting conditions */}
+          {showCameraTip && ( 
+            <CameraTip />
+          )}
           {/* add warnings for students who are exam ready */}
           <WaitingRoom />
-          {/* add warnings for students who are late to exam */}
+          {/* add warnings for students who are late to exam such as delayed verification */}
           <TimeDeduction />
         </Box>
         <CopyrightVersion bottomVal={-2} />

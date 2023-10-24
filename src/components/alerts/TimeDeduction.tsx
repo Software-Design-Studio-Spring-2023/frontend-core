@@ -15,7 +15,7 @@ const TimeDeduction = () => {
 
   useEffect(() => {
     const interval = 10; // update every 50ms
-    const totalDuration = 3000; // 5 seconds in total
+    const totalDuration = 3000; // 3 seconds in total
 
     // Initialize the progress state to totalDuration
     setProgress(totalDuration);
@@ -49,7 +49,7 @@ const TimeDeduction = () => {
           <AlertIcon />
           <AlertTitle mr={2}>Your exam has started.</AlertTitle>
           <AlertDescription flex="1">
-            You are now deducting form your available exam time. Ensure you meet all the requirements and you exam will immediately commence.
+            You are now deducting form your available exam time. Ensure you meet all the requirements and your exam will immediately commence.
           </AlertDescription>
         </Alert>
         <Progress

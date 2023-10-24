@@ -8,7 +8,6 @@ import {
 } from "@chakra-ui/react";
 import React, { useEffect } from "react";
 import { useState } from "react";
-import { currentUser } from "../../pages/LoginForm";
 
 const WaitingRoom = () => {
   const [showAlert, setShowAlert] = useState(true);
@@ -16,7 +15,7 @@ const WaitingRoom = () => {
 
   useEffect(() => {
     const interval = 10; // update every 50ms
-    const totalDuration = 3000; // 5 seconds in total
+    const totalDuration = 5000; // 5 seconds in total
 
     // Initialize the progress state to totalDuration
     setProgress(totalDuration);
@@ -51,11 +50,14 @@ const WaitingRoom = () => {
           <AlertTitle mr={2}>Your exam will begin shortly.</AlertTitle>
           <AlertDescription flex="1">
             Remember, you are currently being monitored by your examiner.
+            Any suspicious activity will be flagged and you may be issued a warning.
+            <br />
+            To ensure a smooth exam experience, make sure you are in a well-lit, quiet, and private room. 
           </AlertDescription>
         </Alert>
         <Progress
           size="xs"
-          value={(progress / 3000) * 100} // Adjust the denominator to your total duration
+          value={(progress / 5000) * 100} // Adjust the denominator to your total duration
           position="absolute"
           width="100%"
           bottom="0"
