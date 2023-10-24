@@ -1,15 +1,9 @@
 import { Fragment } from "react";
-import { useCountdown } from "../hooks/useCountdown";
+import { useCountdown } from "./useCountdown";
 import { Heading } from "@chakra-ui/react";
-
-import React, { Component } from "react";
-
 import { motion } from "framer-motion";
-
-import "./progressbar.css";
-
 export const CountDownApp = () => {
-  const initialTotalTimeMS = 100 * 1000;
+  const initialTotalTimeMS = 9000 * 1000;
   const timeMS = useCountdown(initialTotalTimeMS, () =>
     console.log("Times up!!")
   );
