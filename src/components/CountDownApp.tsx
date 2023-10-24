@@ -1,22 +1,9 @@
-<<<<<<< HEAD
+import { Fragment } from "react";
 import { useCountdown } from "./useCountdown";
 import { Heading } from "@chakra-ui/react";
+import { motion } from "framer-motion";
 export const CountDownApp = () => {
   const initialTotalTimeMS = 9000 * 1000;
-=======
-import { Fragment } from "react";
-import { useCountdown } from "../hooks/useCountdown";
-import { Heading } from "@chakra-ui/react";
-
-import React, { Component } from "react";
-
-import { motion } from "framer-motion";
-
-import "./progressbar.css";
-
-export const CountDownApp = () => {
-  const initialTotalTimeMS = 100 * 1000;
->>>>>>> main
   const timeMS = useCountdown(initialTotalTimeMS, () =>
     console.log("Times up!!")
   );
@@ -28,17 +15,6 @@ export const CountDownApp = () => {
   let displayMinutes = timeTotalMinutes % 60;
   let displaySeconds = timeTotalSeconds % 60;
 
-<<<<<<< HEAD
-  console.log("Seconds: ", timeMS / 1000);
-
-  if (timeTotalSeconds === 0) {
-    return <Heading textAlign={"right"}>TIMES UP!!!!</Heading>;
-  } else {
-    return (
-      <Heading textAlign={"right"}>
-        {timeTotalHours} : {displayMinutes} : {displaySeconds}
-      </Heading>
-=======
   if (timeTotalSeconds === 0) {
     return <Heading>TIMES UP!!!!</Heading>;
   } else {
@@ -60,7 +36,6 @@ export const CountDownApp = () => {
           </div>
         </div>
       </Fragment>
->>>>>>> main
     );
   }
 };
