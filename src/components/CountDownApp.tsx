@@ -8,8 +8,23 @@ import { motion } from "framer-motion";
 
 import "./progressbar.css";
 
+const today = new Date();
+var hours = today.getHours();
+var mins = today.getMinutes();
+var secs = today.getSeconds();
+
+const initialTotalTimeMS = 100 * 7200; //2 Hours
+
+let finishTimeSeconds = initialTotalTimeMS / 1000;
+let finsihTimeMinutes = Math.floor(finishTimeSeconds / 60);
+let finishTimeHours = Math.floor(finsihTimeMinutes / 60);
+
+const finishTime = today;
+finishTime.setHours(today.getHours() + finishTimeHours);
+finishTime.setMinutes(today.getMinutes() + finsihTimeMinutes);
+finishTime.setHours(today.getSeconds() + finishTimeSeconds);
+
 export const CountDownApp = () => {
-  const initialTotalTimeMS = 100 * 10000;
   const timeMS = useCountdown(initialTotalTimeMS, () =>
     console.log("Times up!!")
   );

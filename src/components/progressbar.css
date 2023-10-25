@@ -1,7 +1,7 @@
 .progressbar {
     /* Size */
-    width: 450px;
-    height: 35px;
+    width: 200px;
+    height: 18px;
 
     /* Content alignment */
     display: flex;
@@ -20,11 +20,6 @@
 .bar {
     width: 100%;
 
-    background:rgb(184, 255, 227);
-    background:linear-gradient(
-        180deg,
-        rgb(70, 237, 255) 15%,
-        rgb(33, 240, 213) 36%,
-        rgb(8, 255, 234)100%
-    );
+    background:rgb(224, 117, 117);
+    
 }

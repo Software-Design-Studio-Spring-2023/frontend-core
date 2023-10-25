@@ -23,8 +23,9 @@ import LoginSuccess from "../components/alerts/LoginSuccess";
 import CopyrightVersion from "../components/CopyrightVersion";
 import preventLoad from "../hooks/preventLoad";
 import preventAccess from "../hooks/preventAccess";
-import setBorder from "../hooks/setBordeclearr";
+import setBorder from "../hooks/setBorder";
 import CountDownApp from "../components/CountDownApp";
+
 import {
   DefaultReconnectPolicy,
   Participant,
@@ -41,6 +42,7 @@ import { StreamsContext } from "../contexts/StreamContext";
 import patchData from "../hooks/patchData";
 import CheatDetectionAlert from "../components/alerts/CheatDetectionAlert";
 import StartExamButton from "../components/StartExamButton";
+import BackgroundTimerTracker from "../components/BackgroundTimerTracker";
 
 const TeacherHome = () => {
   const location = useLocation();
@@ -48,6 +50,7 @@ const TeacherHome = () => {
   const [itemClicked, setItemClicked] = useState(false);
   const [userClicked, setUserClicked] = useState("");
   const { data, loading, error } = useUsers();
+
   const [participants, setParticipants] = useState({});
   const [isConnected, setIsConnected] = useState(false);
   const [room, setRoom] = useState<Room | null>(null);
@@ -197,7 +200,14 @@ const TeacherHome = () => {
               }
             />
           </Box>
-
+          <Box
+            position="absolute"
+            top={/Android|iPhone/i.test(navigator.userAgent) ? 10 : 0}
+            left="50%"
+            transform="translateX(-50%)"
+          >
+            <Heading padding={"10px"}>Exam:</Heading>
+          </Box>
           <Heading
             padding={"10px"}
             marginLeft={
@@ -209,9 +219,7 @@ const TeacherHome = () => {
           >
             {itemClicked ? userClicked : "Participants"}
           </Heading>
-
           <Spacer />
-          <Heading>Exam Title</Heading>
           <Spacer />
           <HStack spacing="30px">
             <Spacer />
@@ -232,8 +240,8 @@ const TeacherHome = () => {
                 : "Go Back"}
             </Button>
           </HStack>
-
           <StartExamButton />
+
           <Box
             marginRight={
               /Android|iPhone/i.test(navigator.userAgent) ? "14px" : "30px"

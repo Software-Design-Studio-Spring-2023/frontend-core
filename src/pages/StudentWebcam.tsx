@@ -24,6 +24,7 @@ import "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
 import "@mediapipe/selfie_segmentation";
 import Webcam from "react-webcam";
+import CountDownApp from "../components/CountDownApp";
 
 let name = "";
 
@@ -413,6 +414,7 @@ const StudentWebcam = () => {
                 marginLeft: "25%",
               }}
             ></canvas>
+
             <Webcam
               audio={false}
               height={720}
@@ -434,6 +436,7 @@ const StudentWebcam = () => {
             />
           </div>
         </Box>
+        <CountDownApp />
         <div hidden={ready ? true : false}>
           <p>This is where the checklist will be</p>
         </div>
