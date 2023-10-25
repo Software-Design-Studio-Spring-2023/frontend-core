@@ -8,10 +8,8 @@ const setCurrentExam = () => {
     const { data, loading, error} = useExams();
      
     currentExam = data.find((obj) => obj.id === 112); 
-
-    return currentExam;
     
 }
 
 
-export default setCurrentExam;
+export default currentExam;
