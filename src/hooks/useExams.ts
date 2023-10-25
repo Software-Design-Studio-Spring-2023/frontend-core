@@ -8,12 +8,6 @@ export interface Exam {
     has_started: boolean
 }  
 
-
-
 const useExams = () => useData<Exam>("/all_exams");
 
-/* const {data, loading, error} = useExams();
-
-const exams = data; */
-
-export default useExams;
+export default useExams

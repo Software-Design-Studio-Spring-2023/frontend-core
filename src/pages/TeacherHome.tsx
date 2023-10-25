@@ -200,14 +200,15 @@ const TeacherHome = () => {
               }
             />
           </Box>
-          <Box
+          {/* <Box
             position="absolute"
             top={/Android|iPhone/i.test(navigator.userAgent) ? 10 : 0}
             left="50%"
+            hidden={itemClicked ? true : false}
             transform="translateX(-50%)"
           >
-            <Heading padding={"10px"}>Exam:</Heading>
-          </Box>
+            <Heading padding={"10px"}>Exam:{currentExam.examName}</Heading>
+          </Box> */}
           <Heading
             padding={"10px"}
             marginLeft={
