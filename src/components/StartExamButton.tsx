@@ -7,7 +7,8 @@ const StartExamButton = () => {
   const [started, setStarted] = useState(false);
   const handleStartExam = () => {
     setStarted(true);
-
+    const startTime = Date.now();
+    patchData({ time_started: startTime }, "update_started", 112);
     patchData({ has_started: true }, "update_exam", 112);
   };
 

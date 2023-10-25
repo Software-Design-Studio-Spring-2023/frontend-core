@@ -13,7 +13,7 @@ var hours = today.getHours();
 var mins = today.getMinutes();
 var secs = today.getSeconds();
 
-const initialTotalTimeMS = 100 * 7200; //2 Hours
+const initialTotalTimeMS = 3600000; //2 Hours
 
 let finishTimeSeconds = initialTotalTimeMS / 1000;
 let finsihTimeMinutes = Math.floor(finishTimeSeconds / 60);
