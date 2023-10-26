@@ -7,22 +7,15 @@ import React, { Component } from "react";
 import { motion } from "framer-motion";
 
 import "./progressbar.css";
+import { currentUser } from "../pages/LoginForm";
+import patchData from "../hooks/patchData";
+import { currentExam } from "./StartExamButton";
 
-const today = new Date();
-var hours = today.getHours();
-var mins = today.getMinutes();
-var secs = today.getSeconds();
+const stamp = Date.now();
+
+const timeTakeaway = stamp - currentExam.time_started;
 
 const initialTotalTimeMS = 3600000; //2 Hours
-
-let finishTimeSeconds = initialTotalTimeMS / 1000;
-let finsihTimeMinutes = Math.floor(finishTimeSeconds / 60);
-let finishTimeHours = Math.floor(finsihTimeMinutes / 60);
-
-const finishTime = today;
-finishTime.setHours(today.getHours() + finishTimeHours);
-finishTime.setMinutes(today.getMinutes() + finsihTimeMinutes);
-finishTime.setHours(today.getSeconds() + finishTimeSeconds);
 
 export const CountDownApp = () => {
   const timeMS = useCountdown(initialTotalTimeMS, () =>
@@ -37,6 +30,9 @@ export const CountDownApp = () => {
   let displaySeconds = timeTotalSeconds % 60;
 
   if (timeTotalSeconds === 0) {
+    if (currentUser.userType === "student") {
+      patchData({ terminated: true }, "update_terminate", currentUser.id);
+    }
     return <Heading>TIMES UP!</Heading>;
   } else {
     return (
