@@ -5,7 +5,8 @@ import useData from "./useData";
 export interface Exam {
     id: number;
     examName: string,
-    has_started: boolean
+    has_started: boolean,
+    time_started: number
 }  
 
 const useExams = () => useData<Exam>("/all_exams");
