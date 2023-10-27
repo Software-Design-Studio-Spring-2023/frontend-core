@@ -44,11 +44,31 @@ export const CountDownApp = () => {
   let timeTotalMinutes = Math.floor(timeTotalSeconds / 60);
   let timeTotalHours = Math.floor(timeTotalMinutes / 60);
 
-  let displayMinutes = timeTotalMinutes % 60;
+  let displayMinutes = Math.round(timeTotalMinutes % 60);
   let displaySeconds = Math.round(timeTotalSeconds % 60);
+
+  if (displaySeconds === 60) {
+    displayMinutes += 1;
+    displaySeconds = 0;
+  }
+
+  // Check if minutes hit 60 and if so, increment hours
+  if (displayMinutes === 60) {
+    timeTotalHours += 1;
+    displayMinutes = 0;
+  }
 
   let displaySecondsFormatted =
     displaySeconds < 10 ? `0${displaySeconds}` : displaySeconds;
+
+  let displayMinutesFormatted =
+    displayMinutes < 10 ? `0${displayMinutes}` : displayMinutes;
+
+  let displayHoursFormatted =
+    timeTotalHours < 10 ? `0${timeTotalHours}` : timeTotalHours;
+
+  const initialProgressBarWidthPercentage =
+    (startingTimeMS / initialTotalTimeMS) * 100;
 
   const progressBarWidthPercentage = (timeMS / initialTotalTimeMS) * 100;
 
@@ -59,15 +79,17 @@ export const CountDownApp = () => {
     return <Heading marginRight={5}>TIMES UP!</Heading>;
   } else {
     return (
-      <HStack marginRight={5}>
+      <HStack marginRight={5} spacing={5}>
         <Fragment>
           <Heading>
-            {timeTotalHours} : {displayMinutes} : {displaySecondsFormatted}
+            {displayHoursFormatted} : {displayMinutesFormatted} :{" "}
+            {displaySecondsFormatted}
           </Heading>
           <div className="progressbar-container">
             <div className="progressbar">
               <motion.div
                 className="bar"
+                initial={{ width: `${initialProgressBarWidthPercentage}%` }}
                 animate={{ width: `${progressBarWidthPercentage}%` }}
                 transition={{ duration: timeTotalSeconds }}
               />
