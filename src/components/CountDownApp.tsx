@@ -2,8 +2,6 @@ import { Fragment, useEffect, useState } from "react";
 import { useCountdown } from "../hooks/useCountdown";
 import { Heading, Box, HStack } from "@chakra-ui/react";
 
-import React, { Component } from "react";
-
 import { motion } from "framer-motion";
 
 import "./progressbar.css";
@@ -75,7 +73,7 @@ export const CountDownApp = () => {
 
   const progressBarWidthPercentage = (timeMS / initialTotalTimeMS) * 100;
 
-  if (timeTotalSeconds === 0) {
+  if (displayMinutes === 0 && displaySeconds === 0 && timeTotalHours === 0) {
     if (currentUser.userType === "student") {
       patchData({ terminated: true }, "update_terminate", currentUser.id);
     }
