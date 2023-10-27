@@ -11,23 +11,23 @@ import { currentUser } from "../pages/LoginForm";
 import patchData from "../hooks/patchData";
 import { currentExam } from "./StartExamButton";
 
-const stamp = Date.now();
-
-const timeTakeaway = stamp - currentExam.time_started;
-
-const initialTotalTimeMS = 3600000; //2 Hours
+const initialTotalTimeMS = 3600000; //1 Hour
 
 export const CountDownApp = () => {
-  const [hasStarted, setHasStarted] = useState(currentExam.has_started);
+  const [hasStarted, setHasStarted] = useState(false);
+  currentExam.has_started && setHasStarted(true);
+  const [timeTakeaway, setTimeTakeaway] = useState<number | null>(null);
+  const [startingTimeMS, setStartingTimeMS] = useState<number | null>(null);
 
   useEffect(() => {
-    // Update hasStarted state whenever currentExam.has_started changes
-    setHasStarted(currentExam.has_started);
-  }, [currentExam.has_started]);
+    if (hasStarted && timeTakeaway === null) {
+      const calculatedTimeTakeaway = Date.now() - currentExam.time_started;
+      setTimeTakeaway(calculatedTimeTakeaway);
+      setStartingTimeMS(initialTotalTimeMS - calculatedTimeTakeaway);
+    }
+  }, [hasStarted]);
 
-  const timeMS = hasStarted
-    ? useCountdown(initialTotalTimeMS, () => console.log("Times up!!"))
-    : initialTotalTimeMS;
+  const timeMS = useCountdown(startingTimeMS, () => console.log("Times up!!"));
 
   let timeTotalSeconds = timeMS / 1000;
   let timeTotalMinutes = Math.floor(timeTotalSeconds / 60);
@@ -35,6 +35,8 @@ export const CountDownApp = () => {
 
   let displayMinutes = timeTotalMinutes % 60;
   let displaySeconds = timeTotalSeconds % 60;
+
+  const progressBarWidthPercentage = (timeMS / initialTotalTimeMS) * 100;
 
   if (timeTotalSeconds === 0) {
     if (currentUser.userType === "student") {
@@ -52,7 +54,7 @@ export const CountDownApp = () => {
           <div className="progressbar">
             <motion.div
               className="bar"
-              animate={{ width: "0%" }}
+              animate={{ width: `${progressBarWidthPercentage}%` }}
               transition={{ duration: timeTotalSeconds }}
             />
           </div>

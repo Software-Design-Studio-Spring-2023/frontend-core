@@ -14,21 +14,28 @@ export var currentExam: Exam | undefined = {
 const StartExamButton = () => {
   const { data, loading, error } = useExams();
   const [started, setStarted] = useState(false);
-  // const currentExam = data.find((obj) => obj.id === 112);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const currentExam = data && data.find((obj) => obj.id === 112);
-    if (currentExam && currentExam.has_started) {
-      setStarted(true);
+    const examFromData = data && data.find((obj) => obj.id === 112);
+    if (examFromData) {
+      currentExam = examFromData;
+      setLoaded(true);
+      if (examFromData.has_started) {
+        setStarted(true);
+      }
     }
   }, [data]);
+  //exam is definitely set
 
   const handleStartExam = () => {
     setStarted(true);
-    console.log(currentExam);
+    currentExam.has_started = started;
     const startTime = Date.now();
+    currentExam.time_started = startTime;
     patchData({ time_started: startTime }, "update_started", 112);
     patchData({ has_started: true }, "update_exam", 112);
+    console.log(currentExam);
   };
 
   return (
@@ -38,6 +45,7 @@ const StartExamButton = () => {
       </Box>
       <Button
         colorScheme={"red"}
+        isDisabled={loaded ? false : true}
         hidden={started ? true : false}
         onClick={handleStartExam}
       >
