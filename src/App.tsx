@@ -1,7 +1,12 @@
 //main app hub
 
 import LoginForm from "./pages/LoginForm";
-import { HashRouter as Router, Route, Routes, Outlet } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Outlet,
+} from "react-router-dom";
 import TeacherHome from "./pages/TeacherHome";
 import StudentWebcam from "./pages/StudentWebcam";
 import PageNotFound from "./pages/PageNotFound";
