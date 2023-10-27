@@ -50,6 +50,7 @@ import Webcam from "react-webcam";
 let name = "";
 
 const StudentWebcam = () => {
+  let [phoneDetected, setPhoneDetected] = useState<boolean>(false);
   let [warnings, setWarnings] = useState<number>(0);
   let [terminated, setTerminated] = useState<boolean>(false);
   let [warningOne, setWarningOne] = useState<string>("");
@@ -86,6 +87,12 @@ const StudentWebcam = () => {
   }, []);
 
   const checkVideoFrameForObjects = async () => {
+    function containsHighConfidencePhone(entries: any[]) {
+      return entries.some(
+        (entry) => entry.class === "phone" && entry.score > 0.85
+      );
+    }
+
     if (!objectDetectionModel || !webcamRef.current) {
       return;
     }
@@ -101,6 +108,14 @@ const StudentWebcam = () => {
         // Here, you'd handle any objects detected. This could mean updating state,
         // triggering alerts, or any other application logic.
         console.log("Detected objects:", predictions);
+        if (containsHighConfidencePhone(predictions)) {
+          setPhoneDetected(true);
+          patchData(
+            { isSuspicious: true },
+            "update_isSuspicious",
+            currentUser.id
+          );
+        }
       }
     } catch (error) {
       console.error("Error during object detection:", error);
