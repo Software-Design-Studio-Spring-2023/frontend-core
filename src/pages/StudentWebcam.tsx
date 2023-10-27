@@ -125,11 +125,13 @@ const StudentWebcam = () => {
         }
         if (containsMoreThanOnePerson(predictions)) {
           setPeopleInvalid(true);
-          patchData(
-            { isSuspicious: true },
-            "update_isSuspicious",
-            currentUser.id
-          );
+          if (currentUser.ready) {
+            patchData(
+              { isSuspicious: true },
+              "update_isSuspicious",
+              currentUser.id
+            );
+          }
         } else {
           setPeopleInvalid(false);
         }
