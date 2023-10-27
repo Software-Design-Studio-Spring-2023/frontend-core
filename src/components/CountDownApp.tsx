@@ -20,8 +20,11 @@ export const CountDownApp = () => {
   useEffect(() => {
     if (currentExam.has_started === true && timeTakeaway === null) {
       const calculatedTimeTakeaway = Date.now() - currentExam.time_started;
-      console.log(calculatedTimeTakeaway);
-      setTimeTakeaway(calculatedTimeTakeaway);
+      if (calculatedTimeTakeaway <= 0) {
+        setTimeTakeaway(0);
+      } else {
+        setTimeTakeaway(calculatedTimeTakeaway);
+      }
       const total = initialTotalTimeMS - calculatedTimeTakeaway;
       console.log(total);
 
