@@ -58,7 +58,7 @@ const StudentWebcam = () => {
   const webcamRef = useRef(null);
   const [faceVerified, setFaceVerified] = useState(false);
 
-  const [peopleVerified, setPeopleVerified] = useState(false);
+  const [peopleVerified, setPeopleInvalid] = useState(false);
   const [modelsLoaded, setModelsLoaded] = useState(false);
   const [room, setRoom] = useState<Room | null>(null);
   const { data, loading, error } = useUsers();
@@ -81,7 +81,6 @@ const StudentWebcam = () => {
         console.error("Failed to load the object detection model:", { error });
       }
     };
-
     // Load the model`
     loadObjectDetectionModel();
   }, []);
@@ -89,8 +88,12 @@ const StudentWebcam = () => {
   const checkVideoFrameForObjects = async () => {
     function containsHighConfidencePhone(entries: any[]) {
       return entries.some(
-        (entry) => entry.class === "phone" && entry.score > 0.85
+        (entry) => entry.class === "cell phone" && entry.score > 0.6
       );
+    }
+
+    function containsMoreThanOnePerson(entries: any[]) {
+      return entries.filter((entry) => entry.class === "person").length > 1;
     }
 
     if (!objectDetectionModel || !webcamRef.current) {
@@ -110,11 +113,20 @@ const StudentWebcam = () => {
         console.log("Detected objects:", predictions);
         if (containsHighConfidencePhone(predictions)) {
           setPhoneDetected(true);
-          patchData(
-            { isSuspicious: true },
-            "update_isSuspicious",
-            currentUser.id
-          );
+          if (currentUser.ready) {
+            patchData(
+              { isSuspicious: true },
+              "update_isSuspicious",
+              currentUser.id
+            );
+          }
+        } else {
+          setPhoneDetected(false);
+        }
+        if (containsMoreThanOnePerson(predictions)) {
+          setPeopleInvalid(true);
+        } else {
+          setPeopleInvalid(false);
         }
       }
     } catch (error) {
@@ -238,9 +250,9 @@ const StudentWebcam = () => {
           currentUser.id
         );
       } //patch data only if exam has started
-      setPeopleVerified(true);
+      setPeopleInvalid(true);
     } else {
-      setPeopleVerified(false);
+      setPeopleInvalid(false);
     }
 
     if (detections.length === 0) {
@@ -596,6 +608,7 @@ const StudentWebcam = () => {
           <HStack hidden={ready ? true : false}>
             <Box>{`Face Verified: ${faceVerified ? "✅" : "❌"}`}</Box>
             <Box>{`One Person: ${peopleVerified ? "❌" : "✅"}`}</Box>
+            <Box>{`No Prohibited Items: ${phoneDetected ? "❌" : "✅"}`}</Box>
           </HStack>
         </Box>
         <Box hidden={componentLoading ? true : false}>
@@ -604,7 +617,11 @@ const StudentWebcam = () => {
             variant="solid"
             padding={"10px"}
             hidden={ready ? true : false}
-            isDisabled={faceVerified === false || peopleVerified === true}
+            isDisabled={
+              faceVerified === false ||
+              peopleVerified === true ||
+              phoneDetected === true
+            }
             onClick={handleStartCapture}
           >
             {"Ready"}
