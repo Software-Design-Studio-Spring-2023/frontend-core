@@ -38,6 +38,7 @@ export var currentUser: User | undefined = {
   ready: false,
   warningOne: "",
   warningTwo: "",
+  isSuspicious: false,
 }; //this is the logged in current user exported for the current sessiion, app-wide
 
 const LoginForm = () => {

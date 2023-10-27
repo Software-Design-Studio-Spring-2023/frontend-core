@@ -71,7 +71,7 @@ const StudentCard = ({
       <CardBody
         style={{
           display: "flex",
-          flexDirection: "column", // ensure children are stacked vertically
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
         }}

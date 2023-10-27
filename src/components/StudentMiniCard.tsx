@@ -82,8 +82,8 @@ const StudentMiniCard = ({
               display="flex"
               alignItems="center"
               justifyContent="center"
-              height="80px" // Adjust the height to the desired spinner container size
-              width="100%" // Optional: Adjust the width as needed
+              height="80px"
+              width="100%"
             >
               <Spinner thickness="3px" size={"md"} color="teal" />
             </Box>

@@ -3,14 +3,13 @@
 import {
   Box,
   Button,
-  Flex,
   Grid,
   GridItem,
   HStack,
   Heading,
   Spacer,
+  Spinner,
 } from "@chakra-ui/react";
-import Webcam from "react-webcam";
 import { currentUser } from "./LoginForm";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -23,35 +22,31 @@ import LoginSuccess from "../components/alerts/LoginSuccess";
 import CopyrightVersion from "../components/CopyrightVersion";
 import preventLoad from "../hooks/preventLoad";
 import preventAccess from "../hooks/preventAccess";
-import setBorder from "../hooks/setBorder";
 import CountDownApp from "../components/CountDownApp";
 
 import {
-  DefaultReconnectPolicy,
-  Participant,
   RemoteParticipant,
   RemoteTrack,
   RemoteTrackPublication,
   Room,
   RoomEvent,
   Track,
-  VideoPresets,
 } from "livekit-client";
-import { LiveKitRoom } from "@livekit/components-react";
 import { StreamsContext } from "../contexts/StreamContext";
 import patchData from "../hooks/patchData";
 import CheatDetectionAlert from "../components/alerts/CheatDetectionAlert";
 import StartExamButton from "../components/StartExamButton";
-import BackgroundTimerTracker from "../components/BackgroundTimerTracker";
 
 const TeacherHome = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [suspiciousUser, setSuspiciousUser] = useState(null);
+  const [componentLoading, setComponentLoading] = useState(true);
   const [itemClicked, setItemClicked] = useState(false);
+  const [recentJoinerId, setRecentJoinerId] = useState(null);
+  const [joinerTimestamps, setJoinerTimestamps] = useState({});
   const [userClicked, setUserClicked] = useState("");
   const { data, loading, error } = useUsers();
-
-  const [participants, setParticipants] = useState({});
   const [isConnected, setIsConnected] = useState(false);
   const [room, setRoom] = useState<Room | null>(null);
   const [streams, setStreams] = useState({});
@@ -60,6 +55,14 @@ const TeacherHome = () => {
   preventAccess("student");
 
   const [token, setToken] = useState(null);
+
+  const DEBOUNCE_DELAY = 2000; // 2 seconds
+
+  useEffect(() => {
+    setTimeout(() => {
+      setComponentLoading(false);
+    }, 1500);
+  }, []);
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -70,8 +73,8 @@ const TeacherHome = () => {
         if (!response.ok) {
           throw new Error("Network response was not ok " + response.statusText);
         }
-        const tokenData = await response.json(); // assuming the response is in JSON format
-        setToken(tokenData.token); // update the state with the fetched token
+        const tokenData = await response.json();
+        setToken(tokenData.token);
         // console.log(token);
       } catch (error) {
         console.error("Error fetching the token:", error);
@@ -160,18 +163,8 @@ const TeacherHome = () => {
     connectToRoom();
   }, [token !== null]);
 
-  // Cleanup event listeners on component unmount
-  // return () => {
-  //   if (room) {
-  //     room.off('participantConnected', handleParticipantConnected);
-  //     room.off('participantDisconnected', handleParticipantDisconnected);
-  //   }
-  // };
-
   useEffect(() => {
     if (isConnected) {
-      // Now, attempt to retrieve the room instance
-      // since 'room' is a state variable, it should hold the latest room instance here
       console.log("Current room instance:", room);
     }
   }, [isConnected]);
@@ -185,6 +178,67 @@ const TeacherHome = () => {
   useEffect(() => {
     setItemClicked(false);
   }, []);
+
+  useEffect(() => {
+    const now = Date.now();
+    let mostRecentId = recentJoinerId;
+    let mostRecentTime = joinerTimestamps[mostRecentId] || 0;
+
+    for (let user of data) {
+      if (streams[user.id] && user.id !== recentJoinerId) {
+        const thisUserTime = joinerTimestamps[user.id] || now;
+        setJoinerTimestamps((prev) => ({ ...prev, [user.id]: thisUserTime }));
+
+        if (thisUserTime > mostRecentTime) {
+          mostRecentTime = thisUserTime;
+          mostRecentId = user.id;
+        }
+      }
+    }
+
+    const handle = setTimeout(() => {
+      setRecentJoinerId(mostRecentId);
+    }, DEBOUNCE_DELAY);
+
+    return () => clearTimeout(handle);
+  }, [streams, data, recentJoinerId, joinerTimestamps]);
+
+  useEffect(() => {
+    const checkForSuspiciousUsers = () => {
+      if (data.find((user) => user.isSuspicious)) {
+        const foundUser = data.find((user) => user.isSuspicious === true);
+        setSuspiciousUser(foundUser);
+
+        setTimeout(() => {
+          //set back to null if nothing happens
+          patchData(
+            { isSuspicious: false },
+            "update_isSuspicious",
+            suspiciousUser.id
+          );
+          setSuspiciousUser(null);
+        }, 5000);
+      }
+    };
+
+    // Set up the interval to check for suspicious users every second
+    const intervalId = setInterval(() => {
+      checkForSuspiciousUsers();
+    }, 1000);
+
+    // Clear the interval when the component is unmounted
+    return () => clearInterval(intervalId);
+  }, [data]);
+
+  const cheatHandler = () => {
+    setItemClicked(true);
+    navigate(`/teacher/${suspiciousUser.id}`);
+    patchData(
+      { isSuspicious: false },
+      "update_isSuspicious",
+      suspiciousUser.id
+    );
+  };
 
   //
   return (
@@ -257,75 +311,103 @@ const TeacherHome = () => {
           <hr hidden={itemClicked ? false : true} />
         </Box>
         {/Android|iPhone/i.test(navigator.userAgent) ? <></> : <LoginSuccess />}
+        {suspiciousUser !== null && (
+          <CheatDetectionAlert
+            handleCheatDetectedWarning={cheatHandler}
+            user={suspiciousUser}
+          />
+        )}
         {/* The grid */}
-        <Grid
-          paddingTop={itemClicked ? "10px" : "0px"}
-          paddingLeft={"10px"}
-          paddingRight={"10px"}
-          templateColumns={
-            itemClicked
-              ? //this is for the small grids
-                {
-                  //this is responsive grid scaling for different sized devices
-                  lg: "repeat(10, 1fr)",
-                  md: "repeat(5, 1fr)",
-                  sm: "repeat(4, 1fr)",
+        {componentLoading ? (
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            height="50vh"
+          >
+            <Spinner thickness="4px" size={"xl"} color="teal" />
+          </Box>
+        ) : (
+          <Grid
+            paddingTop={itemClicked ? "10px" : "0px"}
+            paddingLeft={"10px"}
+            paddingRight={"10px"}
+            templateColumns={
+              itemClicked
+                ? //this is for the small grids
+                  {
+                    //this is responsive grid scaling for different sized devices
+                    lg: "repeat(10, 1fr)",
+                    md: "repeat(5, 1fr)",
+                    sm: "repeat(4, 1fr)",
+                  }
+                : {
+                    //this is responsive grid scaling for different sized devices
+                    lg: "repeat(5, 1fr)",
+                    md: "repeat(3, 1fr)",
+                    sm: "repeat(2, 1fr)",
+                  }
+            }
+            gap={4}
+            style={
+              itemClicked
+                ? { width: "calc(100% - 10px)", margin: "0 auto" }
+                : {}
+            }
+          >
+            {data
+              .sort((a, b) => {
+                if (a.id === recentJoinerId) return -1;
+                if (b.id === recentJoinerId) return 1;
+                return streams[b.id] ? 1 : streams[a.id] ? -1 : 0;
+              })
+              .map((user) => {
+                if (user.userType !== "student" || user.terminated === true) {
+                  return null;
                 }
-              : {
-                  //this is responsive grid scaling for different sized devices
-                  lg: "repeat(5, 1fr)",
-                  md: "repeat(3, 1fr)",
-                  sm: "repeat(2, 1fr)",
-                }
-          }
-          gap={4}
-          style={
-            itemClicked ? { width: "calc(100% - 10px)", margin: "0 auto" } : {}
-          }
-        >
-          {data
-            .sort((a, b) => (streams[b.id] ? 1 : streams[a.id] ? -1 : 0))
-            .map((user) => {
-              if (user.userType !== "student" || user.terminated === true) {
-                return null;
-              }
 
-              if (itemClicked && userClicked === user.name) {
-                return null; // This will not render the GridItem at all for the clicked user
-              }
-              return (
-                <GridItem
-                  _hover={
-                    // streams[user.id] && streams[user.id] !== "DISCONNECTED"
-                    //   ?
-                    {
-                      transform: "scale(1.03)", // Increase the scale when hovered
-                      transition: "transform 0.1s", // Smooth transition
+                if (itemClicked && userClicked === user.name) {
+                  return null; // This will not render the GridItem at all for the clicked user
+                }
+                return (
+                  <GridItem
+                    _hover={{
+                      transform: "scale(1.03)",
+                      transition: "transform 0.1s",
+                    }}
+                    borderRadius={"10px"}
+                    cursor={
+                      streams[user.id] && streams[user.id] !== "DISCONNECTED"
+                        ? "pointer"
+                        : "auto"
                     }
-                  }
-                  borderRadius={"10px"}
-                  cursor={
-                    streams[user.id] && streams[user.id] !== "DISCONNECTED"
-                      ? "pointer"
-                      : "auto"
-                  }
-                  key={user.id}
-                  onClick={() => {
-                    if (
-                      streams[user.id] &&
-                      streams[user.id] !== "DISCONNECTED"
-                    ) {
-                      setItemClicked(true);
-                      setUserClicked(user.name);
-                      navigate(`/teacher/${user.id}`); //opens teacher view for student on click
-                    }
-                  }}
-                >
-                  {itemClicked ? (
-                    userClicked === user.name ? (
-                      <></>
+                    key={user.id}
+                    onClick={() => {
+                      if (
+                        streams[user.id] &&
+                        streams[user.id] !== "DISCONNECTED"
+                      ) {
+                        setItemClicked(true);
+                        setUserClicked(user.name);
+                        navigate(`/teacher/${user.id}`); //opens teacher view for student on click
+                      }
+                    }}
+                  >
+                    {itemClicked ? (
+                      userClicked === user.name ? (
+                        <></>
+                      ) : (
+                        <StudentMiniCard
+                          name={user.name}
+                          ready={user.ready}
+                          warnings={user.warnings}
+                          id={user.id}
+                          loading={streams[user.id] ? false : true}
+                          disconnected={streams[user.id] === "DISCONNECTED"}
+                        />
+                      )
                     ) : (
-                      <StudentMiniCard
+                      <StudentCard
                         name={user.name}
                         ready={user.ready}
                         warnings={user.warnings}
@@ -333,21 +415,12 @@ const TeacherHome = () => {
                         loading={streams[user.id] ? false : true}
                         disconnected={streams[user.id] === "DISCONNECTED"}
                       />
-                    )
-                  ) : (
-                    <StudentCard
-                      name={user.name}
-                      ready={user.ready}
-                      warnings={user.warnings}
-                      id={user.id}
-                      loading={streams[user.id] ? false : true}
-                      disconnected={streams[user.id] === "DISCONNECTED"}
-                    />
-                  )}
-                </GridItem>
-              );
-            })}
-        </Grid>
+                    )}
+                  </GridItem>
+                );
+              })}
+          </Grid>
+        )}
         <CopyrightVersion bottomVal={0} />
       </>
     </StreamsContext.Provider>
