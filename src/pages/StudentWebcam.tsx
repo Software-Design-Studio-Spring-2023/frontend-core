@@ -383,6 +383,7 @@ const StudentWebcam = () => {
         </Box>
         <Heading padding={"10px"}>{currentUser.name}</Heading>
         <Spacer />
+        <CountDownApp />
         <Box paddingRight={"30px"}>
           <div hidden={ready ? false : true}>
             <EndExam handleTerminate={handleStopCapture} />
