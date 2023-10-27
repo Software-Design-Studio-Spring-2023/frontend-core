@@ -46,6 +46,7 @@ import "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
 import "@mediapipe/selfie_segmentation";
 import Webcam from "react-webcam";
+import CountDownApp from "../components/CountDownApp";
 
 let name = "";
 
@@ -550,6 +551,7 @@ const StudentWebcam = () => {
         </Box>
         <Heading padding={"10px"}>{currentUser.name}</Heading>
         <Spacer />
+        <CountDownApp />
         <Box paddingRight={"30px"}>
           <div hidden={ready ? false : true}>
             <EndExam handleTerminate={handleStopCapture} />
@@ -590,6 +592,7 @@ const StudentWebcam = () => {
                 marginLeft: "25%",
               }}
             ></canvas>
+
             <Webcam
               audio={false}
               height={720}

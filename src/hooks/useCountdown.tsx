@@ -9,19 +9,31 @@ import { useEffect, useState } from "react";
 export const useCountdown = (
   initialTime: number,
   callback: () => void,
-  interval = 1000
+  interval = 1000,
+  shouldStart: boolean
 ) => {
-  const [time, setTime] = useState(initialTime);
+  const [time, setTime] = useState(0);
 
   useEffect(() => {
+    if (shouldStart) {
+      setTime(initialTime);
+    }
+  }, [shouldStart]);
+
+  useEffect(() => {
+    if (!shouldStart) return;
+
     const customInterval = setInterval(() => {
       if (time > 0) setTime((prev) => prev - interval);
     }, interval);
 
-    if (time === 0) callback();
+    if (time === 0) {
+      callback();
+      clearInterval(customInterval);
+    }
 
     return () => clearInterval(customInterval);
-  }, [time]);
+  }, [time, shouldStart]);
 
   return time;
 };
