@@ -3,6 +3,7 @@ import { Button, Heading, Box } from "@chakra-ui/react";
 import CountDownApp from "./CountDownApp";
 import patchData from "../hooks/patchData";
 import useExams, { Exam } from "../hooks/useExams";
+import { currentUser } from "../pages/LoginForm";
 
 export var currentExam: Exam | undefined = {
   id: 0,
@@ -43,14 +44,16 @@ const StartExamButton = () => {
       <Box hidden={started ? false : true}>
         <CountDownApp></CountDownApp>
       </Box>
-      <Button
-        colorScheme={"red"}
-        isDisabled={loaded ? false : true}
-        hidden={started ? true : false}
-        onClick={handleStartExam}
-      >
-        Start Exam
-      </Button>
+      <Box hidden={currentUser.userType === "student" ? true : false}>
+        <Button
+          colorScheme={"red"}
+          isDisabled={loaded ? false : true}
+          hidden={started ? true : false}
+          onClick={handleStartExam}
+        >
+          Start Exam
+        </Button>
+      </Box>
     </>
   );
 };
