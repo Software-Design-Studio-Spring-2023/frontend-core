@@ -58,7 +58,7 @@ const StudentWebcam = () => {
   const webcamRef = useRef(null);
   const [faceVerified, setFaceVerified] = useState(false);
 
-  const [peopleVerified, setPeopleInvalid] = useState(false);
+  const [peopleInvalid, setPeopleInvalid] = useState(false);
   const [modelsLoaded, setModelsLoaded] = useState(false);
   const [room, setRoom] = useState<Room | null>(null);
   const { data, loading, error } = useUsers();
@@ -607,7 +607,7 @@ const StudentWebcam = () => {
         <Box hidden={componentLoading ? true : false}>
           <HStack hidden={ready ? true : false}>
             <Box>{`Face Verified: ${faceVerified ? "✅" : "❌"}`}</Box>
-            <Box>{`One Person: ${peopleVerified ? "❌" : "✅"}`}</Box>
+            <Box>{`One Person: ${peopleInvalid ? "❌" : "✅"}`}</Box>
             <Box>{`No Prohibited Items: ${phoneDetected ? "❌" : "✅"}`}</Box>
           </HStack>
         </Box>
@@ -619,7 +619,7 @@ const StudentWebcam = () => {
             hidden={ready ? true : false}
             isDisabled={
               faceVerified === false ||
-              peopleVerified === true ||
+              peopleInvalid === true ||
               phoneDetected === true
             }
             onClick={handleStartCapture}
