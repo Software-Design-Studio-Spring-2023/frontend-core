@@ -30,12 +30,12 @@ const StartExamButton = () => {
 
   const handleStartExam = () => {
     setStarted(true);
-    currentExam.has_started = started;
+    currentExam.has_started = true;
     const startTime = Date.now();
     currentExam.time_started = startTime;
     patchData({ time_started: startTime }, "update_started", 112);
     patchData({ has_started: true }, "update_exam", 112);
-    console.log(currentExam);
+    // console.log(currentExam);
   };
 
   return (

@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 import { useCountdown } from "../hooks/useCountdown";
-import { Heading } from "@chakra-ui/react";
+import { Heading, Box, HStack } from "@chakra-ui/react";
 
 import React, { Component } from "react";
 
@@ -14,27 +14,41 @@ import { currentExam } from "./StartExamButton";
 const initialTotalTimeMS = 3600000; //1 Hour
 
 export const CountDownApp = () => {
-  const [hasStarted, setHasStarted] = useState(false);
-  currentExam.has_started && setHasStarted(true);
-  const [timeTakeaway, setTimeTakeaway] = useState<number | null>(null);
-  const [startingTimeMS, setStartingTimeMS] = useState<number | null>(null);
+  const [timeTakeaway, setTimeTakeaway] = useState(null);
+  const [startingTimeMS, setStartingTimeMS] = useState(null);
 
   useEffect(() => {
-    if (hasStarted && timeTakeaway === null) {
+    if (currentExam.has_started === true && timeTakeaway === null) {
       const calculatedTimeTakeaway = Date.now() - currentExam.time_started;
+      console.log(calculatedTimeTakeaway);
       setTimeTakeaway(calculatedTimeTakeaway);
-      setStartingTimeMS(initialTotalTimeMS - calculatedTimeTakeaway);
+      const total = initialTotalTimeMS - calculatedTimeTakeaway;
+      console.log(total);
+
+      setStartingTimeMS(total);
     }
-  }, [hasStarted]);
+  }, [currentExam.has_started]);
 
-  const timeMS = useCountdown(startingTimeMS, () => console.log("Times up!!"));
+  const shouldStart = startingTimeMS !== null && startingTimeMS !== 0;
+  const timeMS = useCountdown(
+    startingTimeMS,
+    () => console.log("Times up!!"),
+    1000,
+    shouldStart
+  );
 
+  if (!startingTimeMS) {
+    return null;
+  }
   let timeTotalSeconds = timeMS / 1000;
   let timeTotalMinutes = Math.floor(timeTotalSeconds / 60);
   let timeTotalHours = Math.floor(timeTotalMinutes / 60);
 
   let displayMinutes = timeTotalMinutes % 60;
-  let displaySeconds = timeTotalSeconds % 60;
+  let displaySeconds = Math.round(timeTotalSeconds % 60);
+
+  let displaySecondsFormatted =
+    displaySeconds < 10 ? `0${displaySeconds}` : displaySeconds;
 
   const progressBarWidthPercentage = (timeMS / initialTotalTimeMS) * 100;
 
@@ -42,24 +56,25 @@ export const CountDownApp = () => {
     if (currentUser.userType === "student") {
       patchData({ terminated: true }, "update_terminate", currentUser.id);
     }
-    return <Heading>TIMES UP!</Heading>;
+    return <Heading marginRight={5}>TIMES UP!</Heading>;
   } else {
     return (
-      <Fragment>
-        <Heading>
-          {timeTotalHours} : {displayMinutes} : {displaySeconds}
-        </Heading>
-
-        <div className="progressbar-container">
-          <div className="progressbar">
-            <motion.div
-              className="bar"
-              animate={{ width: `${progressBarWidthPercentage}%` }}
-              transition={{ duration: timeTotalSeconds }}
-            />
+      <HStack marginRight={5}>
+        <Fragment>
+          <Heading>
+            {timeTotalHours} : {displayMinutes} : {displaySecondsFormatted}
+          </Heading>
+          <div className="progressbar-container">
+            <div className="progressbar">
+              <motion.div
+                className="bar"
+                animate={{ width: `${progressBarWidthPercentage}%` }}
+                transition={{ duration: timeTotalSeconds }}
+              />
+            </div>
           </div>
-        </div>
-      </Fragment>
+        </Fragment>
+      </HStack>
     );
   }
 };
