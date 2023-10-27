@@ -48,6 +48,8 @@ import "@mediapipe/selfie_segmentation";
 import Webcam from "react-webcam";
 import StartExamButton from "../components/StartExamButton";
 
+let name = "";
+
 const StudentWebcam = () => {
   let [phoneDetected, setPhoneDetected] = useState<boolean>(false);
   let [warnings, setWarnings] = useState<number>(0);
