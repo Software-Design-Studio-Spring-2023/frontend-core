@@ -137,7 +137,7 @@ const StudentWebcam = () => {
         }
       }
     } catch (error) {
-      console.error("Error during object detection:", error);
+      console.error("Error during object detection:", { error });
     }
   };
 
