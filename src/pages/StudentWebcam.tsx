@@ -46,10 +46,7 @@ import "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
 import "@mediapipe/selfie_segmentation";
 import Webcam from "react-webcam";
-import CountDownApp from "../components/CountDownApp";
 import StartExamButton from "../components/StartExamButton";
-
-let name = "";
 
 const StudentWebcam = () => {
   let [phoneDetected, setPhoneDetected] = useState<boolean>(false);
