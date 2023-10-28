@@ -43,7 +43,7 @@ export var currentUser: User | undefined = {
 }; //this is the logged in current user exported for the current sessiion, app-wide
 
 const LoginForm = () => {
-  preventLoad(true, true);
+  preventLoad(false, true);
   const navigate = useNavigate();
   const [failed, setFailed] = useState(false);
   const { data, loading, error } = useUsers();
