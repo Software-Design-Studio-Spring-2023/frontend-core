@@ -19,7 +19,13 @@ import WaitingRoom from "../components/alerts/WaitingRoom";
 import TimeDeduction from "../components/alerts/TimeDeduction";
 import CameraTip from "../components/alerts/CameraTip";
 import preventLoad from "../hooks/preventLoad";
-import * as faceapi from "face-api.js";
+import {
+  TinyFaceDetectorOptions,
+  detectAllFaces,
+  detectSingleFace,
+  euclideanDistance,
+  nets,
+} from "@vladmandic/face-api";
 
 import preventAccess from "../hooks/preventAccess";
 import { useNavigate } from "react-router-dom";
@@ -32,15 +38,23 @@ import {
 } from "livekit-client";
 import patchData from "../hooks/patchData";
 import useUsers from "../hooks/useUsers";
-import * as bodySegmentation from "@tensorflow-models/body-segmentation";
+import {
+  createSegmenter,
+  SupportedModels,
+  drawBokehEffect,
+} from "@tensorflow-models/body-segmentation";
+import { load } from "@tensorflow-models/coco-ssd";
+
 import "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
 import "@mediapipe/selfie_segmentation";
 import Webcam from "react-webcam";
+import StartExamButton from "../components/StartExamButton";
 
 let name = "";
 
 const StudentWebcam = () => {
+  let [phoneDetected, setPhoneDetected] = useState<boolean>(false);
   let [warnings, setWarnings] = useState<number>(0);
   let [terminated, setTerminated] = useState<boolean>(false);
   let [warningOne, setWarningOne] = useState<string>("");
@@ -48,7 +62,7 @@ const StudentWebcam = () => {
   const webcamRef = useRef(null);
   const [faceVerified, setFaceVerified] = useState(false);
 
-  const [peopleVerified, setPeopleVerified] = useState(false);
+  const [peopleInvalid, setPeopleInvalid] = useState(false);
   const [modelsLoaded, setModelsLoaded] = useState(false);
   const [room, setRoom] = useState<Room | null>(null);
   const { data, loading, error } = useUsers();
@@ -63,8 +77,79 @@ const StudentWebcam = () => {
   const [isOnePerson, setIsOnePerson] = useState(true);
 
   const navigate = useNavigate();
+  const [objectDetectionModel, setObjectDetectionModel] = useState(null);
 
   const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    // Function to load the model
+    const loadObjectDetectionModel = async () => {
+      try {
+        const model = await load();
+        setObjectDetectionModel(model); // Set the model into state
+      } catch (error) {
+        console.error("Failed to load the object detection model:", { error });
+      }
+    };
+    // Load the model`
+    loadObjectDetectionModel();
+  }, []);
+
+  const checkVideoFrameForObjects = async () => {
+    function containsHighConfidencePhone(entries: any[]) {
+      return entries.some(
+        (entry) => entry.class === "cell phone" && entry.score > 0.6
+      );
+    }
+
+    function containsMoreThanOnePerson(entries: any[]) {
+      return entries.filter((entry) => entry.class === "person").length > 1;
+    }
+
+    if (!objectDetectionModel || !webcamRef.current) {
+      return;
+    }
+
+    // Get video element from webcam reference
+    const video = webcamRef.current.video;
+
+    try {
+      // Now we can run the model on each frame we get from the video
+      const predictions = await objectDetectionModel.detect(video);
+
+      if (predictions.length > 0) {
+        // Here, you'd handle any objects detected. This could mean updating state,
+        // triggering alerts, or any other application logic.
+        console.log("Detected objects:", predictions);
+        if (containsHighConfidencePhone(predictions)) {
+          setPhoneDetected(true);
+          if (currentUser.ready) {
+            patchData(
+              { isSuspicious: true },
+              "update_isSuspicious",
+              currentUser.id
+            );
+          }
+        } else {
+          setPhoneDetected(false);
+        }
+        if (containsMoreThanOnePerson(predictions)) {
+          setPeopleInvalid(true);
+          if (currentUser.ready) {
+            patchData(
+              { isSuspicious: true },
+              "update_isSuspicious",
+              currentUser.id
+            );
+          }
+        } else {
+          setPeopleInvalid(false);
+        }
+      }
+    } catch (error) {
+      console.error("Error during object detection:", { error });
+    }
+  };
 
   useEffect(() => {
     setTimeout(() => {
@@ -142,10 +227,10 @@ const StudentWebcam = () => {
 
   useEffect(() => {
     async function loadModels() {
-      await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
-      await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
-      await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
-      await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
+      await nets.tinyFaceDetector.loadFromUri("/models");
+      await nets.ssdMobilenetv1.loadFromUri("/models");
+      await nets.faceLandmark68Net.loadFromUri("/models");
+      await nets.faceRecognitionNet.loadFromUri("/models");
       setModelsLoaded(true);
     }
     loadModels();
@@ -153,8 +238,7 @@ const StudentWebcam = () => {
 
   useEffect(() => {
     const computeReferenceDescriptor = async (imgElement) => {
-      const detections = await faceapi
-        .detectSingleFace(imgElement)
+      const detections = await detectSingleFace(imgElement)
         .withFaceLandmarks()
         .withFaceDescriptor();
       if (detections) {
@@ -177,8 +261,10 @@ const StudentWebcam = () => {
     const video = webcamRef.current?.video;
     if (!video) return;
 
-    const detections = await faceapi
-      .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+    const detections = await detectAllFaces(
+      video,
+      new TinyFaceDetectorOptions()
+    )
       .withFaceLandmarks()
       .withFaceDescriptors();
 
@@ -191,9 +277,9 @@ const StudentWebcam = () => {
           currentUser.id
         );
       } //patch data only if exam has started
-      setPeopleVerified(true);
+      setPeopleInvalid(true);
     } else {
-      setPeopleVerified(false);
+      setPeopleInvalid(false);
     }
 
     if (detections.length === 0) {
@@ -204,7 +290,7 @@ const StudentWebcam = () => {
     //facial recognition
     for (let detection of detections) {
       if (referenceDescriptor) {
-        const distance = faceapi.euclideanDistance(
+        const distance = euclideanDistance(
           referenceDescriptor,
           detection.descriptor
         );
@@ -235,14 +321,21 @@ const StudentWebcam = () => {
     return () => clearInterval(intervalId);
   }, [modelsLoaded, referenceDescriptor]);
 
+  useEffect(() => {
+    // You might adjust the interval as needed for performance reasons
+    const intervalId = setInterval(checkVideoFrameForObjects, 1000); // Check every second
+
+    return () => clearInterval(intervalId); // Cleanup interval on component unmount
+  }, [objectDetectionModel, webcamRef]); // Dependencies ensure useEffect reruns if they change
+
   //blurring function
   const applyBokehEffect = useCallback(async () => {
     const video = webcamRef.current?.video;
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
 
-    const segmenter = await bodySegmentation.createSegmenter(
-      bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation,
+    const segmenter = await createSegmenter(
+      SupportedModels.MediaPipeSelfieSegmentation,
       {
         runtime: "mediapipe",
         solutionPath:
@@ -285,7 +378,7 @@ const StudentWebcam = () => {
         return;
       }
       //blur the background
-      await bodySegmentation.drawBokehEffect(
+      await drawBokehEffect(
         canvas,
         video,
         segmentation,
@@ -477,6 +570,7 @@ const StudentWebcam = () => {
         </Box>
         <Heading padding={"10px"}>{currentUser.name}</Heading>
         <Spacer />
+        <StartExamButton />
         <Box paddingRight={"30px"}>
           <div hidden={ready ? false : true}>
             <EndExam handleTerminate={handleStopCapture} />
@@ -517,6 +611,7 @@ const StudentWebcam = () => {
                 marginLeft: "25%",
               }}
             ></canvas>
+
             <Webcam
               audio={false}
               height={720}
@@ -541,7 +636,8 @@ const StudentWebcam = () => {
         <Box hidden={componentLoading ? true : false}>
           <HStack hidden={ready ? true : false}>
             <Box>{`Face Verified: ${faceVerified ? "✅" : "❌"}`}</Box>
-            <Box>{`One Person: ${peopleVerified ? "❌" : "✅"}`}</Box>
+            <Box>{`One Person: ${peopleInvalid ? "❌" : "✅"}`}</Box>
+            <Box>{`No Prohibited Items: ${phoneDetected ? "❌" : "✅"}`}</Box>
           </HStack>
         </Box>
         <Box hidden={componentLoading ? true : false}>
@@ -550,7 +646,11 @@ const StudentWebcam = () => {
             variant="solid"
             padding={"10px"}
             hidden={ready ? true : false}
-            isDisabled={faceVerified === false || peopleVerified === true}
+            isDisabled={
+              faceVerified === false ||
+              peopleInvalid === true ||
+              phoneDetected === true
+            }
             onClick={handleStartCapture}
           >
             {"Ready"}
