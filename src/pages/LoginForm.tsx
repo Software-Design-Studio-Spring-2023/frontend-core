@@ -23,6 +23,7 @@ import AlreadyLoggedIn from "../components/alerts/AlreadyLoggedIn";
 import ExamStartedError from "../components/alerts/ExamStartedError";
 import patchData from "../hooks/patchData";
 import CopyrightVersion from "../components/CopyrightVersion";
+import preventLoad from "../hooks/preventLoad";
 
 export var currentUser: User | undefined = {
   id: 0,
@@ -42,6 +43,7 @@ export var currentUser: User | undefined = {
 }; //this is the logged in current user exported for the current sessiion, app-wide
 
 const LoginForm = () => {
+  preventLoad(true, true);
   const navigate = useNavigate();
   const [failed, setFailed] = useState(false);
   const { data, loading, error } = useUsers();
