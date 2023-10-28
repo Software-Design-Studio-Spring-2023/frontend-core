@@ -49,7 +49,7 @@ const TimeDeduction = () => {
           <AlertIcon />
           <AlertTitle mr={2}>Your exam has started.</AlertTitle>
           <AlertDescription flex="1">
-            You are now deducting form your available exam time. Ensure you meet all the requirements and your exam will immediately commence.
+            You are now deducting from your available exam time. Ensure you meet all the requirements, and press "Ready" to commence immediately.
           </AlertDescription>
         </Alert>
         <Progress
