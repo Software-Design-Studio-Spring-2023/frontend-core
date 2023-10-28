@@ -15,6 +15,9 @@ import LoginSuccess from "../components/alerts/LoginSuccess";
 import WarningOne from "../components/alerts/WarningOne";
 import WarningTwo from "../components/alerts/WarningTwo";
 import CopyrightVersion from "../components/CopyrightVersion";
+import WaitingRoom from "../components/alerts/WaitingRoom";
+import TimeDeduction from "../components/alerts/TimeDeduction";
+import CameraTip from "../components/alerts/CameraTip";
 import preventLoad from "../hooks/preventLoad";
 import {
   TinyFaceDetectorOptions,
@@ -46,7 +49,8 @@ import "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
 import "@mediapipe/selfie_segmentation";
 import Webcam from "react-webcam";
-import StartExamButton from "../components/StartExamButton";
+import StartExamButton, { currentExam } from "../components/StartExamButton";
+import ExamStarted from "../components/alerts/ExamStarted";
 
 let name = "";
 
@@ -67,6 +71,12 @@ const StudentWebcam = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [componentLoading, setComponentLoading] = useState(true);
   const [ready, isReady] = useState<boolean>(false);
+  const [lkParticipant, setLkParticipant] = useState<any>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [isFaceVerified, setIsFaceVerified] = useState(false);
+  const [showCameraTip, setShowCameraTip] = useState(false);
+  const [isOnePerson, setIsOnePerson] = useState(true);
+
   const navigate = useNavigate();
   const [objectDetectionModel, setObjectDetectionModel] = useState(null);
 
@@ -114,7 +124,7 @@ const StudentWebcam = () => {
         console.log("Detected objects:", predictions);
         if (containsHighConfidencePhone(predictions)) {
           setPhoneDetected(true);
-          if (currentUser.ready) {
+          if (currentUser.ready && !currentUser.terminated) {
             patchData(
               { isSuspicious: true },
               "update_isSuspicious",
@@ -126,7 +136,7 @@ const StudentWebcam = () => {
         }
         if (containsMoreThanOnePerson(predictions)) {
           setPeopleInvalid(true);
-          if (currentUser.ready) {
+          if (currentUser.ready && !currentUser.terminated) {
             patchData(
               { isSuspicious: true },
               "update_isSuspicious",
@@ -147,6 +157,16 @@ const StudentWebcam = () => {
       setComponentLoading(false);
     }, 1500);
   }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!isFaceVerified || !isOnePerson) {
+        setShowCameraTip(true);
+      }
+    }, 10000); // 10 seconds
+
+    return () => clearTimeout(timer);
+  }, [isFaceVerified, isOnePerson]);
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -251,7 +271,7 @@ const StudentWebcam = () => {
 
     if (detections.length > 1 || detections.length === 0) {
       // more than one person detected
-      if (currentUser.ready === true) {
+      if (currentUser.ready === true && !currentUser.terminated) {
         patchData(
           { isSuspicious: true },
           "update_isSuspicious",
@@ -283,7 +303,7 @@ const StudentWebcam = () => {
           console.log(`No match found for ${currentUser.name}`);
           setFaceVerified(false);
           //patch data only if examinee is ready
-          if (currentUser.ready === true) {
+          if (currentUser.ready === true && !currentUser.terminated) {
             patchData(
               { isSuspicious: true },
               "update_isSuspicious",
@@ -641,6 +661,14 @@ const StudentWebcam = () => {
           <LoginSuccess />
           {warnings === 1 && <WarningOne user={currentUser} />}
           {warnings === 2 && <WarningTwo user={currentUser} />}
+          {/* add warning related to lighting conditions */}
+          {showCameraTip && !currentUser.ready && <CameraTip />}
+          {/* add warnings for students who are exam ready */}
+          {!currentExam.has_started && currentUser.ready && <WaitingRoom />}
+          {currentExam.has_started && <ExamStarted />}
+          {/* add warnings for students who are late to exam such as delayed verification */}
+          {currentExam.has_started && !currentUser.ready && <TimeDeduction />}
+          <TimeDeduction />
         </Box>
         <CopyrightVersion bottomVal={-2} />
       </VStack>
