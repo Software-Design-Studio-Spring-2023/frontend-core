@@ -124,7 +124,12 @@ const StudentWebcam = () => {
         console.log("Detected objects:", predictions);
         if (containsHighConfidencePhone(predictions)) {
           setPhoneDetected(true);
-          if (currentUser.ready && !currentUser.terminated) {
+          currentUser.isSuspicious = true;
+          if (
+            currentUser.isSuspicious === true &&
+            currentUser.ready === true &&
+            currentUser.terminated === false
+          ) {
             patchData(
               { isSuspicious: true },
               "update_isSuspicious",
@@ -132,11 +137,19 @@ const StudentWebcam = () => {
             );
           }
         } else {
+          currentUser.isSuspicious = false;
+
           setPhoneDetected(false);
         }
         if (containsMoreThanOnePerson(predictions)) {
           setPeopleInvalid(true);
-          if (currentUser.ready && !currentUser.terminated) {
+          currentUser.isSuspicious = true;
+
+          if (
+            currentUser.isSuspicious === true &&
+            currentUser.ready === true &&
+            currentUser.terminated === false
+          ) {
             patchData(
               { isSuspicious: true },
               "update_isSuspicious",
@@ -144,6 +157,7 @@ const StudentWebcam = () => {
             );
           }
         } else {
+          currentUser.isSuspicious = false;
           setPeopleInvalid(false);
         }
       }
@@ -271,7 +285,12 @@ const StudentWebcam = () => {
 
     if (detections.length > 1 || detections.length === 0) {
       // more than one person detected
-      if (currentUser.ready === true && !currentUser.terminated) {
+      currentUser.isSuspicious = true;
+      if (
+        currentUser.isSuspicious === true &&
+        currentUser.ready === true &&
+        currentUser.terminated === false
+      ) {
         patchData(
           { isSuspicious: true },
           "update_isSuspicious",
@@ -280,11 +299,15 @@ const StudentWebcam = () => {
       } //patch data only if exam has started
       setPeopleInvalid(true);
     } else {
+      currentUser.isSuspicious = false;
+
       setPeopleInvalid(false);
     }
 
     if (detections.length === 0) {
       //no people means no face :)
+      currentUser.isSuspicious = false;
+
       setFaceVerified(false);
     }
 
@@ -302,8 +325,13 @@ const StudentWebcam = () => {
         } else {
           console.log(`No match found for ${currentUser.name}`);
           setFaceVerified(false);
+          currentUser.isSuspicious = true;
           //patch data only if examinee is ready
-          if (currentUser.ready === true && !currentUser.terminated) {
+          if (
+            currentUser.isSuspicious === true &&
+            currentUser.ready === true &&
+            currentUser.terminated === false
+          ) {
             patchData(
               { isSuspicious: true },
               "update_isSuspicious",
@@ -314,7 +342,7 @@ const StudentWebcam = () => {
       }
     }
   };
-
+  console.log(currentUser);
   useEffect(() => {
     if (!modelsLoaded || !referenceDescriptor) return;
 
@@ -657,18 +685,21 @@ const StudentWebcam = () => {
             {"Ready"}
           </Button>
         </Box>
-        <Box width={"75%"}>
+        <Box width={"90%"}>
           <LoginSuccess />
           {warnings === 1 && <WarningOne user={currentUser} />}
           {warnings === 2 && <WarningTwo user={currentUser} />}
           {/* add warning related to lighting conditions */}
-          {showCameraTip && !currentUser.ready && <CameraTip />}
+          {showCameraTip && currentUser.ready === false && <CameraTip />}
           {/* add warnings for students who are exam ready */}
-          {!currentExam.has_started && currentUser.ready && <WaitingRoom />}
-          {currentExam.has_started && <ExamStarted />}
+          {currentExam.has_started === false && currentUser.ready === true && (
+            <WaitingRoom />
+          )}
+          {currentExam.has_started === true && <ExamStarted />}
           {/* add warnings for students who are late to exam such as delayed verification */}
-          {currentExam.has_started && !currentUser.ready && <TimeDeduction />}
-          <TimeDeduction />
+          {currentExam.has_started === true && currentUser.ready === false && (
+            <TimeDeduction />
+          )}
         </Box>
         <CopyrightVersion bottomVal={-2} />
       </VStack>
