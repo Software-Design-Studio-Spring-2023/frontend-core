@@ -49,7 +49,8 @@ import "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
 import "@mediapipe/selfie_segmentation";
 import Webcam from "react-webcam";
-import StartExamButton from "../components/StartExamButton";
+import StartExamButton, { currentExam } from "../components/StartExamButton";
+import ExamStarted from "../components/alerts/ExamStarted";
 
 let name = "";
 
@@ -123,7 +124,7 @@ const StudentWebcam = () => {
         console.log("Detected objects:", predictions);
         if (containsHighConfidencePhone(predictions)) {
           setPhoneDetected(true);
-          if (currentUser.ready) {
+          if (currentUser.ready && !currentUser.terminated) {
             patchData(
               { isSuspicious: true },
               "update_isSuspicious",
@@ -135,7 +136,7 @@ const StudentWebcam = () => {
         }
         if (containsMoreThanOnePerson(predictions)) {
           setPeopleInvalid(true);
-          if (currentUser.ready) {
+          if (currentUser.ready && !currentUser.terminated) {
             patchData(
               { isSuspicious: true },
               "update_isSuspicious",
@@ -163,10 +164,10 @@ const StudentWebcam = () => {
         setShowCameraTip(true);
       }
     }, 10000); // 10 seconds
-  
+
     return () => clearTimeout(timer);
   }, [isFaceVerified, isOnePerson]);
-  
+
   useEffect(() => {
     const fetchToken = async () => {
       try {
@@ -270,7 +271,7 @@ const StudentWebcam = () => {
 
     if (detections.length > 1 || detections.length === 0) {
       // more than one person detected
-      if (currentUser.ready === true) {
+      if (currentUser.ready === true && !currentUser.terminated) {
         patchData(
           { isSuspicious: true },
           "update_isSuspicious",
@@ -302,7 +303,7 @@ const StudentWebcam = () => {
           console.log(`No match found for ${currentUser.name}`);
           setFaceVerified(false);
           //patch data only if examinee is ready
-          if (currentUser.ready === true) {
+          if (currentUser.ready === true && !currentUser.terminated) {
             patchData(
               { isSuspicious: true },
               "update_isSuspicious",
@@ -661,12 +662,12 @@ const StudentWebcam = () => {
           {warnings === 1 && <WarningOne user={currentUser} />}
           {warnings === 2 && <WarningTwo user={currentUser} />}
           {/* add warning related to lighting conditions */}
-          {showCameraTip && ( 
-            <CameraTip />
-          )}
+          {showCameraTip && !currentUser.ready && <CameraTip />}
           {/* add warnings for students who are exam ready */}
-          <WaitingRoom />
+          {!currentExam.has_started && currentUser.ready && <WaitingRoom />}
+          {currentExam.has_started && <ExamStarted />}
           {/* add warnings for students who are late to exam such as delayed verification */}
+          {currentExam.has_started && !currentUser.ready && <TimeDeduction />}
           <TimeDeduction />
         </Box>
         <CopyrightVersion bottomVal={-2} />
