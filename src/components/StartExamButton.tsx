@@ -5,10 +5,6 @@ import patchData from "../hooks/patchData";
 import useExams, { Exam } from "../hooks/useExams";
 import { currentUser } from "../pages/LoginForm";
 
-export var examBool = {
-  has_started: false,
-};
-
 const StartExamButton = () => {
   const { data, loading, error } = useExams();
   const [started, setStarted] = useState(false);
@@ -34,10 +30,6 @@ const StartExamButton = () => {
     patchData({ has_started: true }, "update_exam", 112);
     // console.log(currentExam);
   };
-
-  if (started === true) {
-    examBool.has_started = true;
-  }
 
   return (
     <>

@@ -51,7 +51,6 @@ import "@mediapipe/selfie_segmentation";
 import Webcam from "react-webcam";
 import ExamStarted from "../components/alerts/ExamStarted";
 import CountDownApp from "../components/CountDownApp";
-import { examBool } from "../components/StartExamButton";
 
 let name = "";
 
