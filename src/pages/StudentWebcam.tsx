@@ -51,6 +51,7 @@ import "@mediapipe/selfie_segmentation";
 import Webcam from "react-webcam";
 import ExamStarted from "../components/alerts/ExamStarted";
 import CountDownApp from "../components/CountDownApp";
+import { examStarted } from "../components/CountDownApp";
 
 let name = "";
 
@@ -689,17 +690,17 @@ const StudentWebcam = () => {
           <LoginSuccess />
           {warnings === 1 && <WarningOne user={currentUser} />}
           {warnings === 2 && <WarningTwo user={currentUser} />}
-          {/*  commented out due to bug
+
           {showCameraTip && currentUser.ready === false && <CameraTip />}
 
-          {examBool.has_started === false && currentUser.ready === true && (
+          {examStarted === false && currentUser.ready === true && (
             <WaitingRoom />
           )}
-          {examBool.has_started === true && <ExamStarted />}
+          {examStarted === true && <ExamStarted />}
 
-          {examBool.has_started === true && currentUser.ready === false && (
+          {examStarted === true && currentUser.ready === false && (
             <TimeDeduction />
-          )} */}
+          )}
         </Box>
         <CopyrightVersion bottomVal={-2} />
       </VStack>

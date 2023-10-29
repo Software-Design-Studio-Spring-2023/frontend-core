@@ -11,6 +11,8 @@ import useExams, { Exam } from "../hooks/useExams";
 
 const initialTotalTimeMS = 3600000; //1 Hour
 
+export var examStarted: boolean;
+
 export const CountDownApp = () => {
   const { data, loading, error } = useExams();
 
@@ -27,6 +29,7 @@ export const CountDownApp = () => {
       setLoaded(true);
       if (examFromData.has_started) {
         setStarted(true);
+        examStarted = true;
       }
     }
   }, [data]);
