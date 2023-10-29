@@ -53,7 +53,13 @@ export const CountDownApp = () => {
   const shouldStart = startingTimeMS !== null && startingTimeMS !== 0;
   const timeMS = useCountdown(
     startingTimeMS,
-    () => console.log("Times up!!"),
+    () => {
+      console.log("Times up!!");
+      // terminate student when time is up
+      if (currentUser.userType === "student") {
+        patchData({ terminated: true }, "update_terminate", currentUser.id);
+      }
+    },
     1000,
     shouldStart
   );
@@ -94,9 +100,6 @@ export const CountDownApp = () => {
   const progressBarWidthPercentage = (timeMS / initialTotalTimeMS) * 100;
 
   if (displayMinutes === 0 && displaySeconds === 0 && timeTotalHours === 0) {
-    if (currentUser.userType === "student") {
-      patchData({ terminated: true }, "update_terminate", currentUser.id);
-    }
     return <Heading marginRight={5}>TIMES UP!</Heading>;
   } else {
     return (

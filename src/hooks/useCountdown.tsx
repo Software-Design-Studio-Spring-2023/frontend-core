@@ -12,7 +12,7 @@ export const useCountdown = (
   interval = 1000,
   shouldStart: boolean
 ) => {
-  const [time, setTime] = useState(0);
+  const [time, setTime] = useState(initialTime);
 
   useEffect(() => {
     if (shouldStart) {
