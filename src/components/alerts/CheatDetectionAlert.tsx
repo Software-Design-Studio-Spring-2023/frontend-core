@@ -34,8 +34,11 @@ const CheatDetectionAlert = ({ handleCheatDetectedWarning, user }: Props) => {
   };
 
   useEffect(() => {
-    onOpen();
     patchData({ isSuspicious: false }, "update_isSuspicious", user.id);
+  }, []); //patch suspicious right away to prevent spam
+
+  useEffect(() => {
+    onOpen();
     const interval = 10; // update every 10ms
     const totalDuration = 5000; // 5 seconds in total
 
