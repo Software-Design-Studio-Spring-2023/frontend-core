@@ -9,7 +9,7 @@ import { currentUser } from "../pages/LoginForm";
 import patchData from "../hooks/patchData";
 import useExams, { Exam } from "../hooks/useExams";
 
-const initialTotalTimeMS = 3600000; //1 Hour
+const initialTotalTimeMS = 3603000; //1 Hour
 
 export var examStarted: boolean;
 
