@@ -696,7 +696,9 @@ const StudentWebcam = () => {
           {examStarted === false && currentUser.ready === true && (
             <WaitingRoom />
           )}
-          {examStarted === true && <ExamStarted />}
+          {examStarted === true && currentUser.ready === true && (
+            <ExamStarted />
+          )}
 
           {examStarted === true && currentUser.ready === false && (
             <TimeDeduction />
