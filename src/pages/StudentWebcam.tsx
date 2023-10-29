@@ -690,17 +690,17 @@ const StudentWebcam = () => {
           <LoginSuccess />
           {warnings === 1 && <WarningOne user={currentUser} />}
           {warnings === 2 && <WarningTwo user={currentUser} />}
-          {/* add warning related to lighting conditions */}
+          {/*  commented out due to bug
           {showCameraTip && currentUser.ready === false && <CameraTip />}
-          {/* add warnings for students who are exam ready */}
+
           {examBool.has_started === false && currentUser.ready === true && (
             <WaitingRoom />
           )}
           {examBool.has_started === true && <ExamStarted />}
-          {/* add warnings for students who are late to exam such as delayed verification */}
+
           {examBool.has_started === true && currentUser.ready === false && (
             <TimeDeduction />
-          )}
+          )} */}
         </Box>
         <CopyrightVersion bottomVal={-2} />
       </VStack>
