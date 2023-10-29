@@ -5,11 +5,8 @@ import patchData from "../hooks/patchData";
 import useExams, { Exam } from "../hooks/useExams";
 import { currentUser } from "../pages/LoginForm";
 
-export var currentExam: Exam | undefined = {
-  id: 0,
-  examName: "",
+export var examBool = {
   has_started: false,
-  time_started: 0,
 };
 
 const StartExamButton = () => {
@@ -20,7 +17,6 @@ const StartExamButton = () => {
   useEffect(() => {
     const examFromData = data && data.find((obj) => obj.id === 112);
     if (examFromData) {
-      currentExam = examFromData;
       setLoaded(true);
       if (examFromData.has_started) {
         setStarted(true);
@@ -31,19 +27,24 @@ const StartExamButton = () => {
 
   const handleStartExam = () => {
     setStarted(true);
-    currentExam.has_started = true;
+
     const startTime = Date.now();
-    currentExam.time_started = startTime;
+
     patchData({ time_started: startTime }, "update_started", 112);
     patchData({ has_started: true }, "update_exam", 112);
     // console.log(currentExam);
   };
+
+  if (started === true) {
+    examBool.has_started = true;
+  }
 
   return (
     <>
       <Box hidden={started ? false : true}>
         <CountDownApp></CountDownApp>
       </Box>
+
       <Box hidden={currentUser.userType === "student" ? true : false}>
         <Button
           colorScheme={"red"}

@@ -49,8 +49,9 @@ import "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
 import "@mediapipe/selfie_segmentation";
 import Webcam from "react-webcam";
-import StartExamButton, { currentExam } from "../components/StartExamButton";
 import ExamStarted from "../components/alerts/ExamStarted";
+import CountDownApp from "../components/CountDownApp";
+import { examBool } from "../components/StartExamButton";
 
 let name = "";
 
@@ -599,7 +600,7 @@ const StudentWebcam = () => {
         </Box>
         <Heading padding={"10px"}>{currentUser.name}</Heading>
         <Spacer />
-        <StartExamButton />
+        <CountDownApp />
         <Box paddingRight={"30px"}>
           <div hidden={ready ? false : true}>
             <EndExam handleTerminate={handleStopCapture} />
@@ -692,12 +693,12 @@ const StudentWebcam = () => {
           {/* add warning related to lighting conditions */}
           {showCameraTip && currentUser.ready === false && <CameraTip />}
           {/* add warnings for students who are exam ready */}
-          {currentExam.has_started === false && currentUser.ready === true && (
+          {examBool.has_started === false && currentUser.ready === true && (
             <WaitingRoom />
           )}
-          {currentExam.has_started === true && <ExamStarted />}
+          {examBool.has_started === true && <ExamStarted />}
           {/* add warnings for students who are late to exam such as delayed verification */}
-          {currentExam.has_started === true && currentUser.ready === false && (
+          {examBool.has_started === true && currentUser.ready === false && (
             <TimeDeduction />
           )}
         </Box>

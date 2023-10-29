@@ -7,16 +7,36 @@ import { motion } from "framer-motion";
 import "./progressbar.css";
 import { currentUser } from "../pages/LoginForm";
 import patchData from "../hooks/patchData";
-import { currentExam } from "./StartExamButton";
+import useExams, { Exam } from "../hooks/useExams";
 
 const initialTotalTimeMS = 3600000; //1 Hour
 
 export const CountDownApp = () => {
+  const { data, loading, error } = useExams();
+
   const [timeTakeaway, setTimeTakeaway] = useState(null);
   const [startingTimeMS, setStartingTimeMS] = useState(null);
+  const [currentExam, setCurrentExam] = useState<Exam | undefined>(null);
+  const [loaded, setLoaded] = useState(false);
+  const [started, setStarted] = useState(false);
 
   useEffect(() => {
-    if (currentExam.has_started === true && timeTakeaway === null) {
+    const examFromData = data && data.find((obj) => obj.id === 112);
+    if (examFromData) {
+      setCurrentExam(examFromData);
+      setLoaded(true);
+      if (examFromData.has_started) {
+        setStarted(true);
+      }
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (
+      currentExam &&
+      currentExam.has_started === true &&
+      timeTakeaway === null
+    ) {
       const calculatedTimeTakeaway = Date.now() - currentExam.time_started;
       if (calculatedTimeTakeaway <= 0) {
         setTimeTakeaway(0);
@@ -28,7 +48,7 @@ export const CountDownApp = () => {
 
       setStartingTimeMS(total);
     }
-  }, [currentExam.has_started]);
+  }, [currentExam?.has_started]);
 
   const shouldStart = startingTimeMS !== null && startingTimeMS !== 0;
   const timeMS = useCountdown(
