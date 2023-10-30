@@ -206,7 +206,9 @@ const TeacherHome = () => {
   useEffect(() => {
     const checkForSuspiciousUsers = () => {
       if (data.find((user) => user.isSuspicious)) {
-        const foundUser = data.find((user) => user.isSuspicious === true);
+        const foundUser = data.find(
+          (user) => user.isSuspicious === true && user.terminated === false
+        );
         setSuspiciousUser(foundUser);
 
         setTimeout(() => {
