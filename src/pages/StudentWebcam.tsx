@@ -664,7 +664,7 @@ const StudentWebcam = () => {
           </div>
         </Box>
         <Box hidden={componentLoading ? true : false}>
-          <HStack hidden={ready ? true : false}>
+          <HStack>
             <Box>{`Face Verified: ${faceVerified ? "✅" : "❌"}`}</Box>
             <Box>{`One Person: ${peopleInvalid ? "❌" : "✅"}`}</Box>
             <Box>{`No Prohibited Items: ${phoneDetected ? "❌" : "✅"}`}</Box>
